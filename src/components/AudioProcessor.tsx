@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -11,11 +11,15 @@ import { Track } from './TrackList';
 import { toast } from '@/components/ui/sonner';
 import StepDisplay from './StepDisplay';
 import { calculateBPM, detectKey } from '@/lib/utils';
+import { processingApi } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
 
 interface AudioProcessorProps {
   selectedTrack: Track | null;
   isProcessing: boolean;
   onSeparate: (options: SeparationOptions) => void;
+  analysisResult: AnalysisResult | null;
+  onAnalyze: (trackId: string) => void;
 }
 
 export interface SeparationOptions {
@@ -37,9 +41,15 @@ export interface AnalysisResult {
   }[];
 }
 
-export default function AudioProcessor({ selectedTrack, isProcessing, onSeparate }: AudioProcessorProps) {
+export default function AudioProcessor({ 
+  selectedTrack, 
+  isProcessing, 
+  onSeparate,
+  analysisResult,
+  onAnalyze
+}: AudioProcessorProps) {
   const [separationOptions, setSeparationOptions] = useState<SeparationOptions>({
-    model: 'demucs',
+    model: 'htdemucs',
     extractVocals: true,
     extractBass: true,
     extractDrums: true,
@@ -48,7 +58,36 @@ export default function AudioProcessor({ selectedTrack, isProcessing, onSeparate
   
   const [volume, setVolume] = useState<number[]>([75]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  
+  // Fetch available models
+  const { data: models = [] } = useQuery({
+    queryKey: ['processingModels'],
+    queryFn: async () => {
+      try {
+        const response = await processingApi.getModels();
+        return response;
+      } catch (error) {
+        console.error('Error fetching models:', error);
+        return [];
+      }
+    },
+    enabled: !!selectedTrack, // Only run when a track is selected
+  });
+
+  // Set first available model when models are loaded and none is selected
+  useEffect(() => {
+    if (models.length > 0 && !models.some(m => m.id === separationOptions.model)) {
+      // Try to find the default model first
+      const defaultModel = models.find(m => m.isDefault && m.installed);
+      
+      if (defaultModel) {
+        setSeparationOptions(prev => ({ ...prev, model: defaultModel.id }));
+      } else if (models[0]) {
+        // Otherwise use the first available model
+        setSeparationOptions(prev => ({ ...prev, model: models[0].id }));
+      }
+    }
+  }, [models, separationOptions.model]);
 
   const handleSeparate = () => {
     if (!selectedTrack) {
@@ -76,31 +115,8 @@ export default function AudioProcessor({ selectedTrack, isProcessing, onSeparate
     setIsAnalyzing(true);
     toast.info(`Analyzing "${selectedTrack.title}"...`);
     
-    // In a real app, this would call a backend API for audio analysis
-    // For now, let's simulate the analysis with a delay and random data
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Parse duration from string format like "3:22" to seconds
-      const [minutes, seconds] = selectedTrack.duration.split(':').map(Number);
-      const duration = minutes * 60 + seconds;
-      
-      // Generate simulated analysis result
-      const result: AnalysisResult = {
-        bpm: calculateBPM([]),
-        key: detectKey([]),
-        loudness: Math.floor(Math.random() * -20) - 3, // Random value between -23 and -3 dB
-        cuePoints: [
-          { time: 0, label: 'Intro', type: 'intro' },
-          { time: Math.floor(duration * 0.2), label: 'Verse 1', type: 'verse' },
-          { time: Math.floor(duration * 0.4), label: 'Chorus', type: 'chorus' },
-          { time: Math.floor(duration * 0.6), label: 'Verse 2', type: 'verse' },
-          { time: Math.floor(duration * 0.8), label: 'Outro', type: 'outro' }
-        ]
-      };
-      
-      setAnalysisResult(result);
-      toast.success(`Analysis complete for "${selectedTrack.title}"`);
+      onAnalyze(selectedTrack.id);
     } catch (error) {
       toast.error('Failed to analyze track');
       console.error('Error analyzing track:', error);
@@ -143,20 +159,35 @@ export default function AudioProcessor({ selectedTrack, isProcessing, onSeparate
               <div>
                 <Label>Separation Model</Label>
                 <div className="flex gap-2 mt-2">
-                  <Button 
-                    variant={separationOptions.model === 'demucs' ? "default" : "outline"}
-                    onClick={() => setSeparationOptions({...separationOptions, model: 'demucs'})}
-                    className="flex-1"
-                  >
-                    Demucs
-                  </Button>
-                  <Button 
-                    variant={separationOptions.model === 'htdemucs' ? "default" : "outline"}
-                    onClick={() => setSeparationOptions({...separationOptions, model: 'htdemucs'})}
-                    className="flex-1"
-                  >
-                    HTDemucs
-                  </Button>
+                  {models.length > 0 ? (
+                    models.filter(model => model.installed).map(model => (
+                      <Button 
+                        key={model.id}
+                        variant={separationOptions.model === model.id ? "default" : "outline"}
+                        onClick={() => setSeparationOptions({...separationOptions, model: model.id})}
+                        className="flex-1"
+                      >
+                        {model.name}
+                      </Button>
+                    ))
+                  ) : (
+                    <>
+                      <Button 
+                        variant={separationOptions.model === 'htdemucs' ? "default" : "outline"}
+                        onClick={() => setSeparationOptions({...separationOptions, model: 'htdemucs'})}
+                        className="flex-1"
+                      >
+                        HTDemucs
+                      </Button>
+                      <Button 
+                        variant={separationOptions.model === 'mdx_extra' ? "default" : "outline"}
+                        onClick={() => setSeparationOptions({...separationOptions, model: 'mdx_extra'})}
+                        className="flex-1"
+                      >
+                        MDX-Extra
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
 

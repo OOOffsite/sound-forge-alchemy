@@ -1,8 +1,9 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from '@/components/ui/sonner';
+import { spotifyApi } from '@/lib/api';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface SpotifyInputProps {
   onFetchPlaylist: (url: string) => void;
@@ -11,8 +12,9 @@ interface SpotifyInputProps {
 
 export default function SpotifyInput({ onFetchPlaylist, isLoading }: SpotifyInputProps) {
   const [playlistUrl, setPlaylistUrl] = useState('');
+  const queryClient = useQueryClient();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!playlistUrl.trim()) {
@@ -21,20 +23,27 @@ export default function SpotifyInput({ onFetchPlaylist, isLoading }: SpotifyInpu
     }
     
     // More comprehensive URL validation
-    const spotifyRegex = /^(https?:\/\/)?(open\.)?spotify\.com\/(playlist|album|track)\/([a-zA-Z0-9]+)(.*)$/;
+    const spotifyRegex = /^(https?:\/\/)?(open\.|play\.)?spotify\.com\/(playlist|album|track)\/([a-zA-Z0-9]+)(.*)$/;
     if (!spotifyRegex.test(playlistUrl)) {
       toast.error('Please enter a valid Spotify URL (playlist, album, or track)');
       return;
     }
 
-    // Extract cleaned URL to pass to the handler
-    const match = playlistUrl.match(spotifyRegex);
-    if (match) {
-      const type = match[3]; // playlist, album, or track
-      const id = match[4]; // the actual ID
-      
-      toast.info(`Fetching ${type}: ${id}`);
-      onFetchPlaylist(playlistUrl);
+    try {
+      // Extract cleaned URL to pass to the handler
+      const match = playlistUrl.match(spotifyRegex);
+      if (match) {
+        const type = match[3]; // playlist, album, or track
+        const id = match[4]; // the actual ID
+        
+        toast.info(`Fetching ${type}: ${id}`);
+        
+        // Call the backend API through our handler
+        onFetchPlaylist(playlistUrl);
+      }
+    } catch (error) {
+      console.error('Error fetching playlist:', error);
+      toast.error('Failed to fetch playlist. Please try again.');
     }
   };
 

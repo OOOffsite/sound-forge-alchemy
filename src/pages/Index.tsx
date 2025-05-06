@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MainLayout from '@/layouts/MainLayout';
 import SpotifyInput from '@/components/SpotifyInput';
 import TrackList, { Track } from '@/components/TrackList';
@@ -8,6 +7,9 @@ import ExportStemsPanel, { ExportOptions } from '@/components/ExportStemsPanel';
 import StemVisualizer, { StemTrack } from '@/components/StemVisualizer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/components/ui/sonner';
+import { spotifyApi, downloadApi, processingApi, analysisApi } from '@/lib/api';
+import { useWebSocket } from '@/lib/socket';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -18,6 +20,8 @@ const Index = () => {
   const [separatedStems, setSeparatedStems] = useState<StemTrack[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const { socket, isConnected, subscribe, unsubscribe } = useWebSocket();
+  const queryClient = useQueryClient();
 
   const stemColors = {
     vocals: '#ff7b92',
@@ -26,146 +30,226 @@ const Index = () => {
     other: '#7bffb1'
   };
 
-  const handleFetchPlaylist = async (url: string) => {
-    setIsLoading(true);
-    
-    // In a real app, this would call a backend API that uses spotdl
-    // For now, let's simulate the API call and return some mock data
-    try {
-      // Simulating API call delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mock data
-      const mockTracks: Track[] = [
-        { 
-          id: '1', 
-          title: 'Blinding Lights', 
-          artist: 'The Weeknd',
-          albumArt: 'https://i.scdn.co/image/ab67616d0000b273c5649add07ed3720be9d5526',
-          duration: '3:22'
-        },
-        { 
-          id: '2', 
-          title: 'Save Your Tears', 
-          artist: 'The Weeknd',
-          albumArt: 'https://i.scdn.co/image/ab67616d0000b273c5649add07ed3720be9d5526', 
-          duration: '3:35'
-        },
-        { 
-          id: '3', 
-          title: 'Water', 
-          artist: 'Tyla',
-          albumArt: 'https://i.scdn.co/image/ab67616d0000b273032f804d1080be64a6aa7376',
-          duration: '3:49'
-        },
-        { 
-          id: '4', 
-          title: 'Dance The Night', 
-          artist: 'Dua Lipa',
-          albumArt: 'https://i.scdn.co/image/ab67616d0000b273bd9d3094d35bd542be15aa20', 
-          duration: '2:57'
-        },
-        { 
-          id: '5', 
-          title: 'I Remember Everything', 
-          artist: 'Zach Bryan, Kacey Musgraves',
-          albumArt: 'https://i.scdn.co/image/ab67616d0000b273a7ee5451c61b93c67516722d', 
-          duration: '3:11'
+  // Set up WebSocket listeners
+  useEffect(() => {
+    if (socket && isConnected && selectedTrack) {
+      // Subscribe to events for the selected track
+      subscribe(selectedTrack.id);
+
+      // Processing events
+      socket.on('processing:update', (data) => {
+        if (data.trackId === selectedTrack.id) {
+          toast.info(`Processing: ${data.progress}%`);
+          // Update processing status in the UI
+          setIsProcessing(true);
         }
-      ];
-      
-      setTracks(mockTracks);
-      toast.success(`Successfully fetched playlist with ${mockTracks.length} tracks`);
-    } catch (error) {
-      toast.error('Failed to fetch playlist');
+      });
+
+      socket.on('processing:completed', (data) => {
+        if (data.trackId === selectedTrack.id) {
+          toast.success('Processing completed successfully!');
+          setIsProcessing(false);
+          // Refetch the processed stems
+          fetchProcessedStems(selectedTrack.id);
+        }
+      });
+
+      socket.on('processing:error', (data) => {
+        if (data.trackId === selectedTrack.id) {
+          toast.error(`Processing error: ${data.error}`);
+          setIsProcessing(false);
+        }
+      });
+
+      // Analysis events
+      socket.on('analysis:completed', (data) => {
+        if (data.trackId === selectedTrack.id) {
+          toast.success('Analysis completed successfully!');
+          // Refetch the analysis results
+          fetchAnalysis(selectedTrack.id);
+        }
+      });
+
+      // Clean up on unmount or track change
+      return () => {
+        unsubscribe(selectedTrack.id);
+        socket.off('processing:update');
+        socket.off('processing:completed');
+        socket.off('processing:error');
+        socket.off('analysis:completed');
+      };
+    }
+  }, [socket, isConnected, selectedTrack]);
+
+  // Fetch playlist mutation
+  const fetchPlaylistMutation = useMutation({
+    mutationFn: async (url: string) => {
+      const response = await spotifyApi.fetchPlaylist(url);
+      return response;
+    },
+    onSuccess: (data) => {
+      setTracks(data.tracks);
+      toast.success(`Successfully fetched ${data.type} with ${data.tracks.length} tracks`);
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to fetch playlist: ${error.message}`);
       console.error('Error fetching playlist:', error);
-    } finally {
+    },
+    onSettled: () => {
       setIsLoading(false);
     }
+  });
+
+  // Download track mutation
+  const downloadTrackMutation = useMutation({
+    mutationFn: async (track: Track) => {
+      const response = await downloadApi.downloadTrack(
+        track.id,
+        `https://open.spotify.com/track/${track.id}`,
+        track
+      );
+      return response;
+    },
+    onSuccess: (data) => {
+      toast.success(`Download job created: ${data.jobId}`);
+      // Start polling for the job status
+      pollDownloadStatus(data.jobId, data.trackId);
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to download track: ${error.message}`);
+    }
+  });
+
+  // Process track mutation
+  const processTrackMutation = useMutation({
+    mutationFn: async ({ trackId, options }: { trackId: string, options: SeparationOptions }) => {
+      const response = await processingApi.separateTrack(trackId, options);
+      return response;
+    },
+    onSuccess: (data) => {
+      toast.success(`Processing job created: ${data.jobId}`);
+      setIsProcessing(true);
+      // WebSocket events will handle updates
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to process track: ${error.message}`);
+      setIsProcessing(false);
+    }
+  });
+
+  // Analyze track mutation
+  const analyzeTrackMutation = useMutation({
+    mutationFn: async (trackId: string) => {
+      const response = await analysisApi.analyzeTrack(trackId);
+      return response;
+    },
+    onSuccess: (data) => {
+      toast.success(`Analysis job created: ${data.jobId}`);
+      // WebSocket events will handle updates
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to analyze track: ${error.message}`);
+    }
+  });
+
+  // Poll for download status
+  const pollDownloadStatus = async (jobId: string, trackId: string) => {
+    try {
+      const response = await downloadApi.getJobStatus(jobId);
+      
+      if (response.status === 'completed') {
+        toast.success(`Download completed: ${response.outputPath}`);
+        return;
+      } else if (response.status === 'error') {
+        toast.error(`Download error: ${response.error}`);
+        return;
+      }
+      
+      // Continue polling if not completed or errored
+      setTimeout(() => pollDownloadStatus(jobId, trackId), 2000);
+    } catch (error) {
+      console.error('Error polling download status:', error);
+    }
+  };
+
+  // Fetch processed stems
+  const fetchProcessedStems = async (trackId: string) => {
+    try {
+      const response = await processingApi.getTrackStatus(trackId);
+      
+      if (response.status === 'completed' && response.stems) {
+        // Convert to StemTrack format
+        const stems: StemTrack[] = response.stems.map((stem: any) => ({
+          id: stem.name,
+          type: stem.type,
+          name: stem.name,
+          active: true,
+          color: stemColors[stem.type as keyof typeof stemColors] || stemColors.other
+        }));
+        
+        setSeparatedStems(stems);
+      }
+    } catch (error) {
+      console.error('Error fetching processed stems:', error);
+    }
+  };
+
+  // Fetch analysis results
+  const fetchAnalysis = async (trackId: string) => {
+    try {
+      const response = await analysisApi.getTrackAnalysis(trackId);
+      
+      if (response.bpm) {
+        setAnalysisResult({
+          bpm: response.bpm,
+          key: response.key,
+          loudness: response.loudness,
+          cuePoints: response.cuePoints
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching analysis:', error);
+    }
+  };
+
+  const handleFetchPlaylist = async (url: string) => {
+    setIsLoading(true);
+    fetchPlaylistMutation.mutate(url);
   };
 
   const handleSelectTrack = (track: Track) => {
     setSelectedTrack(track);
     setSeparatedStems([]);
     setAnalysisResult(null);
+    
+    // Check if this track has already been processed
+    if (track) {
+      fetchProcessedStems(track.id);
+      fetchAnalysis(track.id);
+    }
   };
 
   const handleDownloadTrack = (track: Track) => {
-    // In a real app, this would trigger the download of the audio file
-    toast.info(`Downloading "${track.title}" by ${track.artist}...`);
-    // Simulate download (would be handled by backend in real implementation)
-    setTimeout(() => {
-      toast.success(`Downloaded "${track.title}"`);
-    }, 2000);
+    toast.info(`Starting download for "${track.title}" by ${track.artist}...`);
+    downloadTrackMutation.mutate(track);
   };
 
   const handleSeparate = async (options: SeparationOptions) => {
-    if (!selectedTrack) return;
-    
-    setIsProcessing(true);
-    
-    // In a real app, this would call a backend API with Demucs
-    // For now, let's simulate the process and return some mock stems
-    try {
-      // Simulating processing time
-      toast.info(`Starting audio separation for "${selectedTrack.title}"...`);
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      // Create stems based on selected options
-      const stems: StemTrack[] = [];
-      
-      if (options.extractVocals) {
-        stems.push({ 
-          id: '1', 
-          type: 'vocals', 
-          name: `${selectedTrack.title} - Vocals`,
-          active: true,
-          color: stemColors.vocals
-        });
-      }
-      if (options.extractBass) {
-        stems.push({ 
-          id: '2', 
-          type: 'bass', 
-          name: `${selectedTrack.title} - Bass`,
-          active: true,
-          color: stemColors.bass
-        });
-      }
-      if (options.extractDrums) {
-        stems.push({ 
-          id: '3', 
-          type: 'drums', 
-          name: `${selectedTrack.title} - Drums`,
-          active: true,
-          color: stemColors.drums
-        });
-      }
-      if (options.extractOther) {
-        stems.push({ 
-          id: '4', 
-          type: 'other', 
-          name: `${selectedTrack.title} - Other`,
-          active: true,
-          color: stemColors.other
-        });
-      }
-      
-      setSeparatedStems(stems);
-      toast.success(`Successfully separated "${selectedTrack.title}" into ${stems.length} stems`);
-    } catch (error) {
-      toast.error('Failed to separate audio');
-      console.error('Error separating audio:', error);
-    } finally {
-      setIsProcessing(false);
+    if (!selectedTrack) {
+      toast.error('Please select a track first');
+      return;
     }
+    
+    processTrackMutation.mutate({
+      trackId: selectedTrack.id,
+      options
+    });
   };
 
   const handleExport = (options: ExportOptions) => {
     setIsExporting(true);
     
-    // In a real app, this would generate the export files
-    // For now, let's simulate the export process
+    // In a real app, this would generate the export files via the backend
     toast.info(`Preparing ${options.stems.length} stems for export in ${options.format.toUpperCase()} format...`);
     
     setTimeout(() => {
@@ -209,6 +293,8 @@ const Index = () => {
               selectedTrack={selectedTrack}
               isProcessing={isProcessing}
               onSeparate={handleSeparate}
+              analysisResult={analysisResult}
+              onAnalyze={(trackId) => analyzeTrackMutation.mutate(trackId)}
             />
             
             {separatedStems.length > 0 && (

@@ -6,7 +6,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Download, FileMusic } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Download, FileMusic, Tags } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
 
 interface Stem {
@@ -26,6 +27,8 @@ export interface ExportOptions {
   format: 'wav' | 'mp3' | 'flac';
   sampleRate: '44100' | '48000' | '96000';
   bitDepth: '16' | '24';
+  includeMetadata: boolean;
+  normalizeAudio: boolean;
 }
 
 export default function ExportStemsPanel({ stems, isExporting, onExport }: ExportStemsPanelProps) {
@@ -33,6 +36,8 @@ export default function ExportStemsPanel({ stems, isExporting, onExport }: Expor
   const [exportFormat, setExportFormat] = useState<'wav' | 'mp3' | 'flac'>('wav');
   const [sampleRate, setSampleRate] = useState<'44100' | '48000' | '96000'>('44100');
   const [bitDepth, setBitDepth] = useState<'16' | '24'>('16');
+  const [includeMetadata, setIncludeMetadata] = useState(true);
+  const [normalizeAudio, setNormalizeAudio] = useState(false);
 
   const handleStemToggle = (stemId: string) => {
     setSelectedStems(prev => 
@@ -53,6 +58,8 @@ export default function ExportStemsPanel({ stems, isExporting, onExport }: Expor
       format: exportFormat,
       sampleRate,
       bitDepth,
+      includeMetadata,
+      normalizeAudio
     });
   };
 
@@ -146,6 +153,31 @@ export default function ExportStemsPanel({ stems, isExporting, onExport }: Expor
                   <SelectItem value="24">24-bit</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+          
+          <Separator />
+          
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Tags className="h-4 w-4" />
+                <Label htmlFor="include-metadata">Include ID3 Tags & Analysis Data</Label>
+              </div>
+              <Switch 
+                id="include-metadata" 
+                checked={includeMetadata} 
+                onCheckedChange={setIncludeMetadata}
+              />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <Label htmlFor="normalize-audio">Normalize Audio (-14 LUFS)</Label>
+              <Switch 
+                id="normalize-audio" 
+                checked={normalizeAudio} 
+                onCheckedChange={setNormalizeAudio}
+              />
             </div>
           </div>
         </div>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,6 +10,7 @@ import { Music, Headphones, FileMusic, Volume2 } from 'lucide-react';
 import { Track } from './TrackList';
 import { toast } from '@/components/ui/sonner';
 import StepDisplay from './StepDisplay';
+import { calculateBPM, detectKey } from '@/lib/utils';
 
 interface AudioProcessorProps {
   selectedTrack: Track | null;
@@ -26,6 +26,17 @@ export interface SeparationOptions {
   extractOther: boolean;
 }
 
+export interface AnalysisResult {
+  bpm: number;
+  key: string;
+  loudness: number;
+  cuePoints: {
+    time: number;
+    label: string;
+    type: string;
+  }[];
+}
+
 export default function AudioProcessor({ selectedTrack, isProcessing, onSeparate }: AudioProcessorProps) {
   const [separationOptions, setSeparationOptions] = useState<SeparationOptions>({
     model: 'demucs',
@@ -36,6 +47,8 @@ export default function AudioProcessor({ selectedTrack, isProcessing, onSeparate
   });
   
   const [volume, setVolume] = useState<number[]>([75]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
   const handleSeparate = () => {
     if (!selectedTrack) {
@@ -52,6 +65,48 @@ export default function AudioProcessor({ selectedTrack, isProcessing, onSeparate
     }
     
     onSeparate(separationOptions);
+  };
+
+  const handleAnalyzeTrack = async () => {
+    if (!selectedTrack) {
+      toast.error('Please select a track first');
+      return;
+    }
+    
+    setIsAnalyzing(true);
+    toast.info(`Analyzing "${selectedTrack.title}"...`);
+    
+    // In a real app, this would call a backend API for audio analysis
+    // For now, let's simulate the analysis with a delay and random data
+    try {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Parse duration from string format like "3:22" to seconds
+      const [minutes, seconds] = selectedTrack.duration.split(':').map(Number);
+      const duration = minutes * 60 + seconds;
+      
+      // Generate simulated analysis result
+      const result: AnalysisResult = {
+        bpm: calculateBPM([]),
+        key: detectKey([]),
+        loudness: Math.floor(Math.random() * -20) - 3, // Random value between -23 and -3 dB
+        cuePoints: [
+          { time: 0, label: 'Intro', type: 'intro' },
+          { time: Math.floor(duration * 0.2), label: 'Verse 1', type: 'verse' },
+          { time: Math.floor(duration * 0.4), label: 'Chorus', type: 'chorus' },
+          { time: Math.floor(duration * 0.6), label: 'Verse 2', type: 'verse' },
+          { time: Math.floor(duration * 0.8), label: 'Outro', type: 'outro' }
+        ]
+      };
+      
+      setAnalysisResult(result);
+      toast.success(`Analysis complete for "${selectedTrack.title}"`);
+    } catch (error) {
+      toast.error('Failed to analyze track');
+      console.error('Error analyzing track:', error);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   if (!selectedTrack) {
@@ -198,14 +253,14 @@ export default function AudioProcessor({ selectedTrack, isProcessing, onSeparate
           
           <TabsContent value="analyze" className="mt-4">
             <div className="space-y-4">
-              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium">BPM</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">0</div>
-                    <p className="text-xs text-muted-foreground mt-1">Analyze track to detect</p>
+                    <div className="text-2xl font-bold">{analysisResult?.bpm || 0}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Tempo</p>
                   </CardContent>
                 </Card>
                 
@@ -214,35 +269,87 @@ export default function AudioProcessor({ selectedTrack, isProcessing, onSeparate
                     <CardTitle className="text-sm font-medium">Key</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">--</div>
-                    <p className="text-xs text-muted-foreground mt-1">Analyze track to detect</p>
+                    <div className="text-2xl font-bold">{analysisResult?.key || '--'}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Musical key</p>
                   </CardContent>
                 </Card>
                 
-                <Card className="sm:col-span-2">
+                <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">Frequency Distribution</CardTitle>
+                    <CardTitle className="text-sm font-medium">Loudness</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="h-32 flex items-end space-x-1">
-                      {[...Array(20)].map((_, i) => (
-                        <div
-                          key={i}
-                          className="bg-primary/30 flex-1 rounded-t"
-                          style={{ height: `${Math.floor(Math.random() * 100)}%` }}
-                        />
-                      ))}
-                    </div>
-                    <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                      <span>20Hz</span>
-                      <span>20kHz</span>
-                    </div>
+                    <div className="text-2xl font-bold">{analysisResult?.loudness || 0} dB</div>
+                    <p className="text-xs text-muted-foreground mt-1">Integrated LUFS</p>
                   </CardContent>
                 </Card>
               </div>
+              
+              <Card className="sm:col-span-3">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">Frequency Distribution</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-32 flex items-end space-x-1">
+                    {[...Array(20)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="bg-primary/30 flex-1 rounded-t"
+                        style={{ height: `${Math.floor(Math.random() * 100)}%` }}
+                      />
+                    ))}
+                  </div>
+                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                    <span>20Hz</span>
+                    <span>20kHz</span>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">Track Arrangement</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {analysisResult?.cuePoints ? (
+                    <div className="relative h-12">
+                      <div className="absolute inset-0 bg-secondary/20 rounded-md" />
+                      
+                      {analysisResult.cuePoints.map((cue, index) => {
+                        // Parse duration from string format like "3:22" to seconds
+                        const [minutes, seconds] = selectedTrack.duration.split(':').map(Number);
+                        const duration = minutes * 60 + seconds;
+                        
+                        return (
+                          <div 
+                            key={index}
+                            className="absolute top-0 flex flex-col items-center"
+                            style={{ 
+                              left: `${(cue.time / duration) * 100}%`,
+                              transform: 'translateX(-50%)'
+                            }}
+                          >
+                            <div className="h-12 w-0.5 bg-primary" />
+                            <div className="text-xs mt-1">{cue.label}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center text-muted-foreground py-4">
+                      Run analysis to detect arrangement
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
 
-              <Button variant="outline" className="w-full" disabled={isProcessing}>
-                Run Audio Analysis
+              <Button 
+                variant="outline" 
+                className="w-full" 
+                disabled={isAnalyzing || isProcessing}
+                onClick={handleAnalyzeTrack}
+              >
+                {isAnalyzing ? 'Analyzing...' : 'Run Audio Analysis'}
               </Button>
             </div>
           </TabsContent>

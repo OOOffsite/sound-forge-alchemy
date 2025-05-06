@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import MainLayout from '@/layouts/MainLayout';
 import SpotifyInput from '@/components/SpotifyInput';
 import TrackList, { Track } from '@/components/TrackList';
-import AudioProcessor, { SeparationOptions } from '@/components/AudioProcessor';
+import AudioProcessor, { SeparationOptions, AnalysisResult } from '@/components/AudioProcessor';
 import ExportStemsPanel, { ExportOptions } from '@/components/ExportStemsPanel';
+import StemVisualizer, { StemTrack } from '@/components/StemVisualizer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/components/ui/sonner';
 
@@ -14,9 +15,16 @@ const Index = () => {
   const [isExporting, setIsExporting] = useState(false);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
-  const [separatedStems, setSeparatedStems] = useState<
-    { id: string; type: 'vocals' | 'bass' | 'drums' | 'other'; name: string; }[]
-  >([]);
+  const [separatedStems, setSeparatedStems] = useState<StemTrack[]>([]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+
+  const stemColors = {
+    vocals: '#ff7b92',
+    bass: '#7b93ff',
+    drums: '#ffbb7b',
+    other: '#7bffb1'
+  };
 
   const handleFetchPlaylist = async (url: string) => {
     setIsLoading(true);
@@ -79,6 +87,7 @@ const Index = () => {
   const handleSelectTrack = (track: Track) => {
     setSelectedTrack(track);
     setSeparatedStems([]);
+    setAnalysisResult(null);
   };
 
   const handleDownloadTrack = (track: Track) => {
@@ -103,19 +112,43 @@ const Index = () => {
       await new Promise(resolve => setTimeout(resolve, 3000));
       
       // Create stems based on selected options
-      const stems: { id: string; type: 'vocals' | 'bass' | 'drums' | 'other'; name: string; }[] = [];
+      const stems: StemTrack[] = [];
       
       if (options.extractVocals) {
-        stems.push({ id: '1', type: 'vocals', name: `${selectedTrack.title} - Vocals` });
+        stems.push({ 
+          id: '1', 
+          type: 'vocals', 
+          name: `${selectedTrack.title} - Vocals`,
+          active: true,
+          color: stemColors.vocals
+        });
       }
       if (options.extractBass) {
-        stems.push({ id: '2', type: 'bass', name: `${selectedTrack.title} - Bass` });
+        stems.push({ 
+          id: '2', 
+          type: 'bass', 
+          name: `${selectedTrack.title} - Bass`,
+          active: true,
+          color: stemColors.bass
+        });
       }
       if (options.extractDrums) {
-        stems.push({ id: '3', type: 'drums', name: `${selectedTrack.title} - Drums` });
+        stems.push({ 
+          id: '3', 
+          type: 'drums', 
+          name: `${selectedTrack.title} - Drums`,
+          active: true,
+          color: stemColors.drums
+        });
       }
       if (options.extractOther) {
-        stems.push({ id: '4', type: 'other', name: `${selectedTrack.title} - Other` });
+        stems.push({ 
+          id: '4', 
+          type: 'other', 
+          name: `${selectedTrack.title} - Other`,
+          active: true,
+          color: stemColors.other
+        });
       }
       
       setSeparatedStems(stems);
@@ -139,6 +172,13 @@ const Index = () => {
       setIsExporting(false);
       toast.success(`${options.stems.length} stems exported successfully!`);
     }, 2000);
+  };
+
+  const handlePlayPause = () => {
+    setIsPlaying(!isPlaying);
+    if (!isPlaying) {
+      toast.info('Playing audio...');
+    }
   };
 
   return (
@@ -172,11 +212,24 @@ const Index = () => {
             />
             
             {separatedStems.length > 0 && (
-              <ExportStemsPanel 
-                stems={separatedStems}
-                isExporting={isExporting}
-                onExport={handleExport}
-              />
+              <>
+                <StemVisualizer 
+                  track={selectedTrack}
+                  stems={separatedStems}
+                  isPlaying={isPlaying}
+                  onPlayPause={handlePlayPause}
+                />
+                
+                <ExportStemsPanel 
+                  stems={separatedStems.map(stem => ({
+                    id: stem.id,
+                    type: stem.type,
+                    name: stem.name
+                  }))}
+                  isExporting={isExporting}
+                  onExport={handleExport}
+                />
+              </>
             )}
           </div>
         </div>

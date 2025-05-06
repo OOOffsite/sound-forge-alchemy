@@ -1,73 +1,90 @@
-# Welcome to your Lovable project
+# Sound Forge Alchemy
 
-## Project info
+Sound Forge Alchemy is a powerful web application for audio source separation and analysis. It allows users to separate music tracks into individual stems (vocals, drums, bass, other), and perform detailed audio analysis.
 
-**URL**: https://lovable.dev/projects/14f196b4-72c5-4990-bc39-77002f9a9bf4
+## Features
 
-## How can I edit this code?
+- Spotify playlist integration
+- Audio track downloading with spotdl
+- Audio source separation with Demucs
+- Real-time audio analysis (BPM, key detection, and more)
+- Stem visualization and playback
+- Export functionality
 
-There are several ways of editing your application.
+## Architecture
 
-**Use Lovable**
+This project uses a microservices architecture:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/14f196b4-72c5-4990-bc39-77002f9a9bf4) and start prompting.
+- **Frontend**: React + TypeScript + ShadCN UI + Vite
+- **Backend Microservices**:
+  - API Gateway (Node.js + Express)
+  - Spotify Service (Node.js + Express)
+  - Download Service (Node.js + Python + spotdl)
+  - Processing Service (Node.js + Python + demucs)
+  - Analysis Service (Node.js + Python + librosa/essentia)
+  - WebSocket Service (Node.js + Socket.IO)
+- **Infrastructure**:
+  - Redis (caching, pub/sub)
+  - PostgreSQL (database)
+  - Supabase (auth, storage, database)
 
-Changes made via Lovable will be committed automatically to this repo.
+## Setup and Installation
 
-**Use your preferred IDE**
+### Prerequisites
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- Docker and Docker Compose
+- Node.js 20+ (for local development)
+- Python 3.10+ (for local development)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Environment Variables
 
-Follow these steps:
+Copy the `.env.example` file to `.env` and update the values:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+```bash
+cp .env.example .env
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Be sure to update the Spotify API credentials.
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Running with Docker
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+To start all services:
+
+```bash
+docker-compose up
+```
+
+This will start the frontend, backend services, and all required infrastructure.
+
+### Local Development
+
+To run the frontend locally:
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+For backend services, see the [backend README](backend/README.md).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Usage
 
-**Use GitHub Codespaces**
+1. Enter a Spotify playlist URL in the input field
+2. Select a track to process
+3. Choose separation options (vocals, bass, drums, other)
+4. Click "Separate Audio" to start processing
+5. View the separated stems and visualization
+6. Export the stems in your preferred format
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## License
 
-## What technologies are used for this project?
+MIT
 
-This project is built with:
+## Credits
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/14f196b4-72c5-4990-bc39-77002f9a9bf4) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- [Demucs](https://github.com/facebookresearch/demucs) for audio source separation
+- [librosa](https://librosa.org/) and [essentia](https://essentia.upf.edu/) for audio analysis
+- [spotdl](https://github.com/spotDL/spotify-downloader) for Spotify track downloading

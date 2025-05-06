@@ -1,0 +1,7 @@
+librosa==0.10.1
+essentia==2.1b6.dev1094
+redis==5.0.1
+requests==2.31.0
+python-dotenv==1.0.1
+numpy==1.26.4
+scipy==1.13.0

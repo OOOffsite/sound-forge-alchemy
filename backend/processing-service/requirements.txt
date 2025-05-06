@@ -1,0 +1,4 @@
+demucs==4.0.1
+redis==5.0.1
+python-dotenv==1.0.1
+requests==2.31.0

@@ -20,17 +20,32 @@ export default function SpotifyInput({ onFetchPlaylist, isLoading }: SpotifyInpu
       return;
     }
     
-    // Check if it's a valid Spotify URL
-    if (!playlistUrl.includes('spotify.com/playlist/')) {
-      toast.error('Please enter a valid Spotify playlist URL');
+    // More comprehensive URL validation
+    const spotifyRegex = /^(https?:\/\/)?(open\.)?spotify\.com\/(playlist|album|track)\/([a-zA-Z0-9]+)(.*)$/;
+    if (!spotifyRegex.test(playlistUrl)) {
+      toast.error('Please enter a valid Spotify URL (playlist, album, or track)');
       return;
     }
-    
-    onFetchPlaylist(playlistUrl);
+
+    // Extract cleaned URL to pass to the handler
+    const match = playlistUrl.match(spotifyRegex);
+    if (match) {
+      const type = match[3]; // playlist, album, or track
+      const id = match[4]; // the actual ID
+      
+      toast.info(`Fetching ${type}: ${id}`);
+      onFetchPlaylist(playlistUrl);
+    }
+  };
+
+  // Example URLs to help users
+  const handleExampleClick = () => {
+    setPlaylistUrl('https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M');
+    toast.info('Example playlist URL added. Click "Fetch Playlist" to load it.');
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full space-y-2">
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
         <Input
           type="text"
@@ -48,6 +63,16 @@ export default function SpotifyInput({ onFetchPlaylist, isLoading }: SpotifyInpu
           {isLoading ? 'Loading...' : 'Fetch Playlist'}
         </Button>
       </form>
+      <div className="text-xs text-muted-foreground">
+        <button 
+          type="button" 
+          onClick={handleExampleClick}
+          className="underline text-primary hover:text-primary/90"
+        >
+          Use example
+        </button>
+        <span> • Accepts Spotify playlist, album, or track URLs</span>
+      </div>
     </div>
   );
 }

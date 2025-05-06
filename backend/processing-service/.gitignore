@@ -1,0 +1,14 @@
+# Ignore models directory
+models/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Audio files
+*.mp3
+*.wav
+*.flac
+*.ogg
+*.m4a

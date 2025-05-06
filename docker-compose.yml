@@ -1,0 +1,192 @@
+version: '3.8'
+
+services:
+  # Frontend service
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "8001:8001"
+    depends_on:
+      - api-gateway
+    environment:
+      - VITE_API_URL=http://api-gateway:3000
+      - VITE_WEBSOCKET_URL=ws://websocket-service:3006
+    networks:
+      - sound-forge-network
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+
+  # API Gateway - Entry point for all client requests
+  api-gateway:
+    build:
+      context: ./backend/api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - spotify-service
+      - download-service
+      - processing-service
+      - analysis-service
+    environment:
+      - PORT=3000
+      - SPOTIFY_SERVICE_URL=http://spotify-service:3001
+      - DOWNLOAD_SERVICE_URL=http://download-service:3002
+      - PROCESSING_SERVICE_URL=http://processing-service:3003
+      - ANALYSIS_SERVICE_URL=http://analysis-service:3004
+      - WEBSOCKET_SERVICE_URL=http://websocket-service:3006
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - REDIS_URL=redis://redis:6379
+    networks:
+      - sound-forge-network
+
+  # Spotify Service - Handles Spotify API interactions
+  spotify-service:
+    build:
+      context: ./backend/spotify-service
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+      - REDIS_URL=redis://redis:6379
+    networks:
+      - sound-forge-network
+    depends_on:
+      - redis
+
+  # Download Service - Handles track downloading with spotdl
+  download-service:
+    build:
+      context: ./backend/download-service
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    volumes:
+      - audio_data:/app/audio_data
+    environment:
+      - PORT=3002
+      - REDIS_URL=redis://redis:6379
+      - AUDIO_DATA_PATH=/app/audio_data
+    networks:
+      - sound-forge-network
+    depends_on:
+      - redis
+
+  # Processing Service - Handles audio separation with Demucs
+  processing-service:
+    build:
+      context: ./backend/processing-service
+      dockerfile: Dockerfile
+    ports:
+      - "3003:3003"
+    volumes:
+      - audio_data:/app/audio_data
+    environment:
+      - PORT=3003
+      - REDIS_URL=redis://redis:6379
+      - AUDIO_DATA_PATH=/app/audio_data
+      - WEBSOCKET_SERVICE_URL=http://websocket-service:3006
+    networks:
+      - sound-forge-network
+    depends_on:
+      - redis
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # Analysis Service - Handles audio analysis (BPM, key, etc.)
+  analysis-service:
+    build:
+      context: ./backend/analysis-service
+      dockerfile: Dockerfile
+    ports:
+      - "3004:3004"
+    volumes:
+      - audio_data:/app/audio_data
+    environment:
+      - PORT=3004
+      - REDIS_URL=redis://redis:6379
+      - AUDIO_DATA_PATH=/app/audio_data
+    networks:
+      - sound-forge-network
+    depends_on:
+      - redis
+
+  # WebSocket Service - Real-time communication
+  websocket-service:
+    build:
+      context: ./backend/websocket-service
+      dockerfile: Dockerfile
+    ports:
+      - "3006:3006"
+    environment:
+      - PORT=3006
+      - REDIS_URL=redis://redis:6379
+    networks:
+      - sound-forge-network
+    depends_on:
+      - redis
+
+  # Redis - For caching and pub/sub messaging between services
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - sound-forge-network
+
+  # PostgreSQL - Database for storing metadata
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=soundforge
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sound-forge-network
+
+  # Supabase - Local development setup
+  supabase:
+    image: supabase/supabase-local:latest
+    ports:
+      - "8000:8000" # API Gateway
+      - "5432:5432" # Postgres
+      - "54322:54322" # Database migration
+      - "9000:9000" # Storage bucket API
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - SUPABASE_URL=http://localhost:8000
+      - SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+      - STUDIO_PORT=3333
+      - POSTGRES_PORT=5432
+    volumes:
+      - supabase_data:/var/lib/postgresql/data
+    networks:
+      - sound-forge-network
+
+networks:
+  sound-forge-network:
+    driver: bridge
+
+volumes:
+  redis_data:
+  postgres_data:
+  supabase_data:
+  audio_data:

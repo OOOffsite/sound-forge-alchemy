@@ -7,6 +7,7 @@ const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const Redis = require('ioredis');
 const axios = require('axios');
+const models = require('./models');
 
 // Initialize Redis client
 const redis = new Redis(process.env.REDIS_URL);
@@ -79,6 +80,39 @@ sub.on('message', async (channel, message) => {
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).send({ status: 'ok' });
+});
+
+// Get available models
+app.get('/models', async (req, res) => {
+  try {
+    const allModels = await models.getAllModels();
+    res.json(allModels);
+  } catch (error) {
+    console.error('Error fetching models:', error);
+    res.status(500).json({ error: 'Failed to fetch models', details: error.message });
+  }
+});
+
+// Download a specific model
+app.post('/models/download', async (req, res) => {
+  try {
+    const { modelName } = req.body;
+    
+    if (!modelName) {
+      return res.status(400).json({ error: 'Model name is required' });
+    }
+    
+    // Start the download
+    await models.downloadModel(modelName);
+    
+    res.status(200).json({ 
+      success: true, 
+      message: `Model ${modelName} downloaded successfully` 
+    });
+  } catch (error) {
+    console.error(`Error downloading model:`, error);
+    res.status(500).json({ error: 'Failed to download model', details: error.message });
+  }
 });
 
 // Separate a track into stems
@@ -232,9 +266,25 @@ async function createProcessingJob(trackId, inputPath, options = {}) {
     fs.mkdirSync(stemsDir, { recursive: true });
   }
   
+  // Ensure model is downloaded or use default
+  let modelName = options.model;
+  if (!modelName) {
+    modelName = await models.getDefaultModel();
+    console.log(`Using default model: ${modelName}`);
+  } else {
+    try {
+      await models.ensureModelDownloaded(modelName);
+      console.log(`Ensured model is downloaded: ${modelName}`);
+    } catch (error) {
+      console.error(`Error ensuring model ${modelName} is downloaded:`, error);
+      modelName = await models.getDefaultModel();
+      console.log(`Falling back to default model: ${modelName}`);
+    }
+  }
+  
   // Default options
   const separationOptions = {
-    model: options.model || 'htdemucs',
+    model: modelName,
     twoStems: options.twoStems || false, // If true, separate into vocals and accompaniment only
     extractVocals: options.extractVocals !== false,
     extractBass: options.extractBass !== false,
@@ -379,7 +429,7 @@ async function processSeparation(jobId, trackId, inputPath, outputPath, options)
       try {
         if (code === 0) {
           // Move the files to the right location
-          const demucsOutputDir = path.join(path.dirname(outputPath), 'htdemucs', path.basename(inputPath, path.extname(inputPath)));
+          const demucsOutputDir = path.join(path.dirname(outputPath), modelName, path.basename(inputPath, path.extname(inputPath)));
           
           if (fs.existsSync(demucsOutputDir)) {
             // Get all stem files

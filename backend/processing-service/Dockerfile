@@ -5,7 +5,7 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y ffmpeg curl software-properties-common && \
     curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get install -y nodejs gcc g++ && \
+    apt-get install -y nodejs gcc g++ git && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -21,7 +21,7 @@ RUN npm install
 COPY . .
 
 # Create directories
-RUN mkdir -p /app/audio_data
+RUN mkdir -p /app/audio_data /app/models
 
 EXPOSE 3003
 

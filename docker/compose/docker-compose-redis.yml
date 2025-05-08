@@ -1,0 +1,108 @@
+version: '3.9'
+
+# Redis-specific configuration with improved reliability and monitoring
+services:
+  # Redis - Main instance
+  redis:
+    image: redis:7.2-alpine
+    container_name: sound-forge-redis
+    command: redis-server /usr/local/etc/redis/redis.conf --requirepass ${REDIS_PASSWORD:-redispassword}
+    ports:
+      - "6379:6379"
+    networks:
+      - data-network
+    volumes:
+      - redis_data:/data
+      - ../config/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redispassword}", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+
+  # Redis Sentinel for high availability (only in production)
+  redis-sentinel-1:
+    image: redis:7.2-alpine
+    container_name: sound-forge-redis-sentinel-1
+    command: redis-sentinel /usr/local/etc/redis/sentinel.conf
+    networks:
+      - data-network
+    volumes:
+      - ../config/sentinel.conf:/usr/local/etc/redis/sentinel.conf:ro
+    restart: unless-stopped
+    depends_on:
+      - redis
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 128M
+
+  redis-sentinel-2:
+    image: redis:7.2-alpine
+    container_name: sound-forge-redis-sentinel-2
+    command: redis-sentinel /usr/local/etc/redis/sentinel.conf
+    networks:
+      - data-network
+    volumes:
+      - ../config/sentinel.conf:/usr/local/etc/redis/sentinel.conf:ro
+    restart: unless-stopped
+    depends_on:
+      - redis
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 128M
+
+  redis-sentinel-3:
+    image: redis:7.2-alpine
+    container_name: sound-forge-redis-sentinel-3
+    command: redis-sentinel /usr/local/etc/redis/sentinel.conf
+    networks:
+      - data-network
+    volumes:
+      - ../config/sentinel.conf:/usr/local/etc/redis/sentinel.conf:ro
+    restart: unless-stopped
+    depends_on:
+      - redis
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 128M
+
+  # Redis Commander for management (development environment)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: sound-forge-redis-commander
+    ports:
+      - "8081:8081"
+    networks:
+      - data-network
+    environment:
+      - REDIS_HOSTS=local:redis:6379:0:${REDIS_PASSWORD:-redispassword}
+    restart: unless-stopped
+    depends_on:
+      - redis
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 256M
+
+networks:
+  data-network:
+    name: sound-forge-data-network
+    driver: bridge
+
+volumes:
+  redis_data:
+    name: sound-forge-redis-data

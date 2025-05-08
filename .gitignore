@@ -63,3 +63,4 @@ audio_data/
 
 # Backup files
 **/*.bak.*
+*.bak

@@ -37,17 +37,17 @@ graph TD
     classDef baseImage fill:#e1bee7,stroke:#9c27b0,color:black
     classDef service fill:#bbdefb,stroke:#1976d2,color:black
     classDef storage fill:#c8e6c9,stroke:#388e3c,color:black
-    
+
     Client([Client Browser])-->Frontend
     Frontend-->API_Gateway
-    
+
     subgraph Docker Environment
-        subgraph "Base Images" 
+        subgraph "Base Images"
             NodeBase["node-base"]:::baseImage
             PythonNodeBase["python-node-base"]:::baseImage
             GPUBase["gpu-base"]:::baseImage
         end
-        
+
         subgraph "Core Services"
             API_Gateway["api-gateway<br/>(Port: 3000)"]:::service
             Frontend["frontend<br/>(Port: 8001)"]:::service
@@ -58,16 +58,16 @@ graph TD
             WebSocketService["websocket-service<br/>(Port: 3006)"]:::service
             Redis["redis<br/>(Port: 6379)"]:::storage
         end
-        
+
         AudioData[(audio_data<br/>Volume)]:::storage
     end
-    
+
     API_Gateway --> SpotifyService
     API_Gateway --> DownloadService
     API_Gateway --> ProcessingService
     API_Gateway --> AnalysisService
     API_Gateway --> WebSocketService
-    
+
     SpotifyService --> Redis
     DownloadService --> Redis
     DownloadService --> AudioData
@@ -77,7 +77,7 @@ graph TD
     AnalysisService --> Redis
     AnalysisService --> AudioData
     WebSocketService --> Redis
-    
+
     click NodeBase "#node-base" "View node-base details"
     click PythonNodeBase "#python-node-base" "View python-node-base details"
     click GPUBase "#gpu-base" "View gpu-base details"
@@ -107,17 +107,17 @@ graph LR
     classDef default fill:#bbdefb,stroke:#1976d2,color:black
     classDef macConfig fill:#ffecb3,stroke:#ff9800,color:black
     classDef prodConfig fill:#ffcdd2,stroke:#e53935,color:black
-    
+
     DefaultConfig["docker-compose.yml<br/>Dynamic GPU Configuration"]:::default
     MacConfig["docker-compose.mac.yml<br/>CPU-only for Apple Silicon"]:::macConfig
     ProdConfig["docker-compose.prod.yml<br/>NVIDIA GPU Acceleration"]:::prodConfig
-    
+
     Default[Development Environment] --> DefaultConfig
     Mac[macOS Environment] --> MacConfig
     Production[Production Environment] --> ProdConfig
-    
+
     click DefaultConfig "#default-configuration" "View default configuration details"
-    click MacConfig "#mac-configuration" "View macOS configuration details" 
+    click MacConfig "#mac-configuration" "View macOS configuration details"
     click ProdConfig "#prod-configuration" "View production configuration details"
 ```
 
@@ -165,38 +165,38 @@ flowchart TD
     classDef frontend fill:#bbdefb,stroke:#1976d2,color:black
     classDef backend fill:#e1bee7,stroke:#9c27b0,color:black
     classDef storage fill:#c8e6c9,stroke:#388e3c,color:black
-    
+
     Client([Client Browser]) --> Frontend:::frontend
     Frontend --> API["API Gateway"]:::backend
-    
+
     API --> Spotify["Spotify Service"]:::backend
     API --> Download["Download Service"]:::backend
     API --> Processing["Processing Service"]:::backend
     API --> Analysis["Analysis Service"]:::backend
     API --> WebSocket["WebSocket Service"]:::backend
-    
+
     Frontend --> WebSocket
     Processing --> WebSocket
-    
+
     Spotify --> Redis[(Redis)]:::storage
     Download --> Redis
     Processing --> Redis
     Analysis --> Redis
     WebSocket --> Redis
-    
+
     Download --> AudioVolume[(Audio Data)]:::storage
     Processing --> AudioVolume
     Analysis --> AudioVolume
-    
+
     subgraph External Services
         SpotifyAPI[("Spotify API")]
     end
-    
+
     Spotify --> SpotifyAPI
-    
+
     click Frontend "#frontend" "View Frontend details"
     click API "#api-gateway" "View API Gateway details"
-    click Spotify "#spotify-service" "View Spotify Service details" 
+    click Spotify "#spotify-service" "View Spotify Service details"
     click Download "#download-service" "View Download Service details"
     click Processing "#processing-service" "View Processing Service details"
     click Analysis "#analysis-service" "View Analysis Service details"
@@ -400,42 +400,42 @@ sequenceDiagram
     participant Analysis as Analysis Service
     participant WebSocket as WebSocket Service
     participant Redis
-    
+
     Client->>Frontend: Access UI
     Frontend->>API: Authentication
     API-->>Frontend: Authentication Response
-    
+
     Frontend->>WebSocket: Connect (Real-time updates)
-    
+
     Frontend->>API: Search for Track
     API->>Spotify: Query Track
     Spotify->>Redis: Cache Results
     Spotify-->>API: Track Results
     API-->>Frontend: Display Results
-    
+
     Frontend->>API: Request Download
     API->>Download: Download Track
     Download->>Redis: Update Progress
     Redis->>WebSocket: Publish Progress
     WebSocket-->>Frontend: Progress Update
     Download-->>API: Download Complete
-    
+
     API->>Processing: Request Separation
     Processing->>Redis: Update Status
     Redis->>WebSocket: Publish Status
     WebSocket-->>Frontend: Status Update
     Processing-->>API: Processing Complete
-    
+
     API->>Analysis: Request Analysis
     Analysis->>Redis: Store Results
     Analysis-->>API: Analysis Results
     API-->>Frontend: Display Analysis
-    
+
     note over Client,Redis: Real-time updates flow through WebSocket during all operations
-    
+
     click Frontend "#frontend" "View Frontend details"
     click API "#api-gateway" "View API Gateway details"
-    click Spotify "#spotify-service" "View Spotify Service details" 
+    click Spotify "#spotify-service" "View Spotify Service details"
     click Download "#download-service" "View Download Service details"
     click Processing "#processing-service" "View Processing Service details"
     click Analysis "#analysis-service" "View Analysis Service details"
@@ -519,16 +519,19 @@ docker-compose -f docker-compose.prod.yml up -d
 ### Common Issues
 
 1. **GPU not detected**:
+
    - Ensure NVIDIA drivers are installed
    - Verify NVIDIA Container Toolkit is installed and configured
    - Check that the GPU is compatible with the Docker runtime
 
 2. **Services unable to communicate**:
+
    - Verify all services are on the same network
    - Check that the `sound-forge-network` exists
    - Ensure service names match the environment variables
 
 3. **Processing service crashes on macOS**:
+
    - Use the macOS-specific configuration which uses CPU-only mode
    - Verify PyTorch CPU version is correctly installed
 

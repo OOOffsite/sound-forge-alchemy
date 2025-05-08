@@ -67,3 +67,4 @@ audio_data/
 
 #any old files
 docker/.old
+docker-shared

@@ -4,23 +4,39 @@ This document provides a comprehensive explanation of the Docker architecture us
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [Environment-Specific Configurations](#environment-specific-configurations)
-- [Service Architecture](#service-architecture)
-- [Base Images](#base-images)
-- [Core Services](#core-services)
-  - [API Gateway](#api-gateway)
-  - [Frontend](#frontend)
-  - [Spotify Service](#spotify-service)
-  - [Download Service](#download-service)
-  - [Processing Service](#processing-service)
-  - [Analysis Service](#analysis-service)
-  - [WebSocket Service](#websocket-service)
-  - [Redis](#redis)
-- [Data Flow](#data-flow)
-- [Networks and Volumes](#networks-and-volumes)
-- [Deployment Instructions](#deployment-instructions)
-- [Troubleshooting](#troubleshooting)
+- [Sound Forge Alchemy - Docker Architecture](#sound-forge-alchemy---docker-architecture)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Environment-Specific Configurations](#environment-specific-configurations)
+    - [Default Configuration](#default-configuration)
+    - [Mac Configuration](#mac-configuration)
+    - [Production Configuration](#production-configuration)
+  - [Service Architecture](#service-architecture)
+  - [Base Images](#base-images)
+    - [node-base](#node-base)
+    - [python-node-base](#python-node-base)
+    - [gpu-base](#gpu-base)
+  - [Core Services](#core-services)
+    - [API Gateway](#api-gateway)
+    - [Frontend](#frontend)
+    - [Spotify Service](#spotify-service)
+    - [Download Service](#download-service)
+    - [Processing Service](#processing-service)
+    - [Analysis Service](#analysis-service)
+    - [WebSocket Service](#websocket-service)
+    - [Redis](#redis)
+  - [Data Flow](#data-flow)
+  - [Networks and Volumes](#networks-and-volumes)
+    - [Networks](#networks)
+    - [Volumes](#volumes)
+  - [Deployment Instructions](#deployment-instructions)
+    - [Prerequisites](#prerequisites)
+    - [Setting Up the Network](#setting-up-the-network)
+    - [Development Environment](#development-environment)
+    - [macOS Environment (Apple Silicon)](#macos-environment-apple-silicon)
+    - [Production Environment](#production-environment)
+  - [Troubleshooting](#troubleshooting)
+    - [Common Issues](#common-issues)
 
 ## Overview
 
@@ -389,6 +405,7 @@ Redis serves as the messaging and caching layer:
 
 The data flow through the system follows this sequence:
 
+🧠
 ```mermaid
 sequenceDiagram
     participant Client as Client Browser
@@ -433,8 +450,8 @@ sequenceDiagram
 
     note over Client,Redis: Real-time updates flow through WebSocket during all operations
 
-    click Frontend "#frontend" "View Frontend details"
-    click API "#api-gateway" "View API Gateway details"
+    click Frontend "#frontend"->>"View Frontend details" 
+     click API '\api-gateway"' "View API Gateway details"
     click Spotify "#spotify-service" "View Spotify Service details"
     click Download "#download-service" "View Download Service details"
     click Processing "#processing-service" "View Processing Service details"

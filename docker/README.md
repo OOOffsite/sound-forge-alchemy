@@ -40,10 +40,10 @@ cp .env.docker.example .env.docker
 source .env.docker
 
 # Start the platform services (Redis, PostgreSQL, etc.)
-docker-compose -f docker/compose-files/docker-compose-platform.yml up -d
+docker-compose -f docker-compose-platform.yml up -d
 
 # Start the application services in development mode
-docker-compose -f docker/compose-files/docker-compose.yml -f docker/compose-files/docker-compose.dev.yml up -d
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 ```
 
 ### macOS Environment (Apple Silicon)
@@ -63,7 +63,7 @@ cp .env.docker.example .env.docker
 source .env.docker
 
 # Start the macOS-specific configuration
-docker-compose -f docker/compose-files/docker-compose.yml -f docker/compose-files/docker-compose.mac.yml up -d
+docker-compose -f docker-compose.yml -f docker-compose.mac.yml up -d
 ```
 
 ### Production Environment
@@ -89,7 +89,7 @@ export USE_GPU=true
 export GPU_DRIVER=nvidia
 export GPU_COUNT=1
 export GPU_CAPABILITIES=gpu
-docker-compose -f docker/compose-files/docker-compose.yml -f docker/compose-files/docker-compose.prod.yml up -d
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
 
 ## Environment Variables

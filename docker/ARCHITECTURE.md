@@ -132,8 +132,6 @@ docker/
 │   ├── docker-compose.dev.yml  # Development configuration
 │   ├── docker-compose.mac.yml  # macOS-specific configuration
 │   ├── docker-compose.prod.yml # Production configuration
-│   ├── docker-compose-redis.yml # Redis-specific configuration
-│   └── docker-compose-platform.yml # Platform services configuration
 └── config/
     ├── redis.conf              # Redis configuration
     ├── sentinel.conf           # Redis Sentinel configuration
@@ -151,30 +149,30 @@ docker/
 
 ```bash
 # Start the platform services (Redis, PostgreSQL, etc.)
-docker-compose -f docker/compose/docker-compose-platform.yml up -d
+docker-compose -f docker-compose-platform.yml up -d
 
 # Start the application services (development mode)
-docker-compose -f docker/compose/docker-compose.yml -f docker/compose/docker-compose.dev.yml up -d
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 ```
 
 ### macOS Environment (Apple Silicon)
 
 ```bash
 # Start the platform services (Redis, PostgreSQL, etc.)
-docker-compose -f docker/compose/docker-compose-platform.yml up -d
+docker-compose -f docker-compose-platform.yml up -d
 
 # Start the macOS-specific configuration
-docker-compose -f docker/compose/docker-compose.yml -f docker/compose/docker-compose.mac.yml up -d
+docker-compose -f docker-compose.yml -f docker-compose.mac.yml up -d
 ```
 
 ### Production Environment
 
 ```bash
 # Start the platform services (Redis, PostgreSQL, etc.)
-docker-compose -f docker/compose/docker-compose-platform.yml up -d
+docker-compose -f docker-compose-platform.yml up -d
 
 # Start the production configuration with GPU acceleration
-USE_GPU=true docker-compose -f docker/compose/docker-compose.yml -f docker/compose/docker-compose.prod.yml up -d
+USE_GPU=true docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
 
 ## Compliance with Well-Architected Framework

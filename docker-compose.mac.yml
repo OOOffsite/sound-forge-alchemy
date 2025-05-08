@@ -1,0 +1,62 @@
+services:
+  # Redis service
+  redis:
+    image: redis:latest
+    container_name: sound-forge-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - sound-forge-network
+
+  # Processing Service - Handles audio separation with Demucs (CPU version for Mac)
+  processing-service:
+    build:
+      context: ./backend/processing-service
+      dockerfile: Dockerfile.cpu
+    container_name: sound-forge-processing
+    ports:
+      - "3003:3003"
+    volumes:
+      - audio_data:/app/audio_data
+    environment:
+      - PORT=3003
+      - REDIS_URL=redis://redis:6379
+      - AUDIO_DATA_PATH=/app/audio_data
+      - WEBSOCKET_SERVICE_URL=http://websocket-service:3006
+      - USE_GPU=false
+    networks:
+      - sound-forge-network
+    depends_on:
+      - redis
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./backend/api-gateway
+      dockerfile: Dockerfile
+    container_name: sound-forge-api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - SPOTIFY_SERVICE_URL=http://spotify-service:3001
+      - DOWNLOAD_SERVICE_URL=http://download-service:3002
+      - PROCESSING_SERVICE_URL=http://processing-service:3003
+      - ANALYSIS_SERVICE_URL=http://analysis-service:3004
+      - WEBSOCKET_SERVICE_URL=http://websocket-service:3006
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - REDIS_URL=redis://redis:6379
+    networks:
+      - sound-forge-network
+    depends_on:
+      - redis
+      - processing-service
+
+networks:
+  sound-forge-network:
+    external: true
+
+volumes:
+  audio_data:
+    name: sound-forge-audio-data

@@ -76,7 +76,7 @@ services:
       - redis
 
   # Download Service - Handles track downloading with spotdl
-  download-service:
+  download-service: 
     build:
       context: ./backend/download-service
       dockerfile: Dockerfile
@@ -97,7 +97,7 @@ services:
   processing-service:
     build:
       context: ./backend/processing-service
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.cpu
     ports:
       - "3003:3003"
     volumes:
@@ -107,21 +107,12 @@ services:
       - REDIS_URL=redis://redis:6379
       - AUDIO_DATA_PATH=/app/audio_data
       - WEBSOCKET_SERVICE_URL=http://websocket-service:3006
-      - USE_GPU=${USE_GPU:-false}
+      - USE_GPU=false
     networks:
       - sound-forge-network
     depends_on:
       - redis
       - websocket-service
-      - gpu-base
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: ${GPU_DRIVER:-none}
-              count: ${GPU_COUNT:-0}
-              capabilities: 
-                - ${GPU_CAPABILITIES:-""}
 
   # Analysis Service - Handles audio analysis (BPM, key, etc.)
   analysis-service:

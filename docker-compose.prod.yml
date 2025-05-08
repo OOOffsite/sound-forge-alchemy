@@ -1,3 +1,5 @@
+version: '3.9'
+
 services:
   # Base images
   node-base:
@@ -29,9 +31,6 @@ services:
       - VITE_WEBSOCKET_URL=ws://websocket-service:3006
     networks:
       - sound-forge-network
-    volumes:
-      - ./src:/app/src
-      - ./public:/app/public
 
   # API Gateway - Entry point for all client requests
   api-gateway:
@@ -107,21 +106,19 @@ services:
       - REDIS_URL=redis://redis:6379
       - AUDIO_DATA_PATH=/app/audio_data
       - WEBSOCKET_SERVICE_URL=http://websocket-service:3006
-      - USE_GPU=${USE_GPU:-false}
+      - USE_GPU=true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     networks:
       - sound-forge-network
     depends_on:
       - redis
       - websocket-service
-      - gpu-base
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: ${GPU_DRIVER:-none}
-              count: ${GPU_COUNT:-0}
-              capabilities: 
-                - ${GPU_CAPABILITIES:-""}
 
   # Analysis Service - Handles audio analysis (BPM, key, etc.)
   analysis-service:
@@ -158,8 +155,7 @@ services:
 
   # Redis service - Including a minimal definition that will work with your setup
   redis:
-    image: docker.io/library/redis:latest
-    pull_policy: never
+    image: redis:latest
     ports:
       - "6379:6379"
     networks:

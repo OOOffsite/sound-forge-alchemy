@@ -1,0 +1,117 @@
+version: '3.9'
+
+# Development environment configuration
+# This file extends the base docker-compose.yml with development-specific settings
+
+services:
+  # Frontend service - with source code mounting for hot reload
+  frontend:
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+    environment:
+      - NODE_ENV=development
+    command: ["npm", "run", "dev", "--", "--port", "8001", "--host", "0.0.0.0"]
+    deploy:
+      resources:
+        limits:
+          cpus: '0.8'
+          memory: 1G
+
+  # API Gateway - with development mode
+  api-gateway:
+    volumes:
+      - ./backend/api-gateway:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: ["npm", "run", "dev"]
+
+  # Spotify Service - with development mode
+  spotify-service:
+    volumes:
+      - ./backend/spotify-service:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: ["npm", "run", "dev"]
+
+  # Download Service - with development mode
+  download-service:
+    volumes:
+      - ./backend/download-service:/app
+      - /app/node_modules
+      - /app/audio_data
+    environment:
+      - NODE_ENV=development
+    command: ["npm", "run", "dev"]
+
+  # Processing Service - with CPU mode for development
+  processing-service:
+    build:
+      context: ./backend/processing-service
+      dockerfile: ../../docker/services/Dockerfile.processing-service.cpu
+    volumes:
+      - ./backend/processing-service:/app
+      - /app/node_modules
+      - /app/audio_data
+      - /app/models
+    environment:
+      - NODE_ENV=development
+      - USE_GPU=false
+    command: ["npm", "run", "dev"]
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+
+  # Analysis Service - with development mode
+  analysis-service:
+    volumes:
+      - ./backend/analysis-service:/app
+      - /app/node_modules
+      - /app/audio_data
+    environment:
+      - NODE_ENV=development
+    command: ["npm", "run", "dev"]
+
+  # WebSocket Service - with development mode
+  websocket-service:
+    volumes:
+      - ./backend/websocket-service:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: ["npm", "run", "dev"]
+
+  # Redis - with development configuration
+  redis:
+    command: redis-server --appendonly yes
+    environment:
+      - REDIS_PASSWORD=
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+
+  # Development-only services
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8080:8080"
+    networks:
+      - data-network
+    restart: unless-stopped
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    ports:
+      - "8081:8081"
+    networks:
+      - data-network
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    depends_on:
+      - redis
+    restart: unless-stopped

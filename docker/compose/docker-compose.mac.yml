@@ -1,0 +1,245 @@
+version: '3.9'
+
+# macOS environment configuration (Apple Silicon optimized)
+# This file provides a simplified configuration for macOS/Apple Silicon 
+
+services:
+  # Frontend service - for local development
+  frontend:
+    image: sound-forge-frontend:mac
+    container_name: sound-forge-frontend
+    build:
+      context: ./src
+      dockerfile: ../docker/services/Dockerfile.frontend
+    ports:
+      - "8001:8001"
+    networks:
+      - frontend-network
+      - websocket-network
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://api-gateway:3000
+      - VITE_WEBSOCKET_URL=ws://websocket-service:3006
+    command: ["npm", "run", "dev", "--", "--port", "8001", "--host", "0.0.0.0"]
+    restart: unless-stopped
+
+  # API Gateway
+  api-gateway:
+    image: sound-forge-api-gateway:mac
+    container_name: sound-forge-api-gateway
+    build:
+      context: ./backend/api-gateway
+      dockerfile: ../../docker/services/Dockerfile.api-gateway
+    ports:
+      - "3000:3000"
+    networks:
+      - frontend-network
+      - api-gateway-network
+    volumes:
+      - ./backend/api-gateway:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - SERVICE_NAME=api-gateway
+      - SPOTIFY_SERVICE_URL=http://spotify-service:3001
+      - DOWNLOAD_SERVICE_URL=http://download-service:3002
+      - PROCESSING_SERVICE_URL=http://processing-service:3003
+      - ANALYSIS_SERVICE_URL=http://analysis-service:3004
+      - WEBSOCKET_SERVICE_URL=http://websocket-service:3006
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - REDIS_URL=redis://redis:6379
+    command: ["npm", "run", "dev"]
+    restart: unless-stopped
+
+  # Spotify Service
+  spotify-service:
+    image: sound-forge-spotify-service:mac
+    container_name: sound-forge-spotify-service
+    build:
+      context: ./backend/spotify-service
+      dockerfile: ../../docker/services/Dockerfile.spotify-service
+    ports:
+      - "3001:3001"
+    networks:
+      - api-gateway-network
+      - data-network
+    volumes:
+      - ./backend/spotify-service:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - SERVICE_NAME=spotify-service
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+      - REDIS_URL=redis://redis:6379
+    command: ["npm", "run", "dev"]
+    restart: unless-stopped
+
+  # Download Service
+  download-service:
+    image: sound-forge-download-service:mac
+    container_name: sound-forge-download-service
+    build:
+      context: ./backend/download-service
+      dockerfile: ../../docker/services/Dockerfile.download-service
+    ports:
+      - "3002:3002"
+    networks:
+      - api-gateway-network
+      - data-network
+    volumes:
+      - ./backend/download-service:/app
+      - /app/node_modules
+      - audio_data:/app/audio_data
+    environment:
+      - NODE_ENV=development
+      - PORT=3002
+      - SERVICE_NAME=download-service
+      - REDIS_URL=redis://redis:6379
+      - AUDIO_DATA_PATH=/app/audio_data
+    command: ["npm", "run", "dev"]
+    restart: unless-stopped
+
+  # Processing Service (CPU only for Mac)
+  processing-service:
+    image: sound-forge-processing-service:mac
+    container_name: sound-forge-processing-service
+    build:
+      context: ./backend/processing-service
+      dockerfile: ../../docker/services/Dockerfile.processing-service.cpu
+      # Use platform to ensure compatibility
+      args:
+        - TARGETPLATFORM=linux/arm64
+    platform: linux/arm64
+    ports:
+      - "3003:3003"
+    networks:
+      - api-gateway-network
+      - data-network
+      - websocket-network
+    volumes:
+      - ./backend/processing-service:/app
+      - /app/node_modules
+      - audio_data:/app/audio_data
+    environment:
+      - NODE_ENV=development
+      - PORT=3003
+      - SERVICE_NAME=processing-service
+      - REDIS_URL=redis://redis:6379
+      - AUDIO_DATA_PATH=/app/audio_data
+      - WEBSOCKET_SERVICE_URL=http://websocket-service:3006
+      - USE_GPU=false
+    command: ["npm", "run", "dev"]
+    restart: unless-stopped
+
+  # Analysis Service
+  analysis-service:
+    image: sound-forge-analysis-service:mac
+    container_name: sound-forge-analysis-service
+    build:
+      context: ./backend/analysis-service
+      dockerfile: ../../docker/services/Dockerfile.analysis-service
+    ports:
+      - "3004:3004"
+    networks:
+      - api-gateway-network
+      - data-network
+    volumes:
+      - ./backend/analysis-service:/app
+      - /app/node_modules
+      - audio_data:/app/audio_data
+    environment:
+      - NODE_ENV=development
+      - PORT=3004
+      - SERVICE_NAME=analysis-service
+      - REDIS_URL=redis://redis:6379
+      - AUDIO_DATA_PATH=/app/audio_data
+    command: ["npm", "run", "dev"]
+    restart: unless-stopped
+
+  # WebSocket Service
+  websocket-service:
+    image: sound-forge-websocket-service:mac
+    container_name: sound-forge-websocket-service
+    build:
+      context: ./backend/websocket-service
+      dockerfile: ../../docker/services/Dockerfile.websocket-service
+    ports:
+      - "3006:3006"
+    networks:
+      - api-gateway-network
+      - websocket-network
+      - data-network
+    volumes:
+      - ./backend/websocket-service:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=3006
+      - SERVICE_NAME=websocket-service
+      - REDIS_URL=redis://redis:6379
+    command: ["npm", "run", "dev"]
+    restart: unless-stopped
+
+  # Redis - Shared data store and message broker
+  redis:
+    image: redis:7.2-alpine
+    container_name: sound-forge-redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    networks:
+      - data-network
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  # Redis Commander for Redis management
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: sound-forge-redis-commander
+    ports:
+      - "8081:8081"
+    networks:
+      - data-network
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+networks:
+  # Frontend network
+  frontend-network:
+    driver: bridge
+    name: sound-forge-frontend-network
+
+  # API Gateway network
+  api-gateway-network:
+    driver: bridge
+    name: sound-forge-api-gateway-network
+
+  # Data network
+  data-network:
+    driver: bridge
+    name: sound-forge-data-network
+
+  # WebSocket network
+  websocket-network:
+    driver: bridge
+    name: sound-forge-websocket-network
+
+volumes:
+  # Audio data volume
+  audio_data:
+    name: sound-forge-audio-data
+    
+  # Redis data volume
+  redis_data:
+    name: sound-forge-redis-data

@@ -29,7 +29,12 @@ COPY --chown=soundforge:soundforge package*.json ./
 
 # Environment variables
 ENV PORT=3001 \
-    SERVICE_NAME=spotify-service
+    SERVICE_NAME=spotify-service \
+    TMP_PATH=/app/tmp \
+    CACHE_PATH=/app/cache
+
+# Create necessary directories
+RUN mkdir -p $TMP_PATH $CACHE_PATH
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \

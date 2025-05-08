@@ -30,8 +30,11 @@ COPY --from=builder --chown=soundforge:soundforge /usr/local/lib/python3.10/site
 # Copy application code
 COPY --chown=soundforge:soundforge . .
 
-# Create directories with proper permissions
-RUN mkdir -p /app/audio_data && \
+# Add TMP_PATH and CACHE_PATH environment variables and directory creation
+ENV TMP_PATH=/app/tmp \
+    CACHE_PATH=/app/cache
+
+RUN mkdir -p $TMP_PATH $CACHE_PATH /app/audio_data && \
     chown -R soundforge:soundforge /app/audio_data
 
 # Environment variables

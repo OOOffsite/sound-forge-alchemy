@@ -1,5 +1,15 @@
+import React from 'react';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
+
+// Ensure proper TypeScript support for environment variables
+interface ImportMetaEnv {
+  readonly VITE_WEBSOCKET_URL: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
 
 // Get WebSocket URL from environment
 const WEBSOCKET_URL = import.meta.env.VITE_WEBSOCKET_URL || 'ws://localhost:3006';
@@ -74,7 +84,15 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
   };
 
   return (
-    <WebSocketContext.Provider value={{ socket, isConnected, subscribe, unsubscribe }}>
+  return (
+    <WebSocketContext.Provider
+      value={{
+        socket: socket ?? null,
+        isConnected,
+        subscribe,
+        unsubscribe,
+      }}
+    >
       {children}
     </WebSocketContext.Provider>
   );

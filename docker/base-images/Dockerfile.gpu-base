@@ -1,0 +1,58 @@
+# Dockerfile.gpu-base
+# GPU-accelerated base image with CUDA and PyTorch
+
+FROM pytorch/pytorch:2.2.2-cuda12.1-cudnn8-runtime AS pytorch-base
+
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl \
+    gnupg \
+    tini \
+    ffmpeg \
+    ca-certificates \
+    git \
+    gcc \
+    g++ && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y --no-install-recommends nodejs && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+FROM pytorch-base
+
+# Add non-root user
+RUN groupadd -r soundforge && \
+    useradd -r -g soundforge -d /app soundforge
+
+# Set working directory
+WORKDIR /app
+
+# Create necessary directories with proper permissions
+RUN mkdir -p /app/audio_data /app/models && \
+    chown -R soundforge:soundforge /app
+
+# Environment variables
+ENV TZ=UTC \
+    NODE_ENV=production \
+    PYTHONUNBUFFERED=1 \
+    PORT=3003 \
+    USE_GPU=true \
+    NVIDIA_VISIBLE_DEVICES=all \
+    NVIDIA_DRIVER_CAPABILITIES=compute,utility
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-3003}/health || exit 1
+
+# Expose default port
+EXPOSE 3003
+
+# Use tini as entrypoint for proper signal handling
+ENTRYPOINT ["/usr/bin/tini", "--"]
+
+# Switch to non-root user
+USER soundforge
+
+# Default command
+CMD ["npm", "start"]

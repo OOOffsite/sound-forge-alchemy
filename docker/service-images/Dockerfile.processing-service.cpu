@@ -1,0 +1,57 @@
+# Dockerfile.processing-service.cpu
+# CPU version of the processing service for environments without GPU
+
+FROM python-node-base:latest AS builder
+
+# Set working directory
+WORKDIR /build
+
+# Copy package files
+COPY package*.json ./
+RUN npm ci
+
+# Copy Python requirements
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install PyTorch CPU version - but no models
+# Models will be mounted from host
+RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+# Copy source code
+COPY . .
+
+# Production stage
+FROM python-node-base:latest
+
+# Set working directory
+WORKDIR /app
+
+# Copy built dependencies and application code
+COPY --from=builder --chown=soundforge:soundforge /build/node_modules /app/node_modules
+COPY --from=builder --chown=soundforge:soundforge /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
+COPY --chown=soundforge:soundforge . .
+
+# Create directories with proper permissions
+RUN mkdir -p /app/audio_data /app/models && \
+    chown -R soundforge:soundforge /app/audio_data /app/models
+
+# Environment variables
+ENV PORT=3003 \
+    SERVICE_NAME=processing-service \
+    AUDIO_DATA_PATH=/app/audio_data \
+    USE_GPU=false \
+    PYTORCH_MODEL_PATH=/app/models
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:3003/health || exit 1
+
+# Expose port
+EXPOSE 3003
+
+# Define volumes
+VOLUME ["/app/audio_data", "/app/models"]
+
+# Command to run the service
+CMD ["npm", "start"]

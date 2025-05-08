@@ -8,10 +8,19 @@ Sound Forge Alchemy uses Docker to create a consistent and isolated environment 
 
 ## Directory Structure
 
-- **base/**: Base Dockerfiles for all services
-- **services/**: Service-specific Dockerfiles
-- **compose/**: Docker Compose configurations for different environments
-- **config/**: Configuration files for services
+- **base-images/**: Base Dockerfiles for all services
+- **service-images/**: Service-specific Dockerfiles
+- **compose-files/**: Docker Compose configurations for different environments
+- **config-files/**: Configuration files for services
+
+## Pre-requisites
+
+1. Install Docker and Docker Compose
+2. Download dependencies (optional, but recommended):
+   ```bash
+   # Download PyTorch, Demucs models, and other large dependencies
+   ./docker/download-dependencies.sh
+   ```
 
 ## How to Use
 
@@ -26,11 +35,15 @@ docker network create sound-forge-data-network
 docker network create sound-forge-websocket-network
 docker network create sound-forge-monitoring-network
 
+# Copy and customize environment variables
+cp .env.docker.example .env.docker
+source .env.docker
+
 # Start the platform services (Redis, PostgreSQL, etc.)
-docker-compose -f docker/compose/docker-compose-platform.yml up -d
+docker-compose -f docker/compose-files/docker-compose-platform.yml up -d
 
 # Start the application services in development mode
-docker-compose -f docker/compose/docker-compose.yml -f docker/compose/docker-compose.dev.yml up -d
+docker-compose -f docker/compose-files/docker-compose.yml -f docker/compose-files/docker-compose.dev.yml up -d
 ```
 
 ### macOS Environment (Apple Silicon)
@@ -42,8 +55,15 @@ docker network create sound-forge-api-gateway-network
 docker network create sound-forge-data-network
 docker network create sound-forge-websocket-network
 
+# Download dependencies (optimized for Mac)
+./docker/download-dependencies.sh
+
+# Copy and customize environment variables
+cp .env.docker.example .env.docker
+source .env.docker
+
 # Start the macOS-specific configuration
-docker-compose -f docker/compose/docker-compose.yml -f docker/compose/docker-compose.mac.yml up -d
+docker-compose -f docker/compose-files/docker-compose.yml -f docker/compose-files/docker-compose.mac.yml up -d
 ```
 
 ### Production Environment
@@ -57,28 +77,47 @@ docker network create --driver overlay sound-forge-data-network
 docker network create --driver overlay sound-forge-websocket-network
 docker network create --driver overlay sound-forge-monitoring-network
 
+# Download dependencies (if using shared storage)
+./docker/download-dependencies.sh
+
+# Copy and customize environment variables
+cp .env.docker.example .env.docker
+source .env.docker
+
 # Start the production configuration with GPU acceleration
-USE_GPU=true docker-compose -f docker/compose/docker-compose.yml -f docker/compose/docker-compose.prod.yml up -d
+export USE_GPU=true
+export GPU_DRIVER=nvidia
+export GPU_COUNT=1
+export GPU_CAPABILITIES=gpu
+docker-compose -f docker/compose-files/docker-compose.yml -f docker/compose-files/docker-compose.prod.yml up -d
 ```
 
 ## Environment Variables
 
-The Docker configuration uses several environment variables that should be set before running the Docker Compose commands:
+The Docker configuration uses several environment variables that should be set before running the Docker Compose commands. See `.env.docker.example` for a complete list.
 
-### Required Environment Variables
+## Dependency Management
 
-- `SUPABASE_URL`: The URL of the Supabase instance
-- `SUPABASE_KEY`: The API key for the Supabase instance
-- `SPOTIFY_CLIENT_ID`: The Spotify API client ID
-- `SPOTIFY_CLIENT_SECRET`: The Spotify API client secret
-- `REDIS_PASSWORD`: The password for Redis (defaults to "redispassword" in development)
+Large dependencies like PyTorch models and Demucs models are downloaded separately and mounted into the containers to avoid downloading them during container build time. This saves both time and space.
 
-### Optional Environment Variables
+### Managing Dependencies
 
-- `USE_GPU`: Whether to use GPU acceleration for the processing service (default: false)
-- `GPU_DRIVER`: The GPU driver to use (default: none)
-- `GPU_COUNT`: The number of GPUs to use (default: 0)
-- `GPU_CAPABILITIES`: The GPU capabilities to use
+1. Run the dependency download script:
+   ```bash
+   ./docker/download-dependencies.sh
+   ```
+
+2. This script will:
+   - Create a `deps/` directory in the project root
+   - Download PyTorch based on your system (CPU, CUDA, or MPS for Mac)
+   - Download Demucs models
+   - Set up spotdl cache directory
+   - Create environment variables in `.env.deps`
+
+3. Use the environment variables in your Docker Compose commands:
+   ```bash
+   source .env.deps
+   ```
 
 ## Service Endpoints
 

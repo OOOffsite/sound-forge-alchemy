@@ -64,3 +64,6 @@ audio_data/
 # Backup files
 **/*.bak.*
 *.bak
+
+#any old files
+docker/.old

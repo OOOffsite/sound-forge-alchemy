@@ -60,3 +60,6 @@ docker-compose.override.yml
 
 # Data directories
 audio_data/
+
+# Backup files
+**/*.bak.*

@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 ENV="dev"
 ACTION="up"
 DOCKER_COMPOSE="docker-compose"
-PLATFORM_COMPOSE="docker/compose-files/docker-compose-platform.yml"
+PLATFORM_COMPOSE="docker-compose.yml"
 BASE_COMPOSE="docker/compose-files/docker-compose.yml"
 
 # Function to display help

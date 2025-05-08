@@ -1,5 +1,9 @@
 librosa==0.10.1
-essentia==2.1b6.dev1094
+# Removing essentia which is causing build issues
+# essentia==2.1b5
+# Adding alternatives that don't require complex build dependencies
+audioread>=2.1.9
+soundfile>=0.12.1
 redis==5.0.1
 requests==2.31.0
 python-dotenv==1.0.1

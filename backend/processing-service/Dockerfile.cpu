@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/pytorch:24.03-py3
+FROM pytorch/pytorch:2.2.2-cpu
 
 WORKDIR /app
 
@@ -17,11 +17,9 @@ COPY . .
 # Create directories
 RUN mkdir -p /app/audio_data /app/models
 
-# Configure NVIDIA environment
-ENV NVIDIA_VISIBLE_DEVICES=all
-ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
-ENV USE_GPU=true
-
 EXPOSE 3003
+
+# Set environment variable to indicate CPU-only mode
+ENV USE_GPU=false
 
 CMD ["npm", "start"]

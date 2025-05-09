@@ -3,17 +3,17 @@ services:
   node-base:
     build:
       context: .
-      dockerfile: Dockerfile.node-base
+      dockerfile: ./docker/base-images/Dockerfile.node-base
 
   python-node-base:
     build:
       context: .
-      dockerfile: Dockerfile.python-node-base
+      dockerfile: ./docker/base-images/Dockerfile.python-node-base
 
   gpu-base:
     build:
       context: .
-      dockerfile: Dockerfile.gpu-base
+      dockerfile: docker/base-images/Dockerfile.gpu-base
 
   # Frontend service
   frontend:
@@ -57,6 +57,7 @@ services:
       - REDIS_URL=redis://redis:6379
     networks:
       - sound-forge-network
+      - data-network
 
   # Spotify Service - Handles Spotify API interactions
   spotify-service:
@@ -72,6 +73,7 @@ services:
       - REDIS_URL=redis://redis:6379
     networks:
       - sound-forge-network
+      - data-network
     depends_on:
       - redis
 
@@ -92,6 +94,7 @@ services:
       - TMP_PATH=/app/tmp
     networks:
       - sound-forge-network
+      - data-network
     depends_on:
       - redis
 
@@ -115,6 +118,7 @@ services:
       - GPU_COUNT=all
     networks:
       - sound-forge-network
+      - data-network
     depends_on:
       - redis
       - websocket-service
@@ -139,6 +143,7 @@ services:
       - AUDIO_DATA_PATH=/app/audio_data
     networks:
       - sound-forge-network
+      - data-network
     depends_on:
       - redis
 
@@ -154,6 +159,7 @@ services:
       - REDIS_URL=redis://redis:6379
     networks:
       - sound-forge-network
+      - data-network
     depends_on:
       - redis
 
@@ -165,11 +171,16 @@ services:
       - "6379:6379"
     networks:
       - sound-forge-network
+      - data-network
 
 networks:
   sound-forge-network:
     name: sound-forge-network
     external: true
+
+  data-network:
+    name: sound-forge-data-network
+    driver: bridge
 
 volumes:
   audio_data:

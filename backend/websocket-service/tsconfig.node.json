@@ -1,0 +1,23 @@
+
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist/node",
+    "module": "CommonJS",
+    "target": "ES2022",
+    "lib": ["ES2023"],
+    "strict": true,
+    "skipLibCheck": true,
+    "moduleResolution": "Node",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
+    "jsx": "react"
+  },
+  "include": ["src/node/**/*", "vite.config.ts"],
+  "exclude": ["node_modules"]
+}

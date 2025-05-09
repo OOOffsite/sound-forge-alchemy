@@ -12,12 +12,15 @@ RUN addgroup -S soundforge && \
 RUN apk update && \
     apk upgrade && \
     apk add --no-cache \
-        ca-certificates \
-        tzdata \
-        curl \
-        bash \
-        tini && \
+    ca-certificates \
+    tzdata \
+    curl \
+    bash \
+    tini && \
     rm -rf /var/cache/apk/*
+
+# Install Node.js and npm
+RUN apk add --no-cache nodejs npm
 
 # Set working directory
 WORKDIR /app

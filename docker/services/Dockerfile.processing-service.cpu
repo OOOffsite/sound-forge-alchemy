@@ -1,14 +1,17 @@
 # Dockerfile.processing-service.cpu
 # CPU version of the processing service for environments without GPU
 
-FROM python-node-base:latest AS builder
+FROM sound-forge-alchemy-python-node-base AS builder
 
 # Set working directory
 WORKDIR /build
 
 # Copy package files
 COPY package*.json ./
+USER root
+RUN npm install 
 RUN npm ci
+USER soundforge
 
 # Copy Python requirements
 COPY requirements.txt ./
@@ -21,8 +24,7 @@ RUN pip install torch torchvision torchaudio --index-url https://download.pytorc
 COPY . .
 
 # Production stage
-FROM python-node-base:latest
-
+FROM sound-forge-alchemy-python-node-base
 # Set working directory
 WORKDIR /app
 

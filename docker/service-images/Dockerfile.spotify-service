@@ -1,14 +1,17 @@
 # Dockerfile.spotify-service
 # Service for Spotify API integration
 
-FROM node-base:latest AS builder
+FROM sound-forge-alchemy-node-base:latest AS builder
 
 # Set working directory
 WORKDIR /build
 
 # Copy package files
 COPY package*.json ./
+USER root
+RUN npm install 
 RUN npm ci
+USER soundforge
 
 # Copy source code
 COPY . .
@@ -17,7 +20,8 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node-base:latest
+FROM sound-forge-alchemy-node-base:latest
+
 
 # Set working directory
 WORKDIR /app

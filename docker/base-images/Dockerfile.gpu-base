@@ -32,6 +32,14 @@ WORKDIR /app
 RUN mkdir -p /app/audio_data /app/models && \
     chown -R soundforge:soundforge /app
 
+# Add TMP_PATH and CACHE_PATH environment variables
+ENV TMP_PATH=/app/tmp \
+    CACHE_PATH=/app/cache
+
+# Create TMP_PATH and CACHE_PATH directories with proper permissions
+RUN mkdir -p $TMP_PATH $CACHE_PATH && \
+    chown -R soundforge:soundforge $TMP_PATH $CACHE_PATH
+
 # Environment variables
 ENV TZ=UTC \
     NODE_ENV=production \

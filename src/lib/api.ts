@@ -43,7 +43,7 @@ export const downloadApi = {
 // Processing endpoints
 export const processingApi = {
   separateTrack: async (trackId: string, options: any) => {
-    const response = await api.post('/api/process/separate', {
+    const response = await api.post("/api/process/separate", {
       trackId,
       options,
     });
@@ -57,6 +57,11 @@ export const processingApi = {
     const response = await api.get(`/api/process/track/${trackId}`);
     return response.data;
   },
+  getModels: async () => {
+    const response = await api.get(`/api/models`);
+    return response.data;
+  },
+
 };
 
 // Analysis endpoints

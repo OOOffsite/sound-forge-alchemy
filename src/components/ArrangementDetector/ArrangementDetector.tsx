@@ -32,6 +32,35 @@ const sectionColors = {
   custom: '#808080'
 };
 
+// Reusable component for rendering arrangement sections
+const ArrangementSectionItem = ({ section, onEdit }: { section: ArrangementSection; onEdit: (section: ArrangementSection) => void }) => (
+  <div 
+    key={section.id}
+    className="flex items-center justify-between p-2 border rounded hover:bg-accent/50"
+  >
+    <div className="flex items-center gap-2">
+      <div 
+        className="w-3 h-3 rounded-full" 
+        style={{ backgroundColor: section.color }}
+      />
+      <span>{section.label}</span>
+      <Badge variant="outline">
+        {section.type}
+      </Badge>
+    </div>
+    <div className="text-sm text-muted-foreground">
+      {formatTime(section.start)} - {formatTime(section.end)}
+    </div>
+    <Button 
+      variant="outline" 
+      size="sm"
+      onClick={() => onEdit(section)}
+    >
+      Edit
+    </Button>
+  </div>
+);
+
 const ArrangementDetector: React.FC<ArrangementDetectorProps> = ({
   trackId,
   audioUrl,
@@ -65,18 +94,18 @@ const ArrangementDetector: React.FC<ArrangementDetectorProps> = ({
       
       // Call the analysis API
       const response = await fetch(`/api/analysis/arrangement?trackId=${trackId}`);
-      const data = await response.json();
+      const data: { arrangement: { start: number; end: number; type: string; label?: string }[] } = await response.json();
       
       clearInterval(progressInterval);
       setAnalysisProgress(100);
       
       // Process detected arrangement
       if (data.arrangement) {
-        const processedArrangement = data.arrangement.map((section: any, index: number) => ({
+        const processedArrangement = data.arrangement.map((section, index) => ({
           id: `section-${index}`,
           start: section.start,
           end: section.end,
-          type: section.type,
+          type: section.type as ArrangementSection['type'],
           color: sectionColors[section.type as keyof typeof sectionColors] || sectionColors.custom,
           label: section.label || getDefaultLabel(section.type, index)
         }));
@@ -349,31 +378,11 @@ const ArrangementDetector: React.FC<ArrangementDetectorProps> = ({
             {arrangement.length > 0 ? (
               <div className="space-y-2">
                 {arrangement.map(section => (
-                  <div 
+                  <ArrangementSectionItem 
                     key={section.id}
-                    className="flex items-center justify-between p-2 border rounded hover:bg-accent/50"
-                  >
-                    <div className="flex items-center gap-2">
-                      <div 
-                        className="w-3 h-3 rounded-full" 
-                        style={{ backgroundColor: section.color }}
-                      />
-                      <span>{section.label}</span>
-                      <Badge variant="outline">
-                        {section.type}
-                      </Badge>
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {formatTime(section.start)} - {formatTime(section.end)}
-                    </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => editSection(section)}
-                    >
-                      Edit
-                    </Button>
-                  </div>
+                    section={section}
+                    onEdit={editSection}
+                  />
                 ))}
               </div>
             ) : (

@@ -1,14 +1,13 @@
-
 import React, { useState } from 'react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { Switch } from '@/components/ui/switch';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
+import { Checkbox } from './ui/checkbox';
+import { Label } from './ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Separator } from './ui/separator';
+import { Switch } from './ui/switch';
 import { Download, FileMusic, Tags } from 'lucide-react';
-import { toast } from '@/components/ui/sonner';
+import { toast } from './ui/sonner';
 
 interface Stem {
   id: string;
@@ -30,6 +29,14 @@ export interface ExportOptions {
   includeMetadata: boolean;
   normalizeAudio: boolean;
 }
+
+// Reusable component for rendering labeled switches
+const LabeledSwitch = ({ id, label, isChecked, onChange }: { id: string; label: string; isChecked: boolean; onChange: (checked: boolean) => void }) => (
+  <div className="flex items-center justify-between">
+    <Label htmlFor={id}>{label}</Label>
+    <Switch id={id} checked={isChecked} onCheckedChange={onChange} />
+  </div>
+);
 
 export default function ExportStemsPanel({ stems, isExporting, onExport }: ExportStemsPanelProps) {
   const [selectedStems, setSelectedStems] = useState<string[]>(stems.map(stem => stem.id));
@@ -159,26 +166,18 @@ export default function ExportStemsPanel({ stems, isExporting, onExport }: Expor
           <Separator />
           
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Tags className="h-4 w-4" />
-                <Label htmlFor="include-metadata">Include ID3 Tags & Analysis Data</Label>
-              </div>
-              <Switch 
-                id="include-metadata" 
-                checked={includeMetadata} 
-                onCheckedChange={setIncludeMetadata}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <Label htmlFor="normalize-audio">Normalize Audio (-14 LUFS)</Label>
-              <Switch 
-                id="normalize-audio" 
-                checked={normalizeAudio} 
-                onCheckedChange={setNormalizeAudio}
-              />
-            </div>
+            <LabeledSwitch 
+              id="include-metadata" 
+              label="Include ID3 Tags & Analysis Data" 
+              isChecked={includeMetadata} 
+              onChange={setIncludeMetadata} 
+            />
+            <LabeledSwitch 
+              id="normalize-audio" 
+              label="Normalize Audio (-14 LUFS)" 
+              isChecked={normalizeAudio} 
+              onChange={setNormalizeAudio} 
+            />
           </div>
         </div>
       </CardContent>

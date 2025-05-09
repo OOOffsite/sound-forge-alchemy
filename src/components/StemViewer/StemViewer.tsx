@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useTheme } from '../../hooks/useTheme';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+// import { useTheme } from '../../hooks/useTheme';
 import { Button } from '../ui/button';
 import { Slider } from '../ui/slider';
 import { Toggle } from '../ui/toggle';
@@ -63,6 +63,29 @@ const stemTypeColors = {
   other: '#53B175'
 };
 
+// Reusable component for rendering individual stems
+const StemRow = ({ stem, onSolo, onMute }: { stem: Stem; onSolo: (id: string) => void; onMute: (id: string) => void }) => (
+  <div key={stem.id} className="stem-row mb-4">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        <div 
+          className="w-3 h-3 rounded-full" 
+          style={{ backgroundColor: stem.color }}
+        />
+        <span>{stem.name}</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <Button variant="outline" size="sm" onClick={() => onSolo(stem.id)}>
+          Solo
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => onMute(stem.id)}>
+          Mute
+        </Button>
+      </div>
+    </div>
+  </div>
+);
+
 const StemViewer: React.FC<StemViewerProps> = ({
   trackId,
   trackName,
@@ -75,7 +98,6 @@ const StemViewer: React.FC<StemViewerProps> = ({
   onAddCuePoint,
   onExportStems
 }) => {
-  const { theme } = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
   const wavesurferRefs = useRef<{ [key: string]: WaveSurfer }>({});
   const [activeMIDIDevice, setActiveMIDIDevice] = useState<string | null>(null);
@@ -95,6 +117,73 @@ const StemViewer: React.FC<StemViewerProps> = ({
   const [loopEnd, setLoopEnd] = useState(0);
   const [showArrangement, setShowArrangement] = useState(true);
   const [showCuePoints, setShowCuePoints] = useState(true);
+
+  const handleMIDIControlChange = (cc: number, value: number) => {
+    // Convert MIDI value (0-127) to range 0-1
+    const normalizedValue = value / 127;
+    
+    // Map CC numbers to functions
+    switch (cc) {
+      case 1: // CC#1 - Main volume
+        setMasterVolume(normalizedValue);
+        break;
+      case 2: // CC#2 - First stem volume
+        if (stems.length > 0) {
+          updateStemVolume(stems[0].id, normalizedValue);
+        }
+        break;
+      // Add more CC mappings as needed
+    }
+  };
+
+  const handleMIDINoteOn = (note: number, velocity: number) => {
+    // Map MIDI notes to functions
+    switch (note) {
+      case 36: // C1
+        togglePlayPause();
+        break;
+      case 37: // C#1
+        stopPlayback();
+        break;
+      case 38: // D1
+        toggleLoopActive();
+        break;
+      // Add more note mappings as needed
+    }
+  };
+
+  // Initialize Web MIDI API
+  const initMIDI = useCallback(async () => {
+    if (typeof navigator.requestMIDIAccess === 'function') {
+      try {
+        // Enable WebMidi
+        await WebMidi.enable();
+        
+        // Get list of available MIDI inputs
+        const inputNames = WebMidi.inputs.map(input => input.name);
+        setMidiDevices(inputNames);
+        
+        // Set up event listeners for all inputs
+        WebMidi.inputs.forEach(input => {
+          // Note on events
+          input.addListener('noteon', e => {
+            handleMIDINoteOn(e.note.number, e.note.attack);
+          });
+          
+          // Control change events
+          input.addListener('controlchange', e => {
+            handleMIDIControlChange(e.controller.number as number, e.value as number);
+          });
+        });
+        
+        console.log('MIDI enabled successfully!');
+      } catch (err) {
+        console.error('Failed to enable MIDI:', err);
+      }
+    } else {
+      console.warn('Web MIDI API is not supported in this browser');
+    }
+  }, [handleMIDIControlChange, handleMIDINoteOn]);
 
   // Initialize WaveSurfer instances for each stem
   useEffect(() => {
@@ -116,27 +205,24 @@ const StemViewer: React.FC<StemViewerProps> = ({
         progressColor: '#2D91EF',
         height: 80,
         normalize: true,
-        splitChannels: false,
         minPxPerSec: 50,
         plugins: [
-          RegionsPlugin.create({
+          new RegionsPlugin({
             regions: [
               // Add regions for arrangement sections
-              ...arrangement.map(section => ({
+              ...(arrangement || []).map(section => ({
                 id: section.id,
                 start: section.start,
                 end: section.end,
                 color: `${section.color}33`, // Add transparency
-                drag: false,
                 resize: false
               })),
               // Add regions for existing loops
-              ...loops.map(loop => ({
+              ...(loops || []).map(loop => ({
                 id: loop.id,
                 start: loop.start,
                 end: loop.end,
                 color: '#00FF0033',
-                drag: false,
                 resize: false
               }))
             ]
@@ -178,7 +264,7 @@ const StemViewer: React.FC<StemViewerProps> = ({
     // Sync wavesurfer instances
     const primaryWavesurfer = Object.values(wavesurferRefs.current)[0];
     if (primaryWavesurfer) {
-      primaryWavesurfer.on('seek', (progress) => {
+      primaryWavesurfer.on('seek', (progress: number) => {
         Object.values(wavesurferRefs.current).forEach(ws => {
           if (ws !== primaryWavesurfer) {
             ws.seekTo(progress);
@@ -194,76 +280,7 @@ const StemViewer: React.FC<StemViewerProps> = ({
       });
       wavesurferRefs.current = {};
     };
-  }, [stems]);
-
-  // Initialize Web MIDI API
-  const initMIDI = async () => {
-    if (navigator.requestMIDIAccess) {
-      try {
-        // Enable WebMidi
-        await WebMidi.enable();
-        
-        // Get list of available MIDI inputs
-        const inputNames = WebMidi.inputs.map(input => input.name);
-        setMidiDevices(inputNames);
-        
-        // Set up event listeners for all inputs
-        WebMidi.inputs.forEach(input => {
-          // Note on events
-          input.addListener('noteon', e => {
-            handleMIDINoteOn(e.note.number, e.note.attack);
-          });
-          
-          // Control change events
-          input.addListener('controlchange', e => {
-            handleMIDIControlChange(e.controller.number, e.value);
-          });
-        });
-        
-        console.log('MIDI enabled successfully!');
-      } catch (err) {
-        console.error('Failed to enable MIDI:', err);
-      }
-    } else {
-      console.warn('Web MIDI API is not supported in this browser');
-    }
-  };
-
-  // Handle MIDI note on events
-  const handleMIDINoteOn = (note: number, velocity: number) => {
-    // Map MIDI notes to functions
-    switch (note) {
-      case 36: // C1
-        togglePlayPause();
-        break;
-      case 37: // C#1
-        stopPlayback();
-        break;
-      case 38: // D1
-        toggleLoopActive();
-        break;
-      // Add more note mappings as needed
-    }
-  };
-
-  // Handle MIDI control change events
-  const handleMIDIControlChange = (cc: number, value: number) => {
-    // Convert MIDI value (0-127) to range 0-1
-    const normalizedValue = value / 127;
-    
-    // Map CC numbers to functions
-    switch (cc) {
-      case 1: // CC#1 - Main volume
-        setMasterVolume(normalizedValue);
-        break;
-      case 2: // CC#2 - First stem volume
-        if (stems.length > 0) {
-          updateStemVolume(stems[0].id, normalizedValue);
-        }
-        break;
-      // Add more CC mappings as needed
-    }
-  };
+  }, [stems, arrangement, currentLoop, duration, initMIDI, loopActive, loops, volumes]);
 
   // Control playback
   const togglePlayPause = () => {
@@ -448,50 +465,12 @@ const StemViewer: React.FC<StemViewerProps> = ({
           {/* Stem controls and waveforms */}
           <div className="stems-container">
             {stems.map(stem => (
-              <div key={stem.id} className="stem-row mb-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <div 
-                    className="w-4 h-4 rounded-full" 
-                    style={{ backgroundColor: stem.color || stemTypeColors[stem.type] }}
-                  />
-                  <div className="font-medium">{stem.name}</div>
-                  <div className="flex-grow" />
-                  <Button 
-                    size="sm" 
-                    variant={selectedStems.includes(stem.id) ? "default" : "outline"}
-                    onClick={() => toggleStemSelection(stem.id)}
-                  >
-                    {selectedStems.includes(stem.id) ? 'Selected' : 'Select'}
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant={soloedStems.includes(stem.id) ? "default" : "outline"}
-                    onClick={() => toggleSolo(stem.id)}
-                  >
-                    Solo
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant={mutedStems.includes(stem.id) ? "default" : "outline"}
-                    onClick={() => toggleMute(stem.id)}
-                  >
-                    Mute
-                  </Button>
-                </div>
-                
-                {/* Volume slider */}
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs w-10">Volume</span>
-                  <Slider
-                    defaultValue={[100]}
-                    max={100}
-                    step={1}
-                    value={[volumes[stem.id] * 100]}
-                    onValueChange={([value]) => updateStemVolume(stem.id, value / 100)}
-                  />
-                  <span className="text-xs w-10">{Math.round(volumes[stem.id] * 100)}%</span>
-                </div>
-              </div>
+              <StemRow 
+                key={stem.id}
+                stem={stem}
+                onSolo={(id) => setSoloedStems([id])}
+                onMute={(id) => setMutedStems([...mutedStems, id])}
+              />
             ))}
           </div>
           

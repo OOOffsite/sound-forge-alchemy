@@ -1,12 +1,20 @@
-
 import React from 'react';
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "../components/ui/toaster";
+import { Toaster as Sonner } from "../components/ui/sonner";
+import { TooltipProvider } from "../components/ui/tooltip";
 
 type MainLayoutProps = {
   children: React.ReactNode;
 };
+
+// Reusable component for rendering navigation links
+const NavigationLink = ({ href, label }: { href: string; label: string }) => (
+  <li>
+    <a href={href} className="text-foreground hover:text-primary transition-colors">
+      {label}
+    </a>
+  </li>
+);
 
 export default function MainLayout({ children }: MainLayoutProps) {
   return (
@@ -19,16 +27,8 @@ export default function MainLayout({ children }: MainLayoutProps) {
             </h1>
             <nav>
               <ul className="flex gap-4">
-                <li>
-                  <a href="/" className="text-foreground hover:text-primary transition-colors">
-                    Home
-                  </a>
-                </li>
-                <li>
-                  <a href="/about" className="text-foreground hover:text-primary transition-colors">
-                    About
-                  </a>
-                </li>
+                <NavigationLink href="/" label="Home" />
+                <NavigationLink href="/about" label="About" />
               </ul>
             </nav>
           </div>

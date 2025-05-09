@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
+import { Label } from './ui/label';
+import { Separator } from './ui/separator';
+import { Slider } from './ui/slider';
+import { Switch } from './ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Music, Headphones, FileMusic, Volume2 } from 'lucide-react';
 import { Track } from './TrackList';
-import { toast } from '@/components/ui/sonner';
+import { toast } from './ui/sonner';
 import StepDisplay from './StepDisplay';
-import { calculateBPM, detectKey } from '@/lib/utils';
-import { processingApi } from '@/lib/api';
+import { calculateBPM, detectKey } from '../lib/utils';
+import { processingApi } from '../lib/api';
 import { useQuery } from '@tanstack/react-query';
+import { Icon } from '@radix-ui/react-select';
 
 interface AudioProcessorProps {
   selectedTrack: Track | null;
@@ -41,6 +42,57 @@ export interface AnalysisResult {
   }[];
 }
 
+export interface Model {
+  id: string;
+  name: string;
+  isDefault?: boolean;
+  installed: boolean;
+}
+
+export interface ProcessingApi {
+  getModels: () => Promise<Model[]>;
+}
+
+// Reusable component for rendering model buttons
+const ModelButton = ({ model, isSelected, onClick }: { model: Model; isSelected: boolean; onClick: () => void }) => (
+  <Button 
+    variant={isSelected ? "default" : "outline"}
+    onClick={onClick}
+    className="flex-1"
+  >
+    {model.name}
+  </Button>
+);
+
+// Reusable component for rendering stem switches
+const StemSwitch = ({ id, label, icon, isChecked, onChange }: { id: string; label: string; icon: React.ComponentType; isChecked: boolean; onChange: (checked: boolean) => void }) => (
+  <div className="flex items-center justify-between">
+    <Label htmlFor={id} className="flex items-center gap-2">
+      {icon && <Icon className="h-4 w-4" />} {label}
+    </Label>
+    <Switch 
+      id={id}
+      checked={isChecked} 
+      onCheckedChange={onChange} 
+    />
+  </div>
+);
+
+// Reusable component for rendering labeled sliders
+const LabeledSlider = ({ id, label, value, onChange, min, max, step }: { id: string; label: string; value: number; onChange: (value: number) => void; min: number; max: number; step: number }) => (
+  <div className="space-y-2">
+    <Label htmlFor={id}>{label}</Label>
+    <Slider
+      id={id}
+      value={[value]}
+      onValueChange={(values) => onChange(values[0])}
+      min={min}
+      max={max}
+      step={step}
+    />
+  </div>
+);
+
 export default function AudioProcessor({ 
   selectedTrack, 
   isProcessing, 
@@ -56,7 +108,7 @@ export default function AudioProcessor({
     extractOther: true,
   });
   
-  const [volume, setVolume] = useState<number[]>([75]);
+  const [volume, setVolume] = useState<number>(75);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   
   // Fetch available models
@@ -161,32 +213,25 @@ export default function AudioProcessor({
                 <div className="flex gap-2 mt-2">
                   {models.length > 0 ? (
                     models.filter(model => model.installed).map(model => (
-                      <Button 
+                      <ModelButton 
                         key={model.id}
-                        variant={separationOptions.model === model.id ? "default" : "outline"}
+                        model={model}
+                        isSelected={separationOptions.model === model.id}
                         onClick={() => setSeparationOptions({...separationOptions, model: model.id})}
-                        className="flex-1"
-                      >
-                        {model.name}
-                      </Button>
+                      />
                     ))
                   ) : (
-                    <>
-                      <Button 
-                        variant={separationOptions.model === 'htdemucs' ? "default" : "outline"}
-                        onClick={() => setSeparationOptions({...separationOptions, model: 'htdemucs'})}
-                        className="flex-1"
-                      >
-                        HTDemucs
-                      </Button>
-                      <Button 
-                        variant={separationOptions.model === 'mdx_extra' ? "default" : "outline"}
-                        onClick={() => setSeparationOptions({...separationOptions, model: 'mdx_extra'})}
-                        className="flex-1"
-                      >
-                        MDX-Extra
-                      </Button>
-                    </>
+                    [
+                      { id: 'htdemucs', name: 'HTDemucs' },
+                      { id: 'mdx_extra', name: 'MDX-Extra' }
+                    ].map(model => (
+                      <ModelButton 
+                        key={model.id}
+                        model={{ ...model, installed: false }}
+                        isSelected={separationOptions.model === model.id}
+                        onClick={() => setSeparationOptions({...separationOptions, model: model.id})}
+                      />
+                    ))
                   )}
                 </div>
               </div>
@@ -195,78 +240,34 @@ export default function AudioProcessor({
 
               <div className="space-y-4">
                 <Label>Select Stems to Extract</Label>
-                
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="vocals" className="flex items-center gap-2">
-                    <Music className="h-4 w-4" /> Vocals
-                  </Label>
-                  <Switch 
-                    id="vocals" 
-                    checked={separationOptions.extractVocals} 
-                    onCheckedChange={(checked) => 
-                      setSeparationOptions({...separationOptions, extractVocals: checked})
-                    } 
+                {[
+                  { id: 'vocals', label: 'Vocals', icon: Music, isChecked: separationOptions.extractVocals, onChange: (checked: boolean) => setSeparationOptions({...separationOptions, extractVocals: checked}) },
+                  { id: 'bass', label: 'Bass', icon: Music, isChecked: separationOptions.extractBass, onChange: (checked: boolean) => setSeparationOptions({...separationOptions, extractBass: checked}) },
+                  { id: 'drums', label: 'Drums', icon: Music, isChecked: separationOptions.extractDrums, onChange: (checked: boolean) => setSeparationOptions({...separationOptions, extractDrums: checked}) },
+                  { id: 'other', label: 'Other', icon: Music, isChecked: separationOptions.extractOther, onChange: (checked: boolean) => setSeparationOptions({...separationOptions, extractOther: checked}) }
+                ].map(stem => (
+                  <StemSwitch 
+                    key={stem.id}
+                    id={stem.id}
+                    label={stem.label}
+                    icon={stem.icon}
+                    isChecked={stem.isChecked}
+                    onChange={stem.onChange}
                   />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="bass" className="flex items-center gap-2">
-                    <Music className="h-4 w-4" /> Bass
-                  </Label>
-                  <Switch 
-                    id="bass" 
-                    checked={separationOptions.extractBass} 
-                    onCheckedChange={(checked) => 
-                      setSeparationOptions({...separationOptions, extractBass: checked})
-                    } 
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="drums" className="flex items-center gap-2">
-                    <Music className="h-4 w-4" /> Drums
-                  </Label>
-                  <Switch 
-                    id="drums" 
-                    checked={separationOptions.extractDrums} 
-                    onCheckedChange={(checked) => 
-                      setSeparationOptions({...separationOptions, extractDrums: checked})
-                    } 
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="other" className="flex items-center gap-2">
-                    <Music className="h-4 w-4" /> Other
-                  </Label>
-                  <Switch 
-                    id="other" 
-                    checked={separationOptions.extractOther} 
-                    onCheckedChange={(checked) => 
-                      setSeparationOptions({...separationOptions, extractOther: checked})
-                    } 
-                  />
-                </div>
+                ))}
               </div>
 
               <Separator />
 
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="volume" className="flex items-center gap-2">
-                    <Volume2 className="h-4 w-4" /> Playback Volume
-                  </Label>
-                  <span className="text-sm text-muted-foreground">{volume}%</span>
-                </div>
-                <Slider
-                  id="volume"
-                  min={0}
-                  max={100}
-                  step={1}
-                  value={volume}
-                  onValueChange={setVolume}
-                />
-              </div>
+              <LabeledSlider 
+                id="volume-slider" 
+                label="Playback Volume" 
+                value={volume} 
+                onChange={setVolume} 
+                min={0} 
+                max={100} 
+                step={1} 
+              />
 
               <div className="space-y-2 mt-6">
                 <Label>Processing Status</Label>

@@ -37,6 +37,7 @@ This document provides a comprehensive explanation of the Docker architecture us
     - [Production Environment](#production-environment)
   - [Troubleshooting](#troubleshooting)
     - [Common Issues](#common-issues)
+  - [Container Orchestration](#container-orchestration)
 
 ## Overview
 
@@ -94,18 +95,18 @@ graph TD
     AnalysisService --> AudioData
     WebSocketService --> Redis
 
-    click NodeBase "#node-base" "View node-base details"
-    click PythonNodeBase "#python-node-base" "View python-node-base details"
-    click GPUBase "#gpu-base" "View gpu-base details"
-    click API_Gateway "#api-gateway" "View API Gateway details"
-    click Frontend "#frontend" "View Frontend details"
-    click SpotifyService "#spotify-service" "View Spotify Service details"
-    click DownloadService "#download-service" "View Download Service details"
-    click ProcessingService "#processing-service" "View Processing Service details"
-    click AnalysisService "#analysis-service" "View Analysis Service details"
-    click WebSocketService "#websocket-service" "View WebSocket Service details"
-    click Redis "#redis" "View Redis details"
-    click AudioData "#audio-data-volume" "View Audio Data Volume details"
+click NodeBase "#node-base" "View node-base details"
+click PythonNodeBase "#python-node-base" "View python-node-base details"
+click GPUBase "#gpu-base" "View gpu-base details"
+click API_Gateway "#api-gateway" "View API Gateway details"
+click Frontend "#frontend" "View Frontend details"
+click SpotifyService "#spotify-service" "View Spotify Service details"
+click DownloadService "#download-service" "View Download Service details"
+click ProcessingService "#processing-service" "View Processing Service details"
+click AnalysisService "#analysis-service" "View Analysis Service details"
+click WebSocketService "#websocket-service" "View WebSocket Service details"
+click Redis "#redis" "View Redis details"
+click AudioData "#audio-data-volume" "View Audio Data Volume details"
 ```
 
 ## Environment-Specific Configurations
@@ -210,15 +211,15 @@ flowchart TD
 
     Spotify --> SpotifyAPI
 
-    click Frontend "#frontend" "View Frontend details"
-    click API "#api-gateway" "View API Gateway details"
-    click Spotify "#spotify-service" "View Spotify Service details"
-    click Download "#download-service" "View Download Service details"
-    click Processing "#processing-service" "View Processing Service details"
-    click Analysis "#analysis-service" "View Analysis Service details"
-    click WebSocket "#websocket-service" "View WebSocket Service details"
-    click Redis "#redis" "View Redis details"
-    click AudioVolume "#audio-data-volume" "View Audio Data Volume details"
+click Frontend "#frontend" "View Frontend details"
+click API "#api-gateway" "View API Gateway details"
+click Spotify "#spotify-service" "View Spotify Service details"
+click Download "#download-service" "View Download Service details"
+click Processing "#processing-service" "View Processing Service details"
+click Analysis "#analysis-service" "View Analysis Service details"
+click WebSocket "#websocket-service" "View WebSocket Service details"
+click Redis "#redis" "View Redis details"
+click AudioVolume "#audio-data-volume" "View Audio Data Volume details"
 ```
 
 ## Base Images
@@ -405,7 +406,6 @@ Redis serves as the messaging and caching layer:
 
 The data flow through the system follows this sequence:
 
-🧠
 ```mermaid
 sequenceDiagram
     participant Client as Client Browser
@@ -450,14 +450,14 @@ sequenceDiagram
 
     note over Client,Redis: Real-time updates flow through WebSocket during all operations
 
-    click Frontend "#frontend"->>"View Frontend details" 
-     click API '\api-gateway"' "View API Gateway details"
-    click Spotify "#spotify-service" "View Spotify Service details"
-    click Download "#download-service" "View Download Service details"
-    click Processing "#processing-service" "View Processing Service details"
-    click Analysis "#analysis-service" "View Analysis Service details"
-    click WebSocket "#websocket-service" "View WebSocket Service details"
-    click Redis "#redis" "View Redis details"
+click Frontend "#frontend" "View Frontend details"
+click API "#api-gateway" "View API Gateway details"
+click Spotify "#spotify-service" "View Spotify Service details"
+click Download "#download-service" "View Download Service details"
+click Processing "#processing-service" "View Processing Service details"
+click Analysis "#analysis-service" "View Analysis Service details"
+click WebSocket "#websocket-service" "View WebSocket Service details"
+click Redis "#redis" "View Redis details"
 ```
 
 ## Networks and Volumes
@@ -556,25 +556,185 @@ docker-compose -f docker-compose.prod.yml up -d
    - Ensure Redis is running before other services start
    - Check Redis URL configuration in each service
 
-<style>
-.mermaid {
-  background-color: white;
-  border-radius: 8px;
-  padding: 20px;
-  margin: 20px 0;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
+## Container Orchestration
 
-h1, h2, h3 {
-  color: #1976d2;
-}
+<a id="container-orchestration"></a>
 
-a {
-  color: #1976d2;
-  text-decoration: none;
-}
+<details><summary>🟦 <b>Mermaid Diagram: Container Orchestration (docker-compose.yml)</b></summary>
 
-a:hover {
-  text-decoration: underline;
-}
-</style>
+```mermaid
+graph TD
+  redis["redis\nPort: 6379\nPurpose: Caching, pub/sub messaging"]
+  websocket["websocket-service\nPort: 3006\nPurpose: Real-time communication"]
+  analysis["analysis-service\nPort: 3004\nPurpose: Audio analysis (BPM, key, etc.)"]
+  processing["processing-service\nPort: 3003\nPurpose: Audio separation (Demucs)"]
+  download["download-service\nPort: 3002\nPurpose: Track downloading (spotdl)"]
+  spotify["spotify-service\nPort: 3001\nPurpose: Spotify API interactions"]
+  api["api-gateway\nPort: 3000\nPurpose: Entry point for client requests"]
+  frontend["frontend\nPort: 8001\nPurpose: Web UI"]
+
+  frontend --> api
+  api --> spotify
+  api --> download
+  api --> processing
+  api --> analysis
+  api --> websocket
+  spotify --> redis
+  download --> redis
+  download --> analysis
+  processing --> redis
+  processing --> websocket
+  processing --> download
+  analysis --> redis
+  websocket --> redis
+
+  classDef svc fill:#bbdefb,stroke:#1976d2,color:black
+  classDef infra fill:#c8e6c9,stroke:#388e3c,color:black
+  class frontend,api,spotify,download,processing,analysis,websocket svc;
+  class redis infra;
+```
+</details>
+
+<details><summary>🟧 <b>PlantUML: Container Orchestration (docker-compose.yml)</b></summary>
+
+```plantuml
+@startuml
+!define RECTANGLE class
+RECTANGLE redis as "redis\nPort: 6379\nPurpose: Caching, pub/sub messaging"
+RECTANGLE websocket as "websocket-service\nPort: 3006\nPurpose: Real-time communication"
+RECTANGLE analysis as "analysis-service\nPort: 3004\nPurpose: Audio analysis (BPM, key, etc.)"
+RECTANGLE processing as "processing-service\nPort: 3003\nPurpose: Audio separation (Demucs)"
+RECTANGLE download as "download-service\nPort: 3002\nPurpose: Track downloading (spotdl)"
+RECTANGLE spotify as "spotify-service\nPort: 3001\nPurpose: Spotify API interactions"
+RECTANGLE api as "api-gateway\nPort: 3000\nPurpose: Entry point for client requests"
+RECTANGLE frontend as "frontend\nPort: 8001\nPurpose: Web UI"
+
+frontend --> api
+api --> spotify
+api --> download
+api --> processing
+api --> analysis
+api --> websocket
+spotify --> redis
+analysis --> redis
+download --> redis
+processing --> redis
+processing --> websocket
+processing --> download
+websocket --> redis
+@enduml
+```
+</details>
+
+---
+
+### Container Startup Order (Dependencies)
+
+| Service             | Ports   | Purpose                                 | Depends On                                 |
+|---------------------|---------|-----------------------------------------|--------------------------------------------|
+| redis               | 6379    | Caching, pub/sub messaging              | -                                          |
+| websocket-service   | 3006    | Real-time communication                 | redis                                      |
+| spotify-service     | 3001    | Spotify API interactions                | redis                                      |
+| download-service    | 3002    | Track downloading (spotdl)              | redis                                      |
+| processing-service  | 3003    | Audio separation (Demucs)               | redis, websocket-service, gpu-base         |
+| analysis-service    | 3004    | Audio analysis (BPM, key, etc.)         | redis                                      |
+| api-gateway         | 3000    | Entry point for client requests         | spotify-service, download-service,         |
+|                     |         |                                         | processing-service, analysis-service,       |
+|                     |         |                                         | websocket-service                          |
+| frontend            | 8001    | Web UI                                  | api-gateway                                |
+
+- **Order is correct:**
+  - `redis` starts first (core dependency)
+  - All other services that depend on `redis` are started next
+  - `websocket-service`, `spotify-service`, `download-service`, `processing-service`, `analysis-service` start after `redis`
+  - `api-gateway` starts after all backend services are up
+  - `frontend` starts last, depending on `api-gateway`
+
+---
+
+These diagrams and the table above provide a clear, visual, and tabular summary of the containers, their ports, purposes, and dependencies as orchestrated by `docker-compose.yml`.
+
+<!--
+Collapsible: Container Build Dependency Graph (depcruise style)
+-->
+<details><summary>🟦 <b>Depcruise-style: Docker Build Dependency Graph</b></summary>
+
+```mermaid
+graph TD
+  subgraph BaseImages
+    nodebase["node-base"]
+    pythonnodebase["python-node-base"]
+    gpubase["gpu-base"]
+  end
+
+  subgraph BackendServices
+    apigateway["api-gateway"]
+    spotify["spotify-service"]
+    download["download-service"]
+    processing["processing-service"]
+    analysis["analysis-service"]
+    websocket["websocket-service"]
+  end
+
+  nodebase --> apigateway
+  nodebase --> spotify
+  nodebase --> websocket
+  pythonnodebase --> download
+  pythonnodebase --> analysis
+  gpubase --> processing
+
+  subgraph Volumes
+    audiodata["audio_data"]
+  end
+  download --> audiodata
+  processing --> audiodata
+  analysis --> audiodata
+
+  subgraph Frontend
+    frontend["frontend"]
+  end
+  nodebase --> frontend
+
+  classDef base fill:#e1bee7,stroke:#9c27b0,color:black;
+  classDef svc fill:#bbdefb,stroke:#1976d2,color:black;
+  classDef vol fill:#c8e6c9,stroke:#388e3c,color:black;
+  class nodebase,pythonnodebase,gpubase base;
+  class apigateway,spotify,download,processing,analysis,websocket,frontend svc;
+  class audiodata vol;
+```
+</details>
+
+<!--
+Collapsible: Service Runtime Dependency Graph (depcruise style)
+-->
+<details><summary>🟦 <b>Depcruise-style: Service Runtime Dependency Graph</b></summary>
+
+```mermaid
+graph TD
+  frontend["frontend"] --> apigateway["api-gateway"]
+  apigateway --> spotify["spotify-service"]
+  apigateway --> download["download-service"]
+  apigateway --> processing["processing-service"]
+  apigateway --> analysis["analysis-service"]
+  apigateway --> websocket["websocket-service"]
+  spotify --> redis["redis"]
+  download --> redis
+  processing --> redis
+  analysis --> redis
+  websocket --> redis
+  download --> audiodata["audio_data"]
+  processing --> audiodata
+  analysis --> audiodata
+  frontend --> websocket
+  processing --> websocket
+
+  classDef svc fill:#bbdefb,stroke:#1976d2,color:black;
+  classDef infra fill:#c8e6c9,stroke:#388e3c,color:black;
+  class frontend,apigateway,spotify,download,processing,analysis,websocket svc;
+  class redis,audiodata infra;
+```
+</details>
+
+<!--
+$CODE DOCS,COMMENT: Added depcruise-style build and runtime dependency graphs for Docker architecture and service orchestration. These diagrams are collapsible for clarity and maintainability.
+-->

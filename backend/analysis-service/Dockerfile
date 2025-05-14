@@ -29,9 +29,7 @@ FROM sound-forge-alchemy-python-node-base
 # Set working directory
 WORKDIR /app
 
-# Copy built dependencies and application code
-COPY --from=builder --chown=soundforge:soundforge /build/node_modules /app/node_modules
-COPY --from=builder --chown=soundforge:soundforge /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
+# Copy application code
 COPY --chown=soundforge:soundforge . .
 
 # Create directories with proper permissions

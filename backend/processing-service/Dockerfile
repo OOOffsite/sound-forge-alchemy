@@ -1,7 +1,7 @@
 # Dockerfile.processing-service
 # Service for audio separation with Demucs
 
-FROM docker/base-images/Dockerfile.gpu-base AS builder
+FROM sound-forge-alchemy-gpu-base:latest AS builder
 
 # Set working directory
 WORKDIR /build
@@ -25,7 +25,7 @@ COPY tsconfig.node.json ./
 COPY . .
 
 # Production stage
-FROM docker/base-images/Dockerfile.gpu-base
+FROM sound-forge-alchemy-gpu-base:latest
 
 # Set working directory
 WORKDIR /app

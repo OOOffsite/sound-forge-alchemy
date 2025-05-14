@@ -20,16 +20,14 @@ RUN npm run build
 # Production image
 FROM sound-forge-alchemy-node-base:latest
 
-
 # Set working directory
 WORKDIR /app
 
-# Copy built application from builder stage
-COPY --from=builder --chown=soundforge:soundforge /build/dist /app/dist
-COPY --from=builder --chown=soundforge:soundforge /build/package*.json /app/
+# Copy application code
+COPY --chown=soundforge:soundforge . .
 
 # Copy necessary files
-COPY --chown=soundforge:soundforge ./config /app/config
+# COPY --chown=soundforge:soundforge ./docker/config /app/config
 
 # Environment variables
 ENV PORT=3000 \

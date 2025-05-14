@@ -24,14 +24,13 @@ COPY tsconfig.node.json ./
 # Copy source code
 COPY . .
 
+# Build step
+RUN npm run build
+
 # Production stage
 FROM sound-forge-alchemy-python-node-base
 # Set working directory
 WORKDIR /app
-
-# Copy built dependencies from builder stage
-COPY --from=builder --chown=soundforge:soundforge /build/node_modules /app/node_modules
-COPY --from=builder --chown=soundforge:soundforge /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
 
 # Copy application code
 COPY --chown=soundforge:soundforge . .

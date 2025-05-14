@@ -41,10 +41,8 @@ ENV TMP_PATH=/app/tmp \
 
 RUN mkdir -p $TMP_PATH $CACHE_PATH
 
-# Copy built dependencies and application code
-COPY --from=builder --chown=soundforge:soundforge /build/node_modules /app/node_modules
-COPY --from=builder --chown=soundforge:soundforge /build/dist /app/dist
-COPY --chown=soundforge:soundforge package*.json ./
+# Copy application code
+COPY --chown=soundforge:soundforge . .
 
 # Environment variables
 ENV PORT=3006 \

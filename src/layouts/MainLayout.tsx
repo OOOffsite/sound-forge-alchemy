@@ -9,8 +9,6 @@ import SettingsDropdown from '../components/ui/SettingsDropdown.tsx';
 import DebugConsoleOverlay from '../components/ui/DebugConsoleOverlay';
 import StickyPlayer from '../components/ui/StickyPlayer';
 import OverlayGrid, { OverlayPane } from '../components/ui/OverlayGrid';
-import InputPanel from '../components/InputPanel';
-import PlaylistPanel from '../components/PlaylistPanel';
 import type { Track } from '../components/TrackList';
 
 type MainLayoutProps = {
@@ -66,25 +64,6 @@ export default function MainLayout({ children, currentTrack, isProcessing = fals
     },
   ]);
 
-  // Example placeholder data and handlers for demo purposes
-  const [tracks, setTracks] = useState<Track[]>([]); // Use Track type
-  const [selectedTrackId, setSelectedTrackId] = useState<string | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleFetchPlaylist = (url: string) => {
-    setIsLoading(true);
-    // TODO: Fetch playlist and update tracks
-    setTimeout(() => {
-      setTracks([
-        { id: '1', title: 'Track 1', artist: 'Artist 1', duration: '3:45' },
-        { id: '2', title: 'Track 2', artist: 'Artist 2', duration: '4:12' },
-      ]);
-      setIsLoading(false);
-    }, 1000);
-  };
-  const handleSelectTrack = (track: Track) => setSelectedTrackId(track.id);
-  const handleDownloadTrack = (track: Track) => {/* TODO */};
-
   // Helper functions for pane state
   function handleMinimizePane(id: string) {
     setOverlayPanes((panes) => panes.map(p => p.id === id ? { ...p, minimized: true } : p));
@@ -103,8 +82,8 @@ export default function MainLayout({ children, currentTrack, isProcessing = fals
     <TooltipProvider>
       <div className="min-h-screen flex flex-col bg-background text-foreground">
         <header className="border-b border-border">
-          <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+          <div className="w-full max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent truncate">
               SoundForge
             </h1>
             <nav className="flex items-center gap-4">
@@ -161,24 +140,9 @@ export default function MainLayout({ children, currentTrack, isProcessing = fals
             )}
           </div>
         </header>
-        <main className="flex-grow w-full max-w-full flex flex-row container mx-auto px-0 py-0">
-          {/* Left sticky panel column */}
-          <aside className="flex flex-col w-full max-w-xs min-w-[320px] border-r border-border bg-background sticky top-0 h-[calc(100vh-0px)] z-10">
-            <InputPanel onFetchPlaylist={handleFetchPlaylist} isLoading={isLoading} />
-            <div className="flex-1 overflow-y-auto">
-              <PlaylistPanel
-                tracks={tracks}
-                onSelectTrack={handleSelectTrack}
-                onDownloadTrack={handleDownloadTrack}
-                selectedTrackId={selectedTrackId}
-                isProcessing={isProcessing}
-              />
-            </div>
-          </aside>
-          {/* Main content area */}
-          <section className="flex-1 min-w-0 max-w-full px-8 py-8">
-            {children}
-          </section>
+        <main className="flex-grow w-full max-w-7xl mx-auto flex flex-row px-0 py-0">
+          {/* Left sticky panel column and main content are now controlled by the page, not MainLayout */}
+          {children}
         </main>
         <footer className="border-t border-border">
           <div className="container mx-auto px-4 py-4 text-center text-sm text-muted-foreground">

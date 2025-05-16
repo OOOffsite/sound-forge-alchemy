@@ -1,16 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import MainLayout from '../layouts/MainLayout';
-import SpotifyInput from '../components/SpotifyInput';
-import TrackList, { Track } from '../components/TrackList';
 import AudioProcessor, { SeparationOptions, AnalysisResult } from '../components/AudioProcessor';
 import ExportStemsPanel, { ExportOptions } from '../components/ExportStemsPanel';
 import StemVisualizer, { StemTrack } from '../components/StemVisualizer';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { toast } from '../components/ui/sonner';
 import { spotifyApi, downloadApi, processingApi, analysisApi } from '../lib/api';
 import { useWebSocket } from '../lib/socket';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Server, Settings, Zap, Database } from 'lucide-react';
+import TrackList, { Track } from '../components/TrackList';
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -297,20 +295,8 @@ const Index = () => {
             Enter a Spotify playlist URL to get started. We'll retrieve the tracks and then you can separate them into stems.
           </p>
         </div>
-        
-        <SpotifyInput onFetchPlaylist={handleFetchPlaylist} isLoading={isLoading} />
-        
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          <div className="lg:col-span-2">
-            <TrackList 
-              tracks={tracks} 
-              onSelectTrack={handleSelectTrack} 
-              onDownloadTrack={handleDownloadTrack}
-              selectedTrackId={selectedTrack?.id}
-              isProcessing={isProcessing}
-            />
-          </div>
-          
+          <div className="lg:col-span-2" />
           <div className="lg:col-span-3 space-y-6">
             <AudioProcessor 
               selectedTrack={selectedTrack}
@@ -319,7 +305,6 @@ const Index = () => {
               analysisResult={analysisResult}
               onAnalyze={(trackId) => analyzeTrackMutation.mutate(trackId)}
             />
-            
             {separatedStems.length > 0 && (
               <>
                 <StemVisualizer 
@@ -328,7 +313,6 @@ const Index = () => {
                   isPlaying={isPlaying}
                   onPlayPause={handlePlayPause}
                 />
-                
                 <ExportStemsPanel 
                   stems={separatedStems.map(stem => ({
                     id: stem.id,

@@ -88,7 +88,7 @@ export default function MainLayout({ children, currentTrack, isProcessing = fals
   return (
     <TooltipProvider>
       <div className="min-h-screen flex flex-col bg-background text-foreground">
-        <header className="border-b border-border w-full bg-gradient-to-r from-background via-primary/5 to-accent/10">
+        <header className="sticky top-0 z-30 border-b border-border w-full bg-gradient-to-r from-background via-primary/5 to-accent/10">
           <div className="flex w-full items-center justify-between px-8 py-4">
             <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent truncate text-left">
               SoundForge

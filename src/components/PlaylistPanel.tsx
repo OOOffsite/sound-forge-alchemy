@@ -15,9 +15,9 @@ interface PlaylistPanelProps {
 const PlaylistPanel: React.FC<PlaylistPanelProps> = ({ tracks, onSelectTrack, onDownloadTrack, selectedTrackId, isProcessing }) => {
   const [open, setOpen] = React.useState(true);
   return (
-    <aside className="sticky top-[72px] z-10 bg-gradient-to-b from-background via-muted/40 to-accent/10 border-r border-border h-[calc(100vh-72px)] overflow-y-auto p-2 min-w-[320px] max-w-full">
+    <aside className="sticky top-[72px] z-10 bg-gradient-to-b from-background via-muted/40 to-accent/10 border-r border-border h-[calc(100vh-72px)] min-w-[320px] max-w-full p-2">
       <Collapsible.Root open={open} onOpenChange={setOpen}>
-        <div className="flex items-center justify-between mb-2 px-2 bg-accent/10 border-b border-accent/30 rounded-t">
+        <div className="flex items-center justify-between mb-2 px-2 bg-accent/10 border-b border-accent/30 rounded-t sticky top-0 z-20">
           <Label className="text-lg font-semibold text-accent-foreground">Playlist Tracks</Label>
           <Collapsible.Trigger asChild>
             <button
@@ -30,7 +30,8 @@ const PlaylistPanel: React.FC<PlaylistPanelProps> = ({ tracks, onSelectTrack, on
         </div>
         <Collapsible.Content forceMount>
           {open && (
-            <div className="w-full">
+            <div className="w-full h-[calc(100vh-72px-48px)] overflow-y-auto pr-1">
+              {/* 48px is approx. the height of the header/collapsible trigger */}
               <TrackList
                 tracks={tracks}
                 onSelectTrack={onSelectTrack}

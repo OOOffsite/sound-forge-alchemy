@@ -3,12 +3,13 @@ import path from "path";
 import { exec, spawn } from "child_process";
 import util from "util";
 import axios from "axios";
+import logger from "./config/logging.js";
 
 // Promisify exec
 const execPromise = util.promisify(exec);
 
 // Constants
-const MODELS_DIR = process.env.MODELS_DIR || path.join(__dirname, "models");
+const PYTORCH_MODEL_PATH = process.env.PYTORCH_MODEL_PATH || path.join(__dirname, "models");
 
 // Model source URLs and descriptions
 const PRE_TRAINED_MODELS = {
@@ -47,8 +48,8 @@ const PRE_TRAINED_MODELS = {
 };
 
 // Check if models directory exists, if not create it
-if (!fs.existsSync(MODELS_DIR)) {
-  fs.mkdirSync(MODELS_DIR, { recursive: true });
+if (!fs.existsSync(PYTORCH_MODEL_PATH)) {
+  fs.mkdirSync(PYTORCH_MODEL_PATH, { recursive: true });
 }
 
 // Helper function to get all installed models
@@ -63,7 +64,7 @@ async function getInstalledModels() {
     );
 
     if (!modelMatch || modelMatch.length < 3) {
-      console.warn("Could not parse demucs models from help output");
+      logger.warn("Could not parse demucs models from help output");
       return [];
     }
 
@@ -88,7 +89,7 @@ async function getInstalledModels() {
       };
     });
   } catch (error) {
-    console.error("Error getting installed models:", error);
+    logger.error("Error getting installed models:", error);
     return [];
   }
 }
@@ -100,7 +101,7 @@ async function downloadModel(modelName) {
       throw new Error(`Unknown model: ${modelName}`);
     }
 
-    console.log(`Downloading model: ${modelName}`);
+    logger.info(`Downloading model: ${modelName}`);
 
     // Use python to download the model through demucs
     const pythonProcess = spawn("python", [
@@ -113,21 +114,21 @@ async function downloadModel(modelName) {
 
     pythonProcess.stdout.on("data", (data) => {
       stdoutData += data.toString();
-      console.log(`Python stdout: ${data}`);
+      logger.info(`Python stdout: ${data}`);
     });
 
     pythonProcess.stderr.on("data", (data) => {
       stderrData += data.toString();
-      console.error(`Python stderr: ${data}`);
+      logger.error(`Python stderr: ${data}`);
     });
 
     return new Promise((resolve, reject) => {
       pythonProcess.on("close", (code) => {
         if (code === 0) {
-          console.log(`Successfully downloaded model: ${modelName}`);
+          logger.info(`Successfully downloaded model: ${modelName}`);
           resolve(true);
         } else {
-          console.error(
+          logger.error(
             `Error downloading model: ${modelName}, exit code: ${code}`
           );
           reject(new Error(`Failed to download model: ${stderrData}`));
@@ -135,7 +136,7 @@ async function downloadModel(modelName) {
       });
     });
   } catch (error) {
-    console.error(`Error downloading model ${modelName}:`, error);
+    logger.error(`Error downloading model ${modelName}:`, error);
     throw error;
   }
 }
@@ -170,7 +171,7 @@ async function ensureModelDownloaded(modelName) {
 
     // Check if the model is already installed
     if (installedModelNames.includes(modelName)) {
-      console.log(`Model ${modelName} is already installed`);
+      logger.info(`Model ${modelName} is already installed`);
       return true;
     }
 
@@ -183,7 +184,11 @@ async function ensureModelDownloaded(modelName) {
     await downloadModel(modelName);
     return true;
   } catch (error) {
-    console.error(`Error ensuring model ${modelName} is downloaded:`, error);
+    logger.error(`Error ensuring model ${modelName} is downloaded:`, error);
+    // Add more detailed error logging for debugging
+    if (error && error.stack) {
+      logger.error('Stack trace:', error.stack);
+    }
     throw error;
   }
 }
@@ -210,20 +215,39 @@ async function getDefaultModel() {
     // If no models are installed, find a default one to download
     const defaultModel = allModels.find((model) => model.isDefault);
     if (defaultModel) {
-      await downloadModel(defaultModel.id);
+      try {
+        await downloadModel(defaultModel.id);
+      } catch (err) {
+        logger.error(`Error downloading default model (${defaultModel.id}):`, err);
+        if (err && err.stack) {
+          logger.error('Stack trace:', err.stack);
+        }
+        throw err;
+      }
       return defaultModel.id;
     }
 
     // Last resort: use the first available model
     const firstModel = allModels[0];
     if (firstModel) {
-      await downloadModel(firstModel.id);
+      try {
+        await downloadModel(firstModel.id);
+      } catch (err) {
+        logger.error(`Error downloading first available model (${firstModel.id}):`, err);
+        if (err && err.stack) {
+          logger.error('Stack trace:', err.stack);
+        }
+        throw err;
+      }
       return firstModel.id;
     }
 
     throw new Error("No models available");
   } catch (error) {
-    console.error("Error getting default model:", error);
+    logger.error("Error getting default model:", error);
+    if (error && error.stack) {
+      logger.error('Stack trace:', error.stack);
+    }
     throw error;
   }
 }
@@ -234,5 +258,5 @@ export default {
   downloadModel,
   ensureModelDownloaded,
   getDefaultModel,
-  MODELS_DIR,
+  PYTORCH_MODEL_PATH,
 };

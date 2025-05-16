@@ -1,4 +1,3 @@
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { exec, spawn } = require('child_process');
@@ -7,7 +6,8 @@ const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const Redis = require('ioredis');
 const axios = require('axios');
-const models = require('./models');
+const models = require('./models').default;
+const logger = require("./config/logging.js");
 
 // Initialize Redis client
 const redis = new Redis(process.env.REDIS_URL);
@@ -37,7 +37,7 @@ sub.on('message', async (channel, message) => {
   if (channel === 'download:job:completed') {
     try {
       const jobData = JSON.parse(message);
-      console.log(`Received download completion for job: ${jobData.id}`);
+      logger.info(`Received download completion for job: ${jobData.id}`);
       
       // Automatically start processing if it's a completed download
       if (jobData.status === 'completed' && jobData.outputPath) {
@@ -47,7 +47,7 @@ sub.on('message', async (channel, message) => {
         const autoProcess = await redis.get(`track:${trackId}:autoProcess`);
         
         if (autoProcess === 'true') {
-          console.log(`Auto-processing track: ${trackId}`);
+          logger.info(`Auto-processing track: ${trackId}`);
           
           // Get default separation options
           const separationOptions = JSON.parse(await redis.get(`track:${trackId}:separationOptions`) || '{}');
@@ -67,12 +67,12 @@ sub.on('message', async (channel, message) => {
               }
             });
           } catch (error) {
-            console.error('Error notifying WebSocket service:', error);
+            logger.error('Error notifying WebSocket service:', error);
           }
         }
       }
     } catch (error) {
-      console.error('Error processing download completion message:', error);
+      logger.error('Error processing download completion message:', error);
     }
   }
 });
@@ -88,7 +88,7 @@ app.get('/models', async (req, res) => {
     const allModels = await models.getAllModels();
     res.json(allModels);
   } catch (error) {
-    console.error('Error fetching models:', error);
+    logger.error('Error fetching models:', error);
     res.status(500).json({ error: 'Failed to fetch models', details: error.message });
   }
 });
@@ -110,7 +110,7 @@ app.post('/models/download', async (req, res) => {
       message: `Model ${modelName} downloaded successfully` 
     });
   } catch (error) {
-    console.error(`Error downloading model:`, error);
+    logger.error(`Error downloading model:`, error);
     res.status(500).json({ error: 'Failed to download model', details: error.message });
   }
 });
@@ -153,7 +153,7 @@ app.post('/separate', async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error creating separation job:', error);
+    logger.error('Error creating separation job:', error);
     res.status(500).json({ error: 'Failed to create separation job' });
   }
 });
@@ -173,7 +173,7 @@ app.get('/job/:jobId', async (req, res) => {
     res.json(JSON.parse(jobData));
     
   } catch (error) {
-    console.error('Error getting job status:', error);
+    logger.error('Error getting job status:', error);
     res.status(500).json({ error: 'Failed to get job status' });
   }
 });
@@ -246,7 +246,7 @@ app.get('/track/:trackId', async (req, res) => {
     res.json(parsedJobData);
     
   } catch (error) {
-    console.error('Error getting track processing status:', error);
+    logger.error('Error getting track processing status:', error);
     res.status(500).json({ error: 'Failed to get track processing status' });
   }
 });
@@ -270,15 +270,15 @@ async function createProcessingJob(trackId, inputPath, options = {}) {
   let modelName = options.model;
   if (!modelName) {
     modelName = await models.getDefaultModel();
-    console.log(`Using default model: ${modelName}`);
+    logger.info(`Using default model: ${modelName}`);
   } else {
     try {
       await models.ensureModelDownloaded(modelName);
-      console.log(`Ensured model is downloaded: ${modelName}`);
+      logger.info(`Ensured model is downloaded: ${modelName}`);
     } catch (error) {
-      console.error(`Error ensuring model ${modelName} is downloaded:`, error);
+      logger.error(`Error ensuring model ${modelName} is downloaded:`, error);
       modelName = await models.getDefaultModel();
-      console.log(`Falling back to default model: ${modelName}`);
+      logger.info(`Falling back to default model: ${modelName}`);
     }
   }
   
@@ -354,7 +354,7 @@ async function processSeparation(jobId, trackId, inputPath, outputPath, options)
         }
       });
     } catch (error) {
-      console.error('Error notifying WebSocket service:', error);
+      logger.error('Error notifying WebSocket service:', error);
     }
     
     // Prepare Demucs command
@@ -377,7 +377,7 @@ async function processSeparation(jobId, trackId, inputPath, outputPath, options)
       args.push('--device', 'cpu');
     }
     
-    console.log(`Running Demucs with args: ${args.join(' ')}`);
+    logger.info(`Running Demucs with args: ${args.join(' ')}`);
     
     // Execute Demucs command
     const demucs = spawn('python', args);
@@ -387,7 +387,7 @@ async function processSeparation(jobId, trackId, inputPath, outputPath, options)
     
     demucs.stdout.on('data', (data) => {
       stdoutData += data.toString();
-      console.log(`demucs stdout: ${data}`);
+      logger.info(`demucs stdout: ${data}`);
       
       // Try to extract progress information
       const separator = options.twoStems ? 1 : 4;
@@ -415,14 +415,14 @@ async function processSeparation(jobId, trackId, inputPath, outputPath, options)
             }
           });
         } catch (error) {
-          console.error('Error notifying WebSocket service:', error);
+          logger.error('Error notifying WebSocket service:', error);
         }
       }
     });
     
     demucs.stderr.on('data', (data) => {
       stderrData += data.toString();
-      console.error(`demucs stderr: ${data}`);
+      logger.error(`demucs stderr: ${data}`);
     });
     
     demucs.on('close', async (code) => {
@@ -468,10 +468,10 @@ async function processSeparation(jobId, trackId, inputPath, outputPath, options)
                 }
               });
             } catch (error) {
-              console.error('Error notifying WebSocket service:', error);
+              logger.error('Error notifying WebSocket service:', error);
             }
             
-            console.log(`Separation completed successfully for trackId: ${trackId}, jobId: ${jobId}`);
+            logger.info(`Separation completed successfully for trackId: ${trackId}, jobId: ${jobId}`);
           } else {
             throw new Error(`Demucs output directory not found: ${demucsOutputDir}`);
           }
@@ -479,7 +479,7 @@ async function processSeparation(jobId, trackId, inputPath, outputPath, options)
           throw new Error(`Demucs exited with code ${code}: ${stderrData}`);
         }
       } catch (error) {
-        console.error(`Error in separation completion handler: ${error.message}`);
+        logger.error(`Error in separation completion handler: ${error.message}`);
         
         // Update job status to error
         jobData.status = 'error';
@@ -502,13 +502,13 @@ async function processSeparation(jobId, trackId, inputPath, outputPath, options)
             }
           });
         } catch (error) {
-          console.error('Error notifying WebSocket service:', error);
+          logger.error('Error notifying WebSocket service:', error);
         }
       }
     });
     
   } catch (error) {
-    console.error(`Error separating audio: ${error.message}`);
+    logger.error(`Error separating audio: ${error.message}`);
     
     // Update job status to error
     const jobData = JSON.parse(await redis.get(`processing:job:${jobId}`));
@@ -531,12 +531,12 @@ async function processSeparation(jobId, trackId, inputPath, outputPath, options)
         }
       });
     } catch (error) {
-      console.error('Error notifying WebSocket service:', error);
+      logger.error('Error notifying WebSocket service:', error);
     }
   }
 }
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Processing service listening on port ${PORT}`);
+  logger.info(`Processing service listening on port ${PORT}`);
 });

@@ -58,6 +58,8 @@ services:
     networks:
       - sound-forge-network
       - data-network
+    volumes:
+      - ./backend/config/logging.js:/app/config/logging.js:ro
 
   # Spotify Service - Handles Spotify API interactions
   spotify-service:
@@ -71,11 +73,14 @@ services:
       - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
       - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
       - REDIS_URL=redis://redis:6379
+      - SPOTIFY_API_MODE=spotdl
     networks:
       - sound-forge-network
       - data-network
     depends_on:
       - redis
+    volumes:
+      - ./backend/config/logging.js:/app/config/logging.js:ro
 
   # Download Service - Handles track downloading with spotdl
   download-service:
@@ -87,6 +92,7 @@ services:
     volumes:
       - ./docker-shared/audio_data:/app/audio_data
       - ./docker-shared/tmp:/app/tmp
+      - ./backend/config/logging.js:/app/config/logging.js:ro
     environment:
       - PORT=3002
       - REDIS_URL=redis://redis:6379
@@ -108,6 +114,7 @@ services:
     volumes:
       - ./docker-shared/audio_data:/app/audio_data
       - ./docker-shared/cache:/app/cache
+      - ./backend/config/logging.js:/app/config/logging.js:ro
     environment:
       - PORT=3003
       - REDIS_URL=redis://redis:6379
@@ -123,10 +130,6 @@ services:
       - redis
       - websocket-service
       - gpu-base
-    deploy:
-      resources:
-        reservations:
-          devices: []
 
   # Analysis Service - Handles audio analysis (BPM, key, etc.)
   analysis-service:
@@ -137,6 +140,7 @@ services:
       - "3004:3004"
     volumes:
       - audio_data:/app/audio_data
+      - ./backend/config/logging.js:/app/config/logging.js:ro
     environment:
       - PORT=3004
       - REDIS_URL=redis://redis:6379
@@ -162,6 +166,8 @@ services:
       - data-network
     depends_on:
       - redis
+    volumes:
+      - ./backend/config/logging.js:/app/config/logging.js:ro
 
   # Redis service - Including a minimal definition that will work with your setup
   redis:

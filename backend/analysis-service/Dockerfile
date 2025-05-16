@@ -10,6 +10,7 @@ WORKDIR /build
 COPY package*.json ./
 USER root
 RUN npm install 
+RUN npm install express
 RUN npm ci
 USER soundforge
 
@@ -50,6 +51,7 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
 
 # Expose port
 EXPOSE 3004
+RUN npm install express
 
 # Define volumes
 VOLUME ["/app/audio_data"]

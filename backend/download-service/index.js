@@ -1,4 +1,4 @@
-require('dotenv').config();
+// require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { exec, spawn } = require('child_process');
@@ -7,6 +7,7 @@ const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const Redis = require('ioredis');
 const axios = require('axios');
+const logger = require("./config/logging");
 
 // Initialize Redis client
 const redis = new Redis(process.env.REDIS_URL);
@@ -82,7 +83,7 @@ app.post('/track', async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error creating download job:', error);
+    logger.error('Error creating download job:', error);
     res.status(500).json({ error: 'Failed to create download job' });
   }
 });
@@ -102,7 +103,7 @@ app.get('/job/:jobId', async (req, res) => {
     res.json(JSON.parse(jobData));
     
   } catch (error) {
-    console.error('Error getting job status:', error);
+    logger.error('Error getting job status:', error);
     res.status(500).json({ error: 'Failed to get job status' });
   }
 });
@@ -140,7 +141,7 @@ app.get('/track/:trackId', async (req, res) => {
     res.json(parsedJobData);
     
   } catch (error) {
-    console.error('Error getting track status:', error);
+    logger.error('Error getting track status:', error);
     res.status(500).json({ error: 'Failed to get track status' });
   }
 });
@@ -161,23 +162,26 @@ async function downloadTrack(jobId, trackId, spotifyUrl, trackInfo, trackDir) {
     const downloadUrl = spotifyUrl || `https://open.spotify.com/track/${trackId}`;
     const outputPath = path.join(trackDir, 'original.mp3');
     
-    // Execute spotdl command
-    const spotdl = spawn('python', [
+    // Prepare spotdl args
+    const spotdlArgs = [
       '-m', 'spotdl',
       downloadUrl,
       '--output', trackDir,
-      '--output-format', 'mp3',
-      '--threads', '1',
-      '--format', 'mp3',
-      '--bitrate', '320k'
-    ]);
+
+    ];
+    // If YOUTUBE_COOKIES_PATH env var is set, add --cookies argument
+    if (process.env.YOUTUBE_COOKIES_PATH) {
+      spotdlArgs.push('--cookies', process.env.YOUTUBE_COOKIES_PATH);
+    }
+    // Execute spotdl command
+    const spotdl = spawn('python3', spotdlArgs);
     
     let stdoutData = '';
     let stderrData = '';
     
     spotdl.stdout.on('data', (data) => {
       stdoutData += data.toString();
-      console.log(`spotdl stdout: ${data}`);
+      logger.info(`spotdl stdout: ${data}`);
       
       // Try to extract progress information
       const progressMatch = data.toString().match(/Progress: (\d+)%/);
@@ -193,7 +197,16 @@ async function downloadTrack(jobId, trackId, spotifyUrl, trackInfo, trackDir) {
     
     spotdl.stderr.on('data', (data) => {
       stderrData += data.toString();
-      console.error(`spotdl stderr: ${data}`);
+      logger.error(`spotdl stderr: ${data}`);
+      // Only set error if a real error is detected (not just INFO or normal logs)
+      const str = data.toString();
+      if (str.includes('AudioProviderError') || (str.includes('ERROR:') && !str.includes('INFO:'))) {
+        jobData.status = 'error';
+        jobData.error = str;
+        jobData.completedAt = new Date().toISOString();
+        redis.set(`download:job:${jobId}`, JSON.stringify(jobData));
+        pub.publish('download:job:error', JSON.stringify(jobData));
+      }
     });
     
     spotdl.on('close', async (code) => {
@@ -238,7 +251,7 @@ async function downloadTrack(jobId, trackId, spotifyUrl, trackInfo, trackDir) {
             await redis.set(`download:job:${jobId}`, JSON.stringify(jobData));
             pub.publish('download:job:completed', JSON.stringify(jobData));
             
-            console.log(`Download completed successfully for trackId: ${trackId}, jobId: ${jobId}`);
+            logger.info(`Download completed successfully for trackId: ${trackId}, jobId: ${jobId}`);
           } else {
             throw new Error('No MP3 files found after download');
           }
@@ -246,7 +259,7 @@ async function downloadTrack(jobId, trackId, spotifyUrl, trackInfo, trackDir) {
           throw new Error(`spotdl exited with code ${code}: ${stderrData}`);
         }
       } catch (error) {
-        console.error(`Error in download completion handler: ${error.message}`);
+        logger.error(`Error in download completion handler: ${error.message}`);
         
         // Update job status to error
         jobData.status = 'error';
@@ -260,7 +273,7 @@ async function downloadTrack(jobId, trackId, spotifyUrl, trackInfo, trackDir) {
     });
     
   } catch (error) {
-    console.error(`Error downloading track: ${error.message}`);
+    logger.error(`Error downloading track: ${error.message}`);
     
     // Update job status to error
     const jobData = JSON.parse(await redis.get(`download:job:${jobId}`));
@@ -275,5 +288,5 @@ async function downloadTrack(jobId, trackId, spotifyUrl, trackInfo, trackDir) {
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Download service listening on port ${PORT}`);
+  logger.info(`Download service listening on port ${PORT}`);
 });

@@ -10,12 +10,13 @@ WORKDIR /build
 COPY package*.json ./
 USER root
 RUN npm install 
+RUN npm install express
 RUN npm ci
 USER soundforge
 
 # Copy Python requirements
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --user -r requirements.txt
 
 # Copy TypeScript configuration files
 COPY tsconfig.app.json ./
@@ -31,6 +32,18 @@ RUN npm run build
 FROM sound-forge-alchemy-python-node-base
 # Set working directory
 WORKDIR /app
+COPY requirements.txt ./
+
+RUN python3 --version && \
+    which python3 && \
+    pip3 --version && \
+    pip install --no-cache-dir --user -r ./requirements.txt
+
+# Install ffmpeg and upgrade spotdl/yt-dlp to latest as root
+USER root
+RUN apt-get update && apt-get install -y ffmpeg
+USER soundforge
+RUN pip install --no-cache-dir --user --upgrade spotdl yt-dlp
 
 # Copy application code
 COPY --chown=soundforge:soundforge . .
@@ -56,6 +69,7 @@ EXPOSE 3002
 
 # Define volumes
 VOLUME ["/app/audio_data"]
+RUN npm install express
 
 # Command to run the service
 CMD ["npm", "start"]

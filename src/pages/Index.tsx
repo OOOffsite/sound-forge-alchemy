@@ -10,6 +10,7 @@ import { toast } from '../components/ui/sonner';
 import { spotifyApi, downloadApi, processingApi, analysisApi } from '../lib/api';
 import { useWebSocket } from '../lib/socket';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Server, Settings, Zap, Database } from 'lucide-react';
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -23,12 +24,35 @@ const Index = () => {
   const { socket, isConnected, subscribe, unsubscribe } = useWebSocket();
   const queryClient = useQueryClient();
 
-  const stemColors = {
+  const stemColors = React.useMemo(() => ({
     vocals: '#ff7b92',
     bass: '#7b93ff',
     drums: '#ffbb7b',
     other: '#7bffb1'
-  };
+  }), []);
+
+  const architectureFeatures = [
+    {
+      icon: <Server className="h-6 w-6 text-primary" />,
+      title: 'Microservices',
+      description: 'Backend services for download, separation, and analysis are orchestrated with Docker Compose.'
+    },
+    {
+      icon: <Zap className="h-6 w-6 text-primary" />,
+      title: 'Real-Time Updates',
+      description: 'WebSocket connections deliver live progress and results to the frontend.'
+    },
+    {
+      icon: <Settings className="h-6 w-6 text-primary" />,
+      title: 'Server-Side Processing',
+      description: 'All heavy computation is performed on dedicated backend infrastructure.'
+    },
+    {
+      icon: <Database className="h-6 w-6 text-primary" />,
+      title: 'Persistent Storage',
+      description: 'Redis and PostgreSQL manage caching and persistent data.'
+    },
+  ];
 
   const fetchProcessedStems = useCallback(async (trackId: string) => {
     try {
@@ -48,7 +72,7 @@ const Index = () => {
     } catch (error) {
       console.error('Error fetching processed stems:', error);
     }
-  }, []);
+  }, [stemColors]);
 
   const fetchAnalysis = useCallback(async (trackId: string) => {
     try {
@@ -296,6 +320,27 @@ const Index = () => {
               </>
             )}
           </div>
+        </div>
+      </div>
+      <div className="max-w-4xl mx-auto mt-12">
+        <div className="bg-zinc-900/70 rounded-xl p-8 shadow-lg border border-zinc-800">
+          <h2 className="text-xl font-bold mb-6 text-center">Production Architecture</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+            {architectureFeatures.map((feature) => (
+              <div key={feature.title} className="flex items-start gap-4 p-4 rounded-lg bg-zinc-800/80 border border-zinc-700">
+                <div className="flex items-center justify-center rounded-full h-12 w-12 bg-primary/10">
+                  {feature.icon}
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-white mb-1">{feature.title}</h3>
+                  <p className="text-sm text-zinc-300 leading-relaxed">{feature.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-zinc-400 text-sm mt-2">
+            SoundForge leverages a robust, scalable backend to deliver fast, reliable music source separation and analysis.
+          </p>
         </div>
       </div>
     </MainLayout>

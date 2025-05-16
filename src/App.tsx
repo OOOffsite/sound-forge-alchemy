@@ -9,11 +9,6 @@ import Index from "./pages/Index.tsx";
 import About from "./pages/About.tsx";
 import NotFound from "./pages/NotFound";
 
-// Reusable component for defining routes
-const AppRoute = ({ path, element }: { path: string; element: React.ReactNode }) => (
-  <Route path={path} element={element} />
-);
-
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -24,8 +19,8 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <AppRoute path="/" element={<Index />} />
-            <AppRoute path="/about" element={<About />} />
+            <Route path="/" element={<Index />} />
+            <Route path="/about" element={<About />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

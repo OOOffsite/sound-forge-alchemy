@@ -26,9 +26,6 @@ WORKDIR /app
 # Copy application code
 COPY --chown=soundforge:soundforge . .
 
-# Copy necessary files
-# COPY --chown=soundforge:soundforge ./docker/config /app/config
-
 # Environment variables
 ENV PORT=3000 \
     SERVICE_NAME=api-gateway \
@@ -46,4 +43,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
 EXPOSE 3000
 
 # Command to run the service
-CMD ["node", "dist/server.js"]
+CMD ["node", "index.js"]

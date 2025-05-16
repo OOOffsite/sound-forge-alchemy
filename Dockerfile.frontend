@@ -9,8 +9,8 @@ WORKDIR /build
 
 # Copy package files
 COPY package*.json ./
-RUN npm ci && \
-    npm install axios socket.io socket.io-client
+RUN npm install axios socket.io socket.io-client
+RUN npm ci
 
 # Copy source code
 COPY . .
@@ -33,7 +33,7 @@ RUN addgroup -S nginx-group && \
 COPY --from=builder /build/dist /usr/share/nginx/html
 
 # Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./docker/frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Add health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \

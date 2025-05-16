@@ -1,9 +1,10 @@
-require('dotenv').config();
+// require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const cors = require('cors');
 const { Server } = require('socket.io');
 const Redis = require('ioredis');
+const logger = require("./config/logging");
 
 // Initialize Redis clients
 const redis = new Redis(process.env.REDIS_URL);
@@ -30,23 +31,23 @@ const io = new Server(server, {
 
 // Socket.IO events
 io.on('connection', (socket) => {
-  console.log(`Client connected: ${socket.id}`);
+  logger.info(`Client connected: ${socket.id}`);
   
   // Handle client subscriptions to track events
   socket.on('subscribe:track', (trackId) => {
-    console.log(`Client ${socket.id} subscribed to track: ${trackId}`);
+    logger.info(`Client ${socket.id} subscribed to track: ${trackId}`);
     socket.join(`track:${trackId}`);
   });
   
   // Handle client unsubscriptions
   socket.on('unsubscribe:track', (trackId) => {
-    console.log(`Client ${socket.id} unsubscribed from track: ${trackId}`);
+    logger.info(`Client ${socket.id} unsubscribed from track: ${trackId}`);
     socket.leave(`track:${trackId}`);
   });
   
   // Handle disconnection
   socket.on('disconnect', () => {
-    console.log(`Client disconnected: ${socket.id}`);
+    logger.info(`Client disconnected: ${socket.id}`);
   });
 });
 
@@ -77,10 +78,10 @@ sub.on('message', (channel, message) => {
       // Emit to the track's room
       io.to(`track:${data.trackId}`).emit(channel, data);
       
-      console.log(`Emitted ${channel} event for track: ${data.trackId}`);
+      logger.info(`Emitted ${channel} event for track: ${data.trackId}`);
     }
   } catch (error) {
-    console.error(`Error handling Redis message: ${error.message}`);
+    logger.error(`Error handling Redis message: ${error.message}`);
   }
 });
 
@@ -103,12 +104,12 @@ app.post('/notify', (req, res) => {
     
     res.status(200).json({ success: true });
   } catch (error) {
-    console.error(`Error in notify endpoint: ${error.message}`);
+    logger.error(`Error in notify endpoint: ${error.message}`);
     res.status(500).json({ error: 'Failed to send notification' });
   }
 });
 
 // Start the server
 server.listen(PORT, () => {
-  console.log(`WebSocket service listening on port ${PORT}`);
+  logger.info(`WebSocket service listening on port ${PORT}`);
 });

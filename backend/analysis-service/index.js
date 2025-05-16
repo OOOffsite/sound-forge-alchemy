@@ -1,4 +1,4 @@
-require('dotenv').config();
+// require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { exec, spawn } = require('child_process');
@@ -7,6 +7,7 @@ const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const Redis = require('ioredis');
 const axios = require('axios');
+const logger = require("./config/logging");
 
 // Initialize Redis client
 const redis = new Redis(process.env.REDIS_URL);
@@ -30,7 +31,7 @@ sub.on('message', async (channel, message) => {
   if (channel === 'download:job:completed') {
     try {
       const jobData = JSON.parse(message);
-      console.log(`Received download completion for job: ${jobData.id}`);
+      logger.info(`Received download completion for job: ${jobData.id}`);
       
       // Automatically start analysis if it's a completed download
       if (jobData.status === 'completed' && jobData.outputPath) {
@@ -40,16 +41,16 @@ sub.on('message', async (channel, message) => {
         const autoAnalyze = await redis.get(`track:${trackId}:autoAnalyze`);
         
         if (autoAnalyze === 'true') {
-          console.log(`Auto-analyzing track: ${trackId}`);
+          logger.info(`Auto-analyzing track: ${trackId}`);
           
           // Start analysis
           const analysisJob = await createAnalysisJob(trackId, jobData.outputPath);
           
-          console.log(`Created auto-analysis job: ${analysisJob.jobId}`);
+          logger.info(`Created auto-analysis job: ${analysisJob.jobId}`);
         }
       }
     } catch (error) {
-      console.error('Error processing download completion message:', error);
+      logger.error('Error processing download completion message:', error);
     }
   }
 });
@@ -92,7 +93,7 @@ app.post('/analyze', async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error creating analysis job:', error);
+    logger.error('Error creating analysis job:', error);
     res.status(500).json({ error: 'Failed to create analysis job' });
   }
 });
@@ -112,7 +113,7 @@ app.get('/job/:jobId', async (req, res) => {
     res.json(JSON.parse(jobData));
     
   } catch (error) {
-    console.error('Error getting job status:', error);
+    logger.error('Error getting job status:', error);
     res.status(500).json({ error: 'Failed to get job status' });
   }
 });
@@ -153,7 +154,7 @@ app.get('/track/:trackId', async (req, res) => {
     res.json(JSON.parse(analysisResult));
     
   } catch (error) {
-    console.error('Error getting track analysis:', error);
+    logger.error('Error getting track analysis:', error);
     res.status(500).json({ error: 'Failed to get track analysis' });
   }
 });
@@ -218,7 +219,7 @@ async function analyzeTrack(jobId, trackId, inputPath) {
     
     analyzer.stdout.on('data', (data) => {
       stdoutData += data.toString();
-      console.log(`analyzer stdout: ${data}`);
+      logger.info(`analyzer stdout: ${data}`);
       
       // Try to extract progress information
       const progressMatch = data.toString().match(/Progress: (\d+)%/);
@@ -234,7 +235,7 @@ async function analyzeTrack(jobId, trackId, inputPath) {
     
     analyzer.stderr.on('data', (data) => {
       stderrData += data.toString();
-      console.error(`analyzer stderr: ${data}`);
+      logger.error(`analyzer stderr: ${data}`);
     });
     
     analyzer.on('close', async (code) => {
@@ -252,7 +253,7 @@ async function analyzeTrack(jobId, trackId, inputPath) {
           await redis.set(`analysis:job:${jobId}`, JSON.stringify(jobData));
           pub.publish('analysis:job:completed', JSON.stringify(jobData));
           
-          console.log(`Analysis completed successfully for trackId: ${trackId}, jobId: ${jobId}`);
+          logger.info(`Analysis completed successfully for trackId: ${trackId}, jobId: ${jobId}`);
         } else {
           // No analysis result found
           throw new Error('No analysis result found after successful analysis');
@@ -263,7 +264,7 @@ async function analyzeTrack(jobId, trackId, inputPath) {
     });
     
   } catch (error) {
-    console.error(`Error analyzing track: ${error.message}`);
+    logger.error(`Error analyzing track: ${error.message}`);
     
     // Update job status to error
     const jobData = JSON.parse(await redis.get(`analysis:job:${jobId}`));
@@ -278,5 +279,5 @@ async function analyzeTrack(jobId, trackId, inputPath) {
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Analysis service listening on port ${PORT}`);
+  logger.info(`Analysis service listening on port ${PORT}`);
 });

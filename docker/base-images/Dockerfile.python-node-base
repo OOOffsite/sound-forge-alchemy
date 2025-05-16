@@ -23,6 +23,8 @@ FROM python:3.10-slim-bullseye
 # Install Node.js
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
     curl \
     gnupg \
     tini \
@@ -33,9 +35,29 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Add non-root user
+# Verify and setup Python
+RUN python3 --version && \
+    ln -sf /usr/local/bin/python3 /usr/local/bin/python && \
+    python --version && \
+    pip3 --version && \
+    mkdir -p /usr/local/lib/python3.10/site-packages && \
+    chown -R root:root /usr/local/lib/python3.10 && \
+    chmod -R 755 /usr/local/lib/python3.10
+
+# Add Python to PATH and set Python environment variables
+ENV PYTHONPATH="/usr/local/lib/python3.10/site-packages"
+ENV PYTHONPATH="${PYTHONPATH}:${PYTHONPATH:-}" \
+    PYTHONUNBUFFERED=1 \
+    PATH="/usr/local/bin:${PATH}"
+
+# Add non-root user and setup permissions
 RUN groupadd -r soundforge && \
-    useradd -r -g soundforge -d /app soundforge
+    useradd -r -g soundforge -d /app soundforge && \
+    mkdir -p /app && \
+    chown -R soundforge:soundforge /app && \
+    # Ensure Python directories are accessible
+    chmod -R 755 /usr/local/lib/python* && \
+    chown -R soundforge:soundforge /usr/local/lib/python* 
 
 # Set working directory
 WORKDIR /app
@@ -44,12 +66,18 @@ WORKDIR /app
 COPY --from=node-builder --chown=soundforge:soundforge /build/node_modules /app/node_modules
 # RUN npm install
 
+# Verify Python installation is accessible to soundforge user
+RUN python3 --version && \
+    which python3 && \
+    pip3 --version
+
 # Environment variables
 ENV TZ=UTC \
     NODE_ENV=production \
     PYTHONUNBUFFERED=1 \
     PORT=3000 \
-    PATH="/app/node_modules/.bin:${PATH}"
+    PATH="/usr/local/bin:/usr/bin:/bin:/app/node_modules/.bin:${PATH}" \
+    PYTHONPATH="/usr/local/lib/python3.10/site-packages:/usr/lib/python3/dist-packages:${PYTHONPATH}"
 
 # Set proper permissions
 RUN chown -R soundforge:soundforge /app

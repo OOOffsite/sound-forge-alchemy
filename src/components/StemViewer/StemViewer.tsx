@@ -6,9 +6,10 @@ import { Toggle } from '../ui/toggle';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { WebMidi } from 'webmidi';
-import WaveSurfer from 'wavesurfer.js';
+import WaveSurfer, { WaveSurferOptions } from 'wavesurfer.js';
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions';
 import { formatTime } from '../../lib/utils';
+import { useMIDIControlChange, useMIDINoteOn } from './midiHandlers';
 
 export interface Stem {
   id: string;
@@ -118,39 +119,44 @@ const StemViewer: React.FC<StemViewerProps> = ({
   const [showArrangement, setShowArrangement] = useState(true);
   const [showCuePoints, setShowCuePoints] = useState(true);
 
-  const handleMIDIControlChange = (cc: number, value: number) => {
-    // Convert MIDI value (0-127) to range 0-1
-    const normalizedValue = value / 127;
-    
-    // Map CC numbers to functions
-    switch (cc) {
-      case 1: // CC#1 - Main volume
-        setMasterVolume(normalizedValue);
-        break;
-      case 2: // CC#2 - First stem volume
-        if (stems.length > 0) {
-          updateStemVolume(stems[0].id, normalizedValue);
-        }
-        break;
-      // Add more CC mappings as needed
+  // Set master volume
+  const setMasterVolume = (value: number) => {
+    Object.values(wavesurferRefs.current).forEach(wavesurfer => {
+      wavesurfer.setVolume(value);
+    });
+  };
+
+  // Update volume for a specific stem
+  const updateStemVolume = (stemId: string, value: number) => {
+    if (wavesurferRefs.current[stemId]) {
+      wavesurferRefs.current[stemId].setVolume(value);
+      setVolumes(prev => ({ ...prev, [stemId]: value }));
     }
   };
 
-  const handleMIDINoteOn = (note: number, velocity: number) => {
-    // Map MIDI notes to functions
-    switch (note) {
-      case 36: // C1
-        togglePlayPause();
-        break;
-      case 37: // C#1
-        stopPlayback();
-        break;
-      case 38: // D1
-        toggleLoopActive();
-        break;
-      // Add more note mappings as needed
-    }
+  // Control playback
+  const togglePlayPause = () => {
+    Object.values(wavesurferRefs.current).forEach(wavesurfer => {
+      wavesurfer.playPause();
+    });
+    setPlaying(!playing);
   };
+
+  const stopPlayback = () => {
+    Object.values(wavesurferRefs.current).forEach(wavesurfer => {
+      wavesurfer.stop();
+    });
+    setPlaying(false);
+  };
+
+  // Toggle loop active state
+  const toggleLoopActive = () => {
+    setLoopActive(!loopActive);
+  };
+
+  // Use MIDI handler hooks (must be after the above functions)
+  const handleMIDIControlChange = useMIDIControlChange(stems, setMasterVolume, updateStemVolume);
+  const handleMIDINoteOn = useMIDINoteOn(togglePlayPause, stopPlayback, toggleLoopActive);
 
   // Initialize Web MIDI API
   const initMIDI = useCallback(async () => {
@@ -158,24 +164,24 @@ const StemViewer: React.FC<StemViewerProps> = ({
       try {
         // Enable WebMidi
         await WebMidi.enable();
-        
+
         // Get list of available MIDI inputs
         const inputNames = WebMidi.inputs.map(input => input.name);
         setMidiDevices(inputNames);
-        
+
         // Set up event listeners for all inputs
         WebMidi.inputs.forEach(input => {
           // Note on events
           input.addListener('noteon', e => {
             handleMIDINoteOn(e.note.number, e.note.attack);
           });
-          
+
           // Control change events
           input.addListener('controlchange', e => {
             handleMIDIControlChange(e.controller.number as number, e.value as number);
           });
         });
-        
+
         console.log('MIDI enabled successfully!');
       } catch (err) {
         console.error('Failed to enable MIDI:', err);
@@ -199,6 +205,8 @@ const StemViewer: React.FC<StemViewerProps> = ({
       waveContainer.className = 'waveform-container';
       containerRef.current?.appendChild(waveContainer);
 
+      // Instantiate plugin with no options
+      const regionsPlugin = new RegionsPlugin();
       const wavesurfer = WaveSurfer.create({
         container: `#waveform-${stem.id}`,
         waveColor: stem.color || stemTypeColors[stem.type],
@@ -206,28 +214,7 @@ const StemViewer: React.FC<StemViewerProps> = ({
         height: 80,
         normalize: true,
         minPxPerSec: 50,
-        plugins: [
-          new RegionsPlugin({
-            regions: [
-              // Add regions for arrangement sections
-              ...(arrangement || []).map(section => ({
-                id: section.id,
-                start: section.start,
-                end: section.end,
-                color: `${section.color}33`, // Add transparency
-                resize: false
-              })),
-              // Add regions for existing loops
-              ...(loops || []).map(loop => ({
-                id: loop.id,
-                start: loop.start,
-                end: loop.end,
-                color: '#00FF0033',
-                resize: false
-              }))
-            ]
-          })
-        ]
+        plugins: [regionsPlugin]
       });
 
       // Load the audio
@@ -238,25 +225,31 @@ const StemViewer: React.FC<StemViewerProps> = ({
 
       // Add event listeners
       wavesurfer.on('ready', () => {
-        // Set initial volume
         wavesurfer.setVolume(volumes[stem.id]);
-        // Set duration once the first stem is loaded
         if (Object.keys(wavesurferRefs.current).length === 1) {
           setDuration(wavesurfer.getDuration());
         }
+        // Add regions after ready
+        (arrangement || []).forEach(section => {
+          regionsPlugin.addRegion({
+            id: section.id,
+            start: section.start,
+            end: section.end,
+            color: `${section.color}33`,
+            drag: false,
+            resize: false
+          });
+        });
       });
 
-      wavesurfer.on('audioprocess', (time) => {
+      wavesurfer.on('timeupdate', (time: number) => {
         setCurrentTime(time);
         
         // Handle loop functionality
-        if (loopActive && currentLoop) {
-          if (time >= currentLoop.end) {
-            // Jump back to loop start
-            Object.values(wavesurferRefs.current).forEach(ws => {
-              ws.seekTo(currentLoop.start / duration);
-            });
-          }
+        if (loopActive && currentLoop && time >= currentLoop.end) {
+          Object.values(wavesurferRefs.current).forEach(ws => {
+            ws.seekTo(currentLoop.start / duration);
+          });
         }
       });
     });
@@ -264,7 +257,7 @@ const StemViewer: React.FC<StemViewerProps> = ({
     // Sync wavesurfer instances
     const primaryWavesurfer = Object.values(wavesurferRefs.current)[0];
     if (primaryWavesurfer) {
-      primaryWavesurfer.on('seek', (progress: number) => {
+      primaryWavesurfer.on('interaction', (progress: number) => {
         Object.values(wavesurferRefs.current).forEach(ws => {
           if (ws !== primaryWavesurfer) {
             ws.seekTo(progress);
@@ -281,36 +274,6 @@ const StemViewer: React.FC<StemViewerProps> = ({
       wavesurferRefs.current = {};
     };
   }, [stems, arrangement, currentLoop, duration, initMIDI, loopActive, loops, volumes]);
-
-  // Control playback
-  const togglePlayPause = () => {
-    Object.values(wavesurferRefs.current).forEach(wavesurfer => {
-      wavesurfer.playPause();
-    });
-    setPlaying(!playing);
-  };
-
-  const stopPlayback = () => {
-    Object.values(wavesurferRefs.current).forEach(wavesurfer => {
-      wavesurfer.stop();
-    });
-    setPlaying(false);
-  };
-
-  // Set master volume
-  const setMasterVolume = (value: number) => {
-    Object.values(wavesurferRefs.current).forEach(wavesurfer => {
-      wavesurfer.setVolume(value);
-    });
-  };
-
-  // Update volume for a specific stem
-  const updateStemVolume = (stemId: string, value: number) => {
-    if (wavesurferRefs.current[stemId]) {
-      wavesurferRefs.current[stemId].setVolume(value);
-      setVolumes(prev => ({ ...prev, [stemId]: value }));
-    }
-  };
 
   // Toggle stem selection for loops
   const toggleStemSelection = (stemId: string) => {
@@ -369,11 +332,6 @@ const StemViewer: React.FC<StemViewerProps> = ({
     if (onSaveLoop) {
       onSaveLoop(newLoop);
     }
-  };
-
-  // Toggle loop active state
-  const toggleLoopActive = () => {
-    setLoopActive(!loopActive);
   };
 
   // Add a cue point at current position

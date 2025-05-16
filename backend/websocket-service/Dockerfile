@@ -56,4 +56,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
 EXPOSE 3006
 
 # Command to run the service
-CMD ["node", "dist/server.js"]
+CMD ["node", "index.js"]

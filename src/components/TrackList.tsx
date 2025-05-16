@@ -8,10 +8,11 @@ import {
   PaginationLink,
   PaginationPrevious,
   PaginationNext,
-  PaginationEllipsis,
 } from './ui/pagination';
 import { Play, Download, FileMusic } from 'lucide-react';
 import TrackWaveform from './TrackWaveform';
+import { Input } from './ui/input';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from './ui/select';
 
 export interface Track {
   id: string;
@@ -75,37 +76,40 @@ export default function TrackList({
   }
 
   return (
-    <div className="space-y-4 mt-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <h2 className="text-2xl font-bold">Playlist Tracks</h2>
-        <div className="flex gap-2 items-center">
-          <input
-            type="text"
-            placeholder="Filter by title or artist"
-            value={filter}
-            onChange={e => setFilter(e.target.value)}
-            className="border rounded px-2 py-1 text-sm"
-          />
-          <select value={pageSize} onChange={e => setPageSize(Number(e.target.value))} className="border rounded px-2 py-1 text-sm">
+    <div className="space-y-4" role="region" aria-label="Playlist Panel">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4 px-2 pt-2">
+        <Input
+          type="text"
+          placeholder="Filter by title or artist"
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
+          className="max-w-xs"
+          aria-label="Filter tracks"
+        />
+        <Select value={String(pageSize)} onValueChange={v => setPageSize(Number(v))}>
+          <SelectTrigger className="w-[120px]" aria-label="Page size">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
             {[5, 10, 20, 50].map(size => (
-              <option key={size} value={size}>{size} / page</option>
+              <SelectItem key={size} value={String(size)}>{size} / page</SelectItem>
             ))}
-          </select>
-          <Button size="sm" variant="outline" onClick={handleBatchDownload} disabled={!selectedIds.length || isProcessing}>
-            Download Selected
-          </Button>
-          <Button size="sm" variant="secondary" onClick={() => paginatedTracks.forEach(onDownloadTrack)} disabled={isProcessing}>
-            Download All
-          </Button>
-        </div>
+          </SelectContent>
+        </Select>
+        <Button size="sm" variant="outline" onClick={handleBatchDownload} disabled={!selectedIds.length || isProcessing} aria-label="Download selected tracks">
+          Download Selected
+        </Button>
+        <Button size="sm" variant="secondary" onClick={() => paginatedTracks.forEach(onDownloadTrack)} disabled={isProcessing} aria-label="Download all tracks on page">
+          Download All
+        </Button>
       </div>
-      <div className="grid gap-4">
+      <div className="grid gap-4" role="listbox" aria-label="Track list">
         <div className="flex items-center px-4 py-2 border-b">
-          <input type="checkbox" checked={allOnPageSelected} onChange={toggleSelectAll} className="mr-2" />
+          <input type="checkbox" checked={allOnPageSelected} onChange={toggleSelectAll} className="mr-2" aria-label="Select all tracks on page" />
           <span className="text-xs text-muted-foreground">Select All</span>
         </div>
         {paginatedTracks.map((track) => (
-          <Card key={track.id} className={`overflow-hidden ${selectedTrackId === track.id ? 'border-primary' : ''}`}>
+          <Card key={track.id} className={`overflow-hidden ${selectedTrackId === track.id ? 'border-primary' : ''}`} role="option" aria-selected={selectedTrackId === track.id}>
             <CardContent className="p-0">
               <div className="flex items-center p-4">
                 <input
@@ -113,6 +117,7 @@ export default function TrackList({
                   checked={selectedIds.includes(track.id)}
                   onChange={() => setSelectedIds(ids => ids.includes(track.id) ? ids.filter(id => id !== track.id) : [...ids, track.id])}
                   className="mr-2"
+                  aria-label={`Select track ${track.title} by ${track.artist}`}
                 />
                 <div className="w-12 h-12 mr-4 flex-shrink-0 bg-secondary flex items-center justify-center rounded overflow-hidden">
                   {track.albumArt ? (
@@ -136,6 +141,7 @@ export default function TrackList({
                     variant="secondary"
                     onClick={() => onSelectTrack(track)}
                     disabled={isProcessing}
+                    aria-label={`Select track ${track.title}`}
                   >
                     <Play className="h-4 w-4 mr-1" />
                     <span className="hidden sm:inline">Select</span>
@@ -145,6 +151,7 @@ export default function TrackList({
                     variant="outline"
                     onClick={() => onDownloadTrack(track)}
                     disabled={isProcessing}
+                    aria-label={`Download track ${track.title}`}
                   >
                     <Download className="h-4 w-4 mr-1" />
                     <span className="hidden sm:inline">Download</span>

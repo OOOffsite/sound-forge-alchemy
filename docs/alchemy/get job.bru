@@ -1,0 +1,22 @@
+meta {
+  name: get job
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://0.0.0.0:3000/api/spotify/fetch
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Accepts: application/json
+}
+
+body:json {
+  {
+    "url": "https://open.spotify.com/playlist/3HjYns6TljNiDwwQWeymKL?si=cb9bf6eb99c24b60"
+  }
+}

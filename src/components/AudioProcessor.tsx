@@ -6,7 +6,7 @@ import { Separator } from './ui/separator';
 import { Slider } from './ui/slider';
 import { Switch } from './ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Music, Headphones, FileMusic, Volume2 } from 'lucide-react';
+import { Music, Headphones, FileMusic, Volume2, Info, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
 import { Track } from './TrackList';
 import { toast } from './ui/sonner';
 import StepDisplay from './StepDisplay';
@@ -14,6 +14,8 @@ import { calculateBPM, detectKey } from '../lib/utils';
 import { processingApi } from '../lib/api';
 import { useQuery } from '@tanstack/react-query';
 import { Icon } from '@radix-ui/react-select';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from './ui/dialog';
 
 interface AudioProcessorProps {
   selectedTrack: Track | null;
@@ -110,6 +112,7 @@ export default function AudioProcessor({
   
   const [volume, setVolume] = useState<number>(75);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [showModelDetails, setShowModelDetails] = useState(false);
   
   // Fetch available models
   const { data: models = [] } = useQuery({
@@ -125,6 +128,31 @@ export default function AudioProcessor({
     },
     enabled: !!selectedTrack, // Only run when a track is selected
   });
+
+  // Model status logic
+  const installedModels = models.filter(m => m.installed);
+  const totalModels = models.length;
+  let modelStatus: 'none' | 'partial' | 'all' = 'none';
+  if (installedModels.length === 0) modelStatus = 'none';
+  else if (installedModels.length === totalModels) modelStatus = 'all';
+  else modelStatus = 'partial';
+
+  let statusIcon = <AlertTriangle className="text-yellow-500 inline-block mr-1" />;
+  let statusText = 'No Models Loaded!';
+  if (modelStatus === 'all') {
+    statusIcon = <CheckCircle2 className="text-green-500 inline-block mr-1" />;
+    statusText = 'All pretrained models loaded';
+  } else if (modelStatus === 'partial') {
+    statusIcon = <AlertTriangle className="text-yellow-500 inline-block mr-1" />;
+    statusText = `${installedModels.length} of ${totalModels} models loaded`;
+  }
+
+  // Toast for model errors
+  useEffect(() => {
+    if (totalModels === 0) {
+      toast.error('No audio processing models are available. Please check your backend.');
+    }
+  }, [totalModels]);
 
   // Set first available model when models are loaded and none is selected
   useEffect(() => {
@@ -192,14 +220,57 @@ export default function AudioProcessor({
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="flex items-center">
-          <Headphones className="mr-2 h-5 w-5" />
-          Audio Processing
+        <CardTitle className="flex items-center relative justify-between group">
+          <span className="flex items-center">
+            <Headphones className="mr-2 h-5 w-5" />
+            Audio Processing
+          </span>
+          <span className="flex items-center ml-2 text-xs font-medium cursor-pointer border-dotted border-b border-muted-foreground/60 float-right"
+            style={{ textDecoration: 'underline dotted', transition: 'color 0.2s', display: 'inline-block' }}
+            onClick={() => setShowModelDetails(true)}
+          >
+            {statusIcon}{statusText}
+          </span>
+          {/* Details Button (appears on hover via CSS) */}
+          <button
+            className="ml-2 px-2 py-1 text-xs rounded bg-muted-foreground/10 hover:bg-muted-foreground/20 transition-opacity opacity-0 group-hover:opacity-100"
+            style={{ float: 'right' }}
+            onClick={() => setShowModelDetails(true)}
+            tabIndex={-1}
+          >
+            Details
+          </button>
         </CardTitle>
         <CardDescription>
           Separate and analyze "{selectedTrack.title}" by {selectedTrack.artist}
         </CardDescription>
       </CardHeader>
+      <Dialog open={showModelDetails} onOpenChange={setShowModelDetails}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Audio Separation Models</DialogTitle>
+            <DialogDescription>
+              Manage and view details about available audio separation models.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            {models.length === 0 && <div className="text-red-500">No models available.</div>}
+            {models.map(model => (
+              <div key={model.id} className="flex items-center gap-2">
+                {model.installed ? <CheckCircle2 className="text-green-500 h-4 w-4" /> : <XCircle className="text-red-500 h-4 w-4" />}
+                <span className="font-medium">{model.name}</span>
+                {model.isDefault && <span className="text-xs text-muted-foreground ml-2">(default)</span>}
+                <span className="ml-auto text-xs text-muted-foreground">{model.installed ? 'Loaded' : 'Not loaded'}</span>
+              </div>
+            ))}
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Close</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <CardContent>
         <Tabs defaultValue="separate" className="w-full">
           <TabsList className="grid w-full grid-cols-2">

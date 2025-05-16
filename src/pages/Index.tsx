@@ -35,13 +35,17 @@ const Index = () => {
       const response = await processingApi.getTrackStatus(trackId);
       
       if (response.status === 'completed' && response.stems) {
-        const stems: StemTrack[] = response.stems.map((stem: { name: string; type: string }) => ({
-          id: stem.name,
-          type: stem.type,
-          name: stem.name,
-          active: true,
-          color: stemColors[stem.type as keyof typeof stemColors] || stemColors.other
-        }));
+        const stems: StemTrack[] = response.stems.map((stem: { name: string; type: string }) => {
+          const stemFile = stem.name.endsWith('.mp3') ? stem.name : `${stem.name}.mp3`;
+          return {
+            id: stem.name,
+            type: stem.type,
+            name: stem.name,
+            active: true,
+            color: stemColors[stem.type as keyof typeof stemColors] || stemColors.other,
+            audioUrl: `http://localhost:3000/audio_data/${trackId}/stems/${stemFile}`
+          };
+        });
         
         setSeparatedStems(stems);
       }
@@ -250,8 +254,8 @@ const Index = () => {
     if (track.audioUrl) return track.audioUrl;
     // @ts-expect-error: Some tracks may have previewUrl from backend
     if (track.previewUrl) return track.previewUrl;
-    // Fallback: try to use a local file path if downloaded (customize as needed)
-    return `/audio_data/${track.id}/original.mp3`;
+    // Always use API gateway as base for audio files
+    return `http://localhost:3000/audio_data/${track.id}/original.mp3`;
   };
 
   return (

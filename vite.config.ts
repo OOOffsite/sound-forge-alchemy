@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   build: {
-    outDir: "build/dist",
+    outDir: "dist",
     sourcemap: true,
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(

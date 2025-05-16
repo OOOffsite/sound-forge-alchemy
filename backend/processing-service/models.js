@@ -9,7 +9,8 @@ import logger from "./config/logging.js";
 const execPromise = util.promisify(exec);
 
 // Constants
-const PYTORCH_MODEL_PATH = process.env.PYTORCH_MODEL_PATH || path.join(__dirname, "models");
+const PYTORCH_MODEL_PATH =
+  process.env.PYTORCH_MODEL_PATH || path.join(__dirname, "models");
 
 // Model source URLs and descriptions
 const PRE_TRAINED_MODELS = {
@@ -187,7 +188,7 @@ async function ensureModelDownloaded(modelName) {
     logger.error(`Error ensuring model ${modelName} is downloaded:`, error);
     // Add more detailed error logging for debugging
     if (error && error.stack) {
-      logger.error('Stack trace:', error.stack);
+      logger.error("Stack trace:", error.stack);
     }
     throw error;
   }
@@ -218,9 +219,12 @@ async function getDefaultModel() {
       try {
         await downloadModel(defaultModel.id);
       } catch (err) {
-        logger.error(`Error downloading default model (${defaultModel.id}):`, err);
+        logger.error(
+          `Error downloading default model (${defaultModel.id}):`,
+          err
+        );
         if (err && err.stack) {
-          logger.error('Stack trace:', err.stack);
+          logger.error("Stack trace:", err.stack);
         }
         throw err;
       }
@@ -233,9 +237,12 @@ async function getDefaultModel() {
       try {
         await downloadModel(firstModel.id);
       } catch (err) {
-        logger.error(`Error downloading first available model (${firstModel.id}):`, err);
+        logger.error(
+          `Error downloading first available model (${firstModel.id}):`,
+          err
+        );
         if (err && err.stack) {
-          logger.error('Stack trace:', err.stack);
+          logger.error("Stack trace:", err.stack);
         }
         throw err;
       }
@@ -246,7 +253,7 @@ async function getDefaultModel() {
   } catch (error) {
     logger.error("Error getting default model:", error);
     if (error && error.stack) {
-      logger.error('Stack trace:', error.stack);
+      logger.error("Stack trace:", error.stack);
     }
     throw error;
   }

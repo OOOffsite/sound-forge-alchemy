@@ -9,6 +9,9 @@ import SettingsDropdown from '../components/ui/SettingsDropdown.tsx';
 import DebugConsoleOverlay from '../components/ui/DebugConsoleOverlay';
 import StickyPlayer from '../components/ui/StickyPlayer';
 import OverlayGrid, { OverlayPane } from '../components/ui/OverlayGrid';
+import InputPanel from '../components/InputPanel';
+import PlaylistPanel from '../components/PlaylistPanel';
+import type { Track } from '../components/TrackList';
 
 type MainLayoutProps = {
   children: React.ReactNode;
@@ -62,6 +65,25 @@ export default function MainLayout({ children, currentTrack, isProcessing = fals
       ),
     },
   ]);
+
+  // Example placeholder data and handlers for demo purposes
+  const [tracks, setTracks] = useState<Track[]>([]); // Use Track type
+  const [selectedTrackId, setSelectedTrackId] = useState<string | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleFetchPlaylist = (url: string) => {
+    setIsLoading(true);
+    // TODO: Fetch playlist and update tracks
+    setTimeout(() => {
+      setTracks([
+        { id: '1', title: 'Track 1', artist: 'Artist 1', duration: '3:45' },
+        { id: '2', title: 'Track 2', artist: 'Artist 2', duration: '4:12' },
+      ]);
+      setIsLoading(false);
+    }, 1000);
+  };
+  const handleSelectTrack = (track: Track) => setSelectedTrackId(track.id);
+  const handleDownloadTrack = (track: Track) => {/* TODO */};
 
   // Helper functions for pane state
   function handleMinimizePane(id: string) {
@@ -139,8 +161,24 @@ export default function MainLayout({ children, currentTrack, isProcessing = fals
             )}
           </div>
         </header>
-        <main className="flex-grow container mx-auto px-4 py-8">
-          {children}
+        <main className="flex-grow w-full max-w-full flex flex-row container mx-auto px-0 py-0">
+          {/* Left sticky panel column */}
+          <aside className="flex flex-col w-full max-w-xs min-w-[320px] border-r border-border bg-background sticky top-0 h-[calc(100vh-0px)] z-10">
+            <InputPanel onFetchPlaylist={handleFetchPlaylist} isLoading={isLoading} />
+            <div className="flex-1 overflow-y-auto">
+              <PlaylistPanel
+                tracks={tracks}
+                onSelectTrack={handleSelectTrack}
+                onDownloadTrack={handleDownloadTrack}
+                selectedTrackId={selectedTrackId}
+                isProcessing={isProcessing}
+              />
+            </div>
+          </aside>
+          {/* Main content area */}
+          <section className="flex-1 min-w-0 max-w-full px-8 py-8">
+            {children}
+          </section>
         </main>
         <footer className="border-t border-border">
           <div className="container mx-auto px-4 py-4 text-center text-sm text-muted-foreground">

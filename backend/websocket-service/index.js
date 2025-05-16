@@ -1,9 +1,9 @@
 // require('dotenv').config();
-const express = require('express');
-const http = require('http');
-const cors = require('cors');
-const { Server } = require('socket.io');
-const Redis = require('ioredis');
+const express = require("express");
+const http = require("http");
+const cors = require("cors");
+const { Server } = require("socket.io");
+const Redis = require("ioredis");
 const logger = require("./config/logging");
 
 // Initialize Redis clients
@@ -24,60 +24,60 @@ const server = http.createServer(app);
 // Create Socket.IO server
 const io = new Server(server, {
   cors: {
-    origin: '*',
-    methods: ['GET', 'POST']
-  }
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
 });
 
 // Socket.IO events
-io.on('connection', (socket) => {
+io.on("connection", (socket) => {
   logger.info(`Client connected: ${socket.id}`);
-  
+
   // Handle client subscriptions to track events
-  socket.on('subscribe:track', (trackId) => {
+  socket.on("subscribe:track", (trackId) => {
     logger.info(`Client ${socket.id} subscribed to track: ${trackId}`);
     socket.join(`track:${trackId}`);
   });
-  
+
   // Handle client unsubscriptions
-  socket.on('unsubscribe:track', (trackId) => {
+  socket.on("unsubscribe:track", (trackId) => {
     logger.info(`Client ${socket.id} unsubscribed from track: ${trackId}`);
     socket.leave(`track:${trackId}`);
   });
-  
+
   // Handle disconnection
-  socket.on('disconnect', () => {
+  socket.on("disconnect", () => {
     logger.info(`Client disconnected: ${socket.id}`);
   });
 });
 
 // Subscribe to Redis channels
 const channels = [
-  'download:job:created',
-  'download:job:updated',
-  'download:job:completed',
-  'download:job:error',
-  'processing:job:created',
-  'processing:job:updated',
-  'processing:job:completed',
-  'processing:job:error',
-  'analysis:job:created',
-  'analysis:job:updated',
-  'analysis:job:completed',
-  'analysis:job:error'
+  "download:job:created",
+  "download:job:updated",
+  "download:job:completed",
+  "download:job:error",
+  "processing:job:created",
+  "processing:job:updated",
+  "processing:job:completed",
+  "processing:job:error",
+  "analysis:job:created",
+  "analysis:job:updated",
+  "analysis:job:completed",
+  "analysis:job:error",
 ];
 
-channels.forEach(channel => sub.subscribe(channel));
+channels.forEach((channel) => sub.subscribe(channel));
 
 // Handle Redis messages
-sub.on('message', (channel, message) => {
+sub.on("message", (channel, message) => {
   try {
     const data = JSON.parse(message);
-    
+
     if (data.trackId) {
       // Emit to the track's room
       io.to(`track:${data.trackId}`).emit(channel, data);
-      
+
       logger.info(`Emitted ${channel} event for track: ${data.trackId}`);
     }
   } catch (error) {
@@ -86,26 +86,28 @@ sub.on('message', (channel, message) => {
 });
 
 // Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).send({ status: 'ok' });
+app.get("/health", (req, res) => {
+  res.status(200).send({ status: "ok" });
 });
 
 // Notify endpoint for other services to send messages to clients
-app.post('/notify', (req, res) => {
+app.post("/notify", (req, res) => {
   try {
     const { event, data } = req.body;
-    
+
     if (!event || !data || !data.trackId) {
-      return res.status(400).json({ error: 'Event, data, and trackId are required' });
+      return res
+        .status(400)
+        .json({ error: "Event, data, and trackId are required" });
     }
-    
+
     // Emit to the track's room
     io.to(`track:${data.trackId}`).emit(event, data);
-    
+
     res.status(200).json({ success: true });
   } catch (error) {
     logger.error(`Error in notify endpoint: ${error.message}`);
-    res.status(500).json({ error: 'Failed to send notification' });
+    res.status(500).json({ error: "Failed to send notification" });
   }
 });
 

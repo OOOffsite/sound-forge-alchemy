@@ -48,8 +48,8 @@ export default function TrackList({
   const [selectionAction, setSelectionAction] = useState<'add' | 'process' | 'analyze'>('add');
 
   // Compute unique values for each property
-  const uniqueArtists = Array.from(new Set(tracks.map(t => t.artist))).sort();
-  const uniqueTitles = Array.from(new Set(tracks.map(t => t.title))).sort();
+  const uniqueArtists = React.useMemo(() => Array.from(new Set(tracks.map(t => t.artist))).sort(), [tracks]);
+  const uniqueTitles = React.useMemo(() => Array.from(new Set(tracks.map(t => t.title))).sort(), [tracks]);
 
   // Autocomplete logic
   React.useEffect(() => {

@@ -8,6 +8,7 @@
 | 1.1.0   | 2025-05-16 | peguesj     | Detailed implementation outline and standards|
 | 1.2.0   | 2025-05-16 | peguesj     | Expanded explanations, color wireframes, PM table |
 | 1.3.0   | 2025-05-16 | peguesj     | Added narrative, technical mapping, and interactive diagrams |
+| 1.4.0   | 2025-05-16 | peguesj     | UI/UX implementation plan update            |
 
 ---
 
@@ -236,6 +237,22 @@ The journey from vision to reality is mapped in clear, actionable steps. Each st
 | 5    | Animation & Feedback | Add smooth transitions, animate notifications, loading/progress indicators | [Framer Motion](https://www.framer.com/motion/), [Material Motion](https://m3.material.io/styles/motion/overview) | feat(animation): add panel and notification animations |
 | 6    | Testing & QA | Unit/integration tests for layout, notifications, accessibility; manual QA; accessibility audit | [Jest](https://jestjs.io/), [axe](https://www.deque.com/axe/), [Lighthouse](https://web.dev/accessibility/) | test: add tests for layout and notifications |
 | 7    | Documentation & Changelog | Update docs, diagrams, changelog as features are implemented | [Markdown Guide](https://www.markdownguide.org/), [Mermaid Diagrams](https://mermaid.js.org/) | docs: update documentation and changelog |
+
+---
+
+## 1.4.0 - 2025-05-16 (peguesj)
+
+### UI/UX Implementation Plan Update
+
+- Remove duplicate/legacy playlist/input components from the right (main) pane. Only the audio processing/visualization panel should be present.
+- Refactor notification overlays to:
+  - Appear at the bottom right of the viewport, tiling right-to-left.
+  - Use the design system theme and styling.
+  - Be user-draggable (using a well-maintained library such as react-draggable).
+- Enhance the left pane:
+  - Add section headers/headings for clarity (e.g., “Playlist”, “Tracks”).
+  - Use ShadCN Collapsible for collapsible sections within the left pane.
+- Each step will be implemented atomically and committed with clear, descriptive messages.
 
 ---
 

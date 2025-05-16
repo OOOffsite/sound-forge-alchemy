@@ -86,27 +86,37 @@ export default function TrackList({
           className="max-w-xs"
           aria-label="Filter tracks"
         />
-        <Select value={String(pageSize)} onValueChange={v => setPageSize(Number(v))}>
-          <SelectTrigger className="w-[120px]" aria-label="Page size">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {[5, 10, 20, 50].map(size => (
-              <SelectItem key={size} value={String(size)}>{size} / page</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Button size="sm" variant="outline" onClick={handleBatchDownload} disabled={!selectedIds.length || isProcessing} aria-label="Download selected tracks">
-          Download Selected
-        </Button>
-        <Button size="sm" variant="secondary" onClick={() => paginatedTracks.forEach(onDownloadTrack)} disabled={isProcessing} aria-label="Download all tracks on page">
-          Download All
-        </Button>
       </div>
+      {/* Batch controls row */}
+      <div className="flex items-center gap-2 px-2 pb-2">
+        <button
+          onClick={toggleSelectAll}
+          aria-label={allOnPageSelected ? 'Deselect all tracks on page' : 'Select all tracks on page'}
+          className={`group/icon-btn flex items-center justify-center h-9 w-9 rounded-full transition-all duration-200 bg-accent/10 hover:bg-primary/90 focus:bg-primary/80 text-primary hover:text-white focus:text-white outline-none border border-transparent hover:shadow-lg focus:ring-2 focus:ring-primary/60 ${allOnPageSelected ? 'bg-primary text-white' : ''}`}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="4" y="4" width="16" height="16" rx="2" strokeWidth="2" /><path d="M9 12l2 2 4-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        </button>
+        <button
+          onClick={handleBatchDownload}
+          disabled={!selectedIds.length || isProcessing}
+          aria-label="Download selected tracks"
+          className="group/icon-btn flex items-center justify-center h-9 w-9 rounded-full transition-all duration-200 bg-accent/10 hover:bg-accent/90 focus:bg-accent/80 text-accent hover:text-white focus:text-white outline-none border border-transparent hover:shadow-lg focus:ring-2 focus:ring-accent/60"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 4v12m0 0l-4-4m4 4l4-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><rect x="4" y="20" width="16" height="2" rx="1" strokeWidth="2" /></svg>
+        </button>
+        <button
+          onClick={() => paginatedTracks.forEach(onDownloadTrack)}
+          disabled={isProcessing}
+          aria-label="Download all tracks on page"
+          className="group/icon-btn flex items-center justify-center h-9 w-9 rounded-full transition-all duration-200 bg-accent/10 hover:bg-accent/90 focus:bg-accent/80 text-accent hover:text-white focus:text-white outline-none border border-transparent hover:shadow-lg focus:ring-2 focus:ring-accent/60"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 4v12m0 0l-4-4m4 4l4-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><rect x="4" y="20" width="16" height="2" rx="1" strokeWidth="2" /></svg>
+        </button>
+      </div>
+      {/* Track list */}
       <div className="grid gap-4" role="listbox" aria-label="Track list">
         <div className="flex items-center px-4 py-2 border-b">
           <input type="checkbox" checked={allOnPageSelected} onChange={toggleSelectAll} className="mr-2" aria-label="Select all tracks on page" />
-          <span className="text-xs text-muted-foreground">Select All</span>
         </div>
         {paginatedTracks.map((track) => {
           const isActive = selectedTrackId === track.id;
@@ -209,6 +219,19 @@ export default function TrackList({
           </PaginationItem>
         </PaginationContent>
       </Pagination>
+      {/* Page size select moved below pagination */}
+      <div className="flex justify-end mt-2 px-2">
+        <Select value={String(pageSize)} onValueChange={v => setPageSize(Number(v))}>
+          <SelectTrigger className="w-[120px]" aria-label="Page size">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {[5, 10, 20, 50].map(size => (
+              <SelectItem key={size} value={String(size)}>{size} / page</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 }

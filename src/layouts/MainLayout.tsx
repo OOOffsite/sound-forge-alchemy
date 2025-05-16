@@ -5,9 +5,20 @@ import { Toaster as Sonner } from "../components/ui/sonner";
 import { TooltipProvider } from "../components/ui/tooltip";
 import NotificationLog from '../components/ui/NotificationLog';
 import SettingsDropdown from '../components/ui/SettingsDropdown';
+import DebugConsoleOverlay from '../components/ui/DebugConsoleOverlay';
+import StickyPlayer from '../components/ui/StickyPlayer';
 
 type MainLayoutProps = {
   children: React.ReactNode;
+  currentTrack?: {
+    title: string;
+    artist: string;
+    albumArt?: string;
+    duration: string;
+    audioUrl?: string;
+  };
+  isProcessing?: boolean;
+  isWorkingWithStems?: boolean;
 };
 
 // Reusable component for rendering navigation links
@@ -19,9 +30,10 @@ const NavigationLink = ({ href, label }: { href: string; label: string }) => (
   </li>
 );
 
-export default function MainLayout({ children }: MainLayoutProps) {
+export default function MainLayout({ children, currentTrack, isProcessing = false, isWorkingWithStems = false }: MainLayoutProps) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [debugConsoleEnabled, setDebugConsoleEnabled] = useState(false);
 
   return (
     <TooltipProvider>
@@ -52,7 +64,13 @@ export default function MainLayout({ children }: MainLayoutProps) {
               </button>
             </nav>
             {showNotifications && <NotificationLog onClose={() => setShowNotifications(false)} />}
-            {showSettings && <SettingsDropdown onClose={() => setShowSettings(false)} />}
+            {showSettings && (
+              <SettingsDropdown
+                onClose={() => setShowSettings(false)}
+                debugConsoleEnabled={debugConsoleEnabled}
+                onToggleDebugConsole={setDebugConsoleEnabled}
+              />
+            )}
           </div>
         </header>
         <main className="flex-grow container mx-auto px-4 py-8">
@@ -64,6 +82,14 @@ export default function MainLayout({ children }: MainLayoutProps) {
           </div>
         </footer>
       </div>
+      {debugConsoleEnabled && (
+        <DebugConsoleOverlay onClose={() => setDebugConsoleEnabled(false)} />
+      )}
+      <StickyPlayer
+        track={currentTrack}
+        isProcessing={isProcessing}
+        isWorkingWithStems={isWorkingWithStems}
+      />
       <Toaster />
       <Sonner />
     </TooltipProvider>

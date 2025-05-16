@@ -267,8 +267,29 @@ const Index = () => {
     }
   };
 
+  // Helper to get audioUrl for the selected track (if available)
+  const getAudioUrl = (track: Track | null) => {
+    if (!track) return undefined;
+    // @ts-expect-error: Some tracks may have audioUrl or previewUrl from backend
+    if (track.audioUrl) return track.audioUrl;
+    // @ts-expect-error: Some tracks may have previewUrl from backend
+    if (track.previewUrl) return track.previewUrl;
+    // Fallback: try to use a local file path if downloaded (customize as needed)
+    return `/audio_data/${track.id}/original.mp3`;
+  };
+
   return (
-    <MainLayout>
+    <MainLayout
+      currentTrack={selectedTrack ? {
+        title: selectedTrack.title,
+        artist: selectedTrack.artist,
+        albumArt: selectedTrack.albumArt,
+        duration: selectedTrack.duration,
+        audioUrl: getAudioUrl(selectedTrack)
+      } : undefined}
+      isProcessing={isProcessing}
+      isWorkingWithStems={separatedStems.length > 0}
+    >
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold mb-4">Audio Source Separation</h1>

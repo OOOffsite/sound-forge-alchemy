@@ -3,9 +3,11 @@ import { X } from 'lucide-react';
 
 interface SettingsDropdownProps {
   onClose: () => void;
+  debugConsoleEnabled: boolean;
+  onToggleDebugConsole: (enabled: boolean) => void;
 }
 
-export default function SettingsDropdown({ onClose }: SettingsDropdownProps) {
+export default function SettingsDropdown({ onClose, debugConsoleEnabled, onToggleDebugConsole }: SettingsDropdownProps) {
   return (
     <div className="absolute right-0 mt-2 w-80 bg-popover border border-border rounded shadow-lg z-50">
       <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted-foreground/10">
@@ -35,7 +37,7 @@ export default function SettingsDropdown({ onClose }: SettingsDropdownProps) {
         <div>
           <div className="font-medium mb-1">Debugging</div>
           <label className="flex items-center gap-2">
-            <input type="checkbox" /> Enable Debug Console
+            <input type="checkbox" checked={debugConsoleEnabled} onChange={e => onToggleDebugConsole(e.target.checked)} /> Enable Debug Console
           </label>
         </div>
       </div>

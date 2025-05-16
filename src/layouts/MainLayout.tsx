@@ -52,6 +52,9 @@ export default function MainLayout({ children, currentTrack, isProcessing = fals
       title: 'Debug Console',
       icon: <Terminal className="h-5 w-5 text-primary" />,
       minimized: false,
+      onMinimize: () => handleMinimizePane('debug'),
+      onExpand: () => handleExpandPane('debug'),
+      onClose: () => handleClosePane('debug'),
       content: (
         <DebugConsoleOverlay
           minimized={false}
@@ -63,6 +66,9 @@ export default function MainLayout({ children, currentTrack, isProcessing = fals
       title: 'Notifications',
       icon: <BellIcon className="h-5 w-5 text-yellow-500" />,
       minimized: false,
+      onMinimize: () => handleMinimizePane('notifications'),
+      onExpand: () => handleExpandPane('notifications'),
+      onClose: () => handleClosePane('notifications'),
       content: (
         <NotificationLog
           minimized={false}
@@ -128,6 +134,9 @@ export default function MainLayout({ children, currentTrack, isProcessing = fals
                           title: 'Debug Console',
                           icon: <Terminal className="h-5 w-5 text-primary" />,
                           minimized: false,
+                          onMinimize: () => handleMinimizePane('debug'),
+                          onExpand: () => handleExpandPane('debug'),
+                          onClose: () => handleClosePane('debug'),
                           content: (
                             <DebugConsoleOverlay
                               minimized={false}

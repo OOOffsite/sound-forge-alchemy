@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
+import { useToast } from '../../hooks/use-toast';
 
-// Example notification type
 export interface Notification {
   id: string;
   message: string;
@@ -13,42 +13,17 @@ export interface Notification {
 
 interface NotificationLogProps {
   minimized?: boolean;
-  notifications?: Notification[];
   onClose: () => void;
   onMinimize: () => void;
-  onDismissNotification?: (id: string) => void;
 }
 
-// Dummy notifications for UI demo
-const demoNotifications: Notification[] = [
-  {
-    id: '1',
-    message: 'Model download complete',
-    icon: <CheckCircle2 className="text-green-500" />,
-    status: 'success',
-  },
-  {
-    id: '2',
-    message: 'Failed to analyze track',
-    icon: <XCircle className="text-red-500" />,
-    status: 'error',
-    actionLabel: 'Retry',
-    onAction: () => alert('Retrying...'),
-  },
-  {
-    id: '3',
-    message: 'Some models are missing',
-    icon: <AlertTriangle className="text-yellow-500" />,
-    status: 'warning',
-  },
-];
-
-export default function NotificationLog({ notifications = demoNotifications, onClose, onMinimize, minimized, onDismissNotification }: NotificationLogProps) {
-  const [unreadIds, setUnreadIds] = React.useState(() => notifications.map(n => n.id));
+export default function NotificationLog({ onClose, onMinimize, minimized }: NotificationLogProps) {
+  const { toasts, dismiss } = useToast();
+  const [unreadIds, setUnreadIds] = React.useState(() => toasts.map(n => n.id));
 
   function handleDismiss(id: string) {
     setUnreadIds(ids => ids.filter(nid => nid !== id));
-    onDismissNotification?.(id);
+    dismiss(id);
   }
 
   if (minimized) {
@@ -73,10 +48,10 @@ export default function NotificationLog({ notifications = demoNotifications, onC
         </div>
       </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-2">
-        {notifications.length === 0 ? (
+        {toasts.length === 0 ? (
           <div className="text-gray-400">No notifications</div>
         ) : (
-          notifications.map((n) => (
+          toasts.map((n) => (
             <div
               key={n.id}
               className={`group flex items-center gap-2 px-3 py-2 rounded transition-all duration-200 border border-transparent relative bg-background ${
@@ -85,10 +60,19 @@ export default function NotificationLog({ notifications = demoNotifications, onC
               } animate-fade-in`}
               onMouseEnter={() => setUnreadIds(ids => ids.filter(id => id !== n.id))}
             >
-              {n.icon}
-              <span className="truncate flex-1 text-sm">{n.message}</span>
-              {n.actionLabel && n.onAction && (
-                <button onClick={n.onAction} className="text-xs px-2 py-1 rounded bg-primary text-white hover:bg-primary/80 ml-2">{n.actionLabel}</button>
+              {/* Icon based on status */}
+              {n.variant === 'destructive' ? (
+                <XCircle className="text-red-500" />
+              ) : n.variant === 'success' ? (
+                <CheckCircle2 className="text-green-500" />
+              ) : n.variant === 'warning' ? (
+                <AlertTriangle className="text-yellow-500" />
+              ) : (
+                <CheckCircle2 className="text-primary" />
+              )}
+              <span className="truncate flex-1 text-sm">{n.title || n.description}</span>
+              {n.action && (
+                <button onClick={n.action} className="text-xs px-2 py-1 rounded bg-primary text-white hover:bg-primary/80 ml-2">Action</button>
               )}
               <button
                 onClick={() => handleDismiss(n.id)}
@@ -102,7 +86,6 @@ export default function NotificationLog({ notifications = demoNotifications, onC
           ))
         )}
       </div>
-      {/* Animation keyframes for fade-in */}
       <style>{`
         @keyframes fade-in {
           from { opacity: 0; transform: translateY(10px); }

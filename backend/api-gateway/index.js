@@ -55,11 +55,18 @@ const analysisServiceProxy = createProxyMiddleware({
   },
 });
 
+const modelsProxy = createProxyMiddleware({
+  target: process.env.PROCESSING_SERVICE_URL,
+  changeOrigin: true,
+  pathRewrite: { "^/api/models": "/models" },
+});
+
 // Proxy routes (no body parser before these)
 app.use("/api/spotify", spotifyServiceProxy);
 app.use("/api/download", downloadServiceProxy);
 app.use("/api/process", processingServiceProxy);
 app.use("/api/analyze", analysisServiceProxy);
+app.use("/api/models", modelsProxy);
 
 // Health check endpoint (no body parser needed)
 app.get("/health", (req, res) => {

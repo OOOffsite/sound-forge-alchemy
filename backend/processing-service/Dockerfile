@@ -46,7 +46,12 @@ ENV PORT=3003 \
     PYTORCH_MODEL_PATH=/app/models \
     TMP_PATH=/app/tmp \
     CACHE_PATH=/app/cache
-
+RUN pip install demucs
+# Add Python to PATH and set Python environment variables   
+ENV PYTHONPATH="/usr/local/lib/python3.10/site-packages"
+ENV PYTHONPATH="${PYTHONPATH}:${PYTHONPATH:-}" \
+    PYTHONUNBUFFERED=1 \
+    PATH="/usr/local/bin:${PATH}"
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
     CMD curl -f http://localhost:3003/health || exit 1

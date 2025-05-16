@@ -81,29 +81,30 @@ export default function MainLayout({ children, currentTrack, isProcessing = fals
   return (
     <TooltipProvider>
       <div className="min-h-screen flex flex-col bg-background text-foreground">
-        <header className="border-b border-border w-full">
+        <header className="border-b border-border w-full bg-gradient-to-r from-background via-primary/5 to-accent/10">
           <div className="flex w-full items-center justify-between px-8 py-4">
             <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent truncate text-left">
               SoundForge
             </h1>
             <nav className="flex items-center gap-4">
               <ul className="flex gap-4">
-                <NavigationLink href="/" label="Home" />
+                <NavigationLink href="/home" label="Home" />
+                <NavigationLink href="/" label="Forge" />
                 <NavigationLink href="/about" label="About" />
               </ul>
               <button
-                className="ml-4 relative"
+                className="ml-4 relative bg-primary/10 hover:bg-primary/20 rounded p-1 transition-colors"
                 onClick={() => handleExpandPane('notifications')}
                 aria-label="Show notifications"
               >
-                <BellIcon className="h-6 w-6" />
+                <BellIcon className="h-6 w-6 text-primary" />
               </button>
               <button
-                className="ml-2 relative"
+                className="ml-2 relative bg-accent/10 hover:bg-accent/20 rounded p-1 transition-colors"
                 onClick={() => setShowSettings((v) => !v)}
                 aria-label="Show settings"
               >
-                <Settings className="h-6 w-6" />
+                <Settings className="h-6 w-6 text-accent" />
               </button>
             </nav>
             {showSettings && (
@@ -140,7 +141,7 @@ export default function MainLayout({ children, currentTrack, isProcessing = fals
             )}
           </div>
         </header>
-        <main className="flex-grow w-full max-w-7xl mx-auto flex flex-row px-0 py-0">
+        <main className="flex-grow w-full max-w-8xl mx-auto flex flex-row px-0 py-0">
           {/* Left sticky panel column and main content are now controlled by the page, not MainLayout */}
           {children}
         </main>
@@ -149,7 +150,12 @@ export default function MainLayout({ children, currentTrack, isProcessing = fals
             <p>© {new Date().getFullYear()} SoundForge. All rights reserved.</p>
           </div>
         </footer>
-        <OverlayGrid panes={overlayPanes} onUpdatePane={handleUpdatePane} />
+        <OverlayGrid
+          panes={overlayPanes}
+          onUpdatePane={handleUpdatePane}
+          stickyPlayerActive={!!currentTrack}
+          stickyPlayerHeight={72}
+        />
         <StickyPlayer
           track={currentTrack}
           isProcessing={isProcessing}

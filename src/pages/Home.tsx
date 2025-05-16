@@ -29,9 +29,9 @@ const Home: React.FC = () => {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">SoundForge</h1>
           <nav className="flex gap-6">
-            <a href="/" className="font-medium hover:text-primary transition-colors">App</a>
+            <a href="/home" className="font-medium hover:text-primary transition-colors">Home</a>
+            <a href="/" className="font-medium hover:text-primary transition-colors">Forge</a>
             <a href="/about" className="font-medium hover:text-primary transition-colors">About</a>
-            <a href="/login" className="font-medium hover:text-primary transition-colors">Login</a>
           </nav>
         </div>
       </header>

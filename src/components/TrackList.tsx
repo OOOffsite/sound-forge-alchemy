@@ -108,59 +108,73 @@ export default function TrackList({
           <input type="checkbox" checked={allOnPageSelected} onChange={toggleSelectAll} className="mr-2" aria-label="Select all tracks on page" />
           <span className="text-xs text-muted-foreground">Select All</span>
         </div>
-        {paginatedTracks.map((track) => (
-          <Card key={track.id} className={`overflow-hidden ${selectedTrackId === track.id ? 'border-primary' : ''}`} role="option" aria-selected={selectedTrackId === track.id}>
-            <CardContent className="p-0">
-              <div className="flex items-center p-4">
-                <input
-                  type="checkbox"
-                  checked={selectedIds.includes(track.id)}
-                  onChange={() => setSelectedIds(ids => ids.includes(track.id) ? ids.filter(id => id !== track.id) : [...ids, track.id])}
-                  className="mr-2"
-                  aria-label={`Select track ${track.title} by ${track.artist}`}
-                />
-                <div className="w-12 h-12 mr-4 flex-shrink-0 bg-secondary flex items-center justify-center rounded overflow-hidden">
-                  {track.albumArt ? (
-                    <img src={track.albumArt} alt={`${track.title} album art`} className="w-full h-full object-cover" />
-                  ) : (
-                    <FileMusic className="h-6 w-6 text-muted-foreground" />
-                  )}
+        {paginatedTracks.map((track) => {
+          const isActive = selectedTrackId === track.id;
+          return (
+            <Card
+              key={track.id}
+              className={`overflow-hidden transition-shadow duration-200 group ${isActive ? 'border-2 border-primary ring-2 ring-primary/30 bg-primary/5 shadow-lg' : 'border-border'} hover:shadow-md`}
+              role="option"
+              aria-selected={isActive}
+            >
+              <CardContent className="p-0">
+                <div className="flex items-center p-4 gap-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.includes(track.id)}
+                    onChange={() => setSelectedIds(ids => ids.includes(track.id) ? ids.filter(id => id !== track.id) : [...ids, track.id])}
+                    className="mr-2"
+                    aria-label={`Select track ${track.title} by ${track.artist}`}
+                  />
+                  <div className="w-12 h-12 mr-2 flex-shrink-0 bg-secondary flex items-center justify-center rounded overflow-hidden">
+                    {track.albumArt ? (
+                      <img src={track.albumArt} alt={`${track.title} album art`} className="w-full h-full object-cover" />
+                    ) : (
+                      <FileMusic className="h-6 w-6 text-muted-foreground" />
+                    )}
+                  </div>
+                  <div className="flex-grow min-w-0">
+                    <h3 className="font-medium truncate">{track.title}</h3>
+                    <p className="text-sm text-muted-foreground truncate">{track.artist}</p>
+                    {isActive && (
+                      <div className="mt-2">
+                        <TrackWaveform />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-shrink-0 ml-2 flex gap-1">
+                    {/* Select/Play Button */}
+                    <button
+                      onClick={() => onSelectTrack(track)}
+                      disabled={isProcessing}
+                      aria-label={`Select track ${track.title}`}
+                      className={
+                        `group/icon-btn relative flex items-center justify-center h-9 w-9 rounded-full transition-all duration-200 bg-accent/10 hover:bg-primary/90 focus:bg-primary/80 text-primary hover:text-white focus:text-white outline-none border border-transparent hover:shadow-lg focus:ring-2 focus:ring-primary/60 ${isActive ? 'bg-primary text-white' : ''}`
+                      }
+                    >
+                      <Play className="h-5 w-5 transition-transform duration-200 group-hover/icon-btn:scale-110 group-focus/icon-btn:scale-110" />
+                      <span className="absolute left-full ml-2 whitespace-nowrap bg-background text-primary text-xs font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover/icon-btn:opacity-100 group-focus/icon-btn:opacity-100 transition-opacity duration-200 pointer-events-none">
+                        Select
+                      </span>
+                    </button>
+                    {/* Download Button */}
+                    <button
+                      onClick={() => onDownloadTrack(track)}
+                      disabled={isProcessing}
+                      aria-label={`Download track ${track.title}`}
+                      className="group/icon-btn relative flex items-center justify-center h-9 w-9 rounded-full transition-all duration-200 bg-accent/10 hover:bg-accent/90 focus:bg-accent/80 text-accent hover:text-white focus:text-white outline-none border border-transparent hover:shadow-lg focus:ring-2 focus:ring-accent/60"
+                    >
+                      <Download className="h-5 w-5 transition-transform duration-200 group-hover/icon-btn:scale-110 group-focus/icon-btn:scale-110" />
+                      <span className="absolute left-full ml-2 whitespace-nowrap bg-background text-accent text-xs font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover/icon-btn:opacity-100 group-focus/icon-btn:opacity-100 transition-opacity duration-200 pointer-events-none">
+                        Download
+                      </span>
+                    </button>
+                  </div>
                 </div>
-                <div className="flex-grow min-w-0">
-                  <h3 className="font-medium truncate">{track.title}</h3>
-                  <p className="text-sm text-muted-foreground truncate">{track.artist}</p>
-                  {selectedTrackId === track.id && (
-                    <div className="mt-2">
-                      <TrackWaveform />
-                    </div>
-                  )}
-                </div>
-                <div className="flex-shrink-0 ml-4 flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => onSelectTrack(track)}
-                    disabled={isProcessing}
-                    aria-label={`Select track ${track.title}`}
-                  >
-                    <Play className="h-4 w-4 mr-1" />
-                    <span className="hidden sm:inline">Select</span>
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => onDownloadTrack(track)}
-                    disabled={isProcessing}
-                    aria-label={`Download track ${track.title}`}
-                  >
-                    <Download className="h-4 w-4 mr-1" />
-                    <span className="hidden sm:inline">Download</span>
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
       {/* Pagination Bar */}
       <Pagination className="mt-4">

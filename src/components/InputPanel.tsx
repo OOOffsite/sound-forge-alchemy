@@ -18,12 +18,12 @@ const InputPanel: React.FC<InputPanelProps> = ({ onFetchPlaylist, isLoading }) =
       aria-label="Spotify input panel"
     >
       <Collapsible.Root open={open} onOpenChange={setOpen}>
-        <div className="flex items-center justify-between mb-2">
-          <Label className="text-lg font-semibold">Playlist Input</Label>
+        <div className="flex items-center justify-between mb-2 px-2 bg-accent/10 border-b border-accent/20 rounded-t">
+          <Label className="text-lg font-semibold text-accent">Playlist Input</Label>
           <Collapsible.Trigger asChild>
             <button
               aria-label={open ? 'Collapse input' : 'Expand input'}
-              className="ml-2 p-1 rounded hover:bg-accent/30 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="ml-2 p-1 rounded hover:bg-accent/20 focus:outline-none focus:ring-2 focus:ring-accent"
             >
               {open ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
             </button>

@@ -10,6 +10,7 @@ import DebugConsoleOverlay from '../components/ui/DebugConsoleOverlay';
 import StickyPlayer from '../components/ui/StickyPlayer';
 import OverlayGrid, { OverlayPane } from '../components/ui/OverlayGrid';
 import type { Track } from '../components/TrackList';
+import { NavLink, useLocation } from 'react-router-dom';
 
 type MainLayoutProps = {
   children: React.ReactNode;
@@ -24,14 +25,24 @@ type MainLayoutProps = {
   isWorkingWithStems?: boolean;
 };
 
-// Reusable component for rendering navigation links
-const NavigationLink = ({ href, label }: { href: string; label: string }) => (
-  <li>
-    <a href={href} className="text-foreground hover:text-primary transition-colors">
-      {label}
-    </a>
-  </li>
-);
+// Reusable component for rendering navigation links with active highlighting
+const NavigationLink = ({ to, label }: { to: string; label: string }) => {
+  const location = useLocation();
+  const isActive = location.pathname === to || (to === '/' && location.pathname === '/home');
+  return (
+    <li>
+      <NavLink
+        to={to}
+        className={({ isActive }) =>
+          `text-foreground hover:text-primary transition-colors px-2 py-1 rounded ${isActive ? 'bg-primary/10 text-primary font-semibold' : ''}`
+        }
+        aria-current={isActive ? 'page' : undefined}
+      >
+        {label}
+      </NavLink>
+    </li>
+  );
+};
 
 export default function MainLayout({ children, currentTrack, isProcessing = false, isWorkingWithStems = false }: MainLayoutProps) {
   const [showSettings, setShowSettings] = useState(false);
@@ -44,8 +55,6 @@ export default function MainLayout({ children, currentTrack, isProcessing = fals
       content: (
         <DebugConsoleOverlay
           minimized={false}
-          onClose={() => handleClosePane('debug')}
-          onMinimize={() => handleMinimizePane('debug')}
         />
       ),
     },
@@ -57,8 +66,6 @@ export default function MainLayout({ children, currentTrack, isProcessing = fals
       content: (
         <NotificationLog
           minimized={false}
-          onClose={() => handleClosePane('notifications')}
-          onMinimize={() => handleMinimizePane('notifications')}
         />
       ),
     },
@@ -88,9 +95,9 @@ export default function MainLayout({ children, currentTrack, isProcessing = fals
             </h1>
             <nav className="flex items-center gap-4">
               <ul className="flex gap-4">
-                <NavigationLink href="/home" label="Home" />
-                <NavigationLink href="/" label="Forge" />
-                <NavigationLink href="/about" label="About" />
+                <NavigationLink to="/" label="Home" />
+                <NavigationLink to="/alchemy/session" label="Forge" />
+                <NavigationLink to="/about" label="About" />
               </ul>
               <button
                 className="ml-4 relative bg-primary/10 hover:bg-primary/20 rounded p-1 transition-colors"
@@ -124,8 +131,6 @@ export default function MainLayout({ children, currentTrack, isProcessing = fals
                           content: (
                             <DebugConsoleOverlay
                               minimized={false}
-                              onClose={() => handleClosePane('debug')}
-                              onMinimize={() => handleMinimizePane('debug')}
                             />
                           ),
                         },

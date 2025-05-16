@@ -5,6 +5,7 @@ import { TooltipProvider } from "./components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { WebSocketProvider } from "./lib/socket";
+import Home from "./pages/Home";
 import Index from "./pages/Index.tsx";
 import About from "./pages/About.tsx";
 import NotFound from "./pages/NotFound";
@@ -19,7 +20,8 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/alchemy/session" element={<Index />} />
             <Route path="/about" element={<About />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

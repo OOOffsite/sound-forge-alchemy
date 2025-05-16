@@ -27,8 +27,24 @@ const DebugConsoleOverlay: React.FC<DebugConsoleOverlayProps> = ({ minimized }) 
     return null;
   }
 
+  // Test button to dispatch a debug event
+  function sendTestDebug() {
+    const event = new CustomEvent('debug-log', { detail: `Debug event at ${new Date().toLocaleTimeString()}` });
+    window.dispatchEvent(event);
+  }
+
   return (
     <div className="w-full h-full flex flex-col">
+      <div className="flex items-center justify-between px-4 pt-2 pb-1">
+        <span className="text-xs text-muted-foreground">Debug Console</span>
+        <button
+          onClick={sendTestDebug}
+          className="text-xs px-2 py-1 rounded bg-primary text-white hover:bg-primary/80"
+          aria-label="Send test debug event"
+        >
+          Test Event
+        </button>
+      </div>
       <div className="flex-1 overflow-y-auto p-4 text-mono text-xs text-green-200 bg-gray-950">
         {logs.length === 0 ? (
           <div className="text-gray-400">No debug logs yet.</div>

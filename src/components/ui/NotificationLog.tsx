@@ -36,10 +36,9 @@ export default function NotificationLog({ minimized }: NotificationLogProps) {
           toasts.map((n) => (
             <div
               key={n.id}
-              className={`group flex items-center gap-2 px-3 py-2 rounded transition-all duration-200 border border-transparent relative bg-background ${
-                unreadIds.includes(n.id)
-                  ? 'ring-2 ring-primary/40 bg-primary/5' : 'hover:bg-accent/40'
-              } animate-fade-in`}
+              className={`group flex items-center gap-2 px-3 py-2 rounded transition-all duration-200 border border-transparent relative bg-background animate-fade-in
+                ${unreadIds.includes(n.id) ? 'ring-2 ring-primary/40 bg-primary/5' : 'hover:bg-accent/40'}
+                ${n.open === false ? 'opacity-60 grayscale pointer-events-none' : ''}`}
               onMouseEnter={() => setUnreadIds(ids => ids.filter(id => id !== n.id))}
             >
               {/* Icon based on status */}
@@ -53,17 +52,19 @@ export default function NotificationLog({ minimized }: NotificationLogProps) {
                 <CheckCircle2 className="text-primary" />
               )}
               <span className="truncate flex-1 text-sm">{n.title || n.description}</span>
-              {n.action && (
+              {n.action && n.open !== false && (
                 <button onClick={n.action} className="text-xs px-2 py-1 rounded bg-primary text-white hover:bg-primary/80 ml-2">Action</button>
               )}
-              <button
-                onClick={() => handleDismiss(n.id)}
-                className="ml-2 text-muted-foreground hover:text-red-500 opacity-70 group-hover:opacity-100 transition-opacity duration-150 flex items-center justify-center"
-                aria-label="Dismiss notification"
-                style={{ alignSelf: 'center' }}
-              >
-                <span className="sr-only">Dismiss</span>✕
-              </button>
+              {n.open !== false && (
+                <button
+                  onClick={() => handleDismiss(n.id)}
+                  className="ml-2 text-muted-foreground hover:text-red-500 opacity-70 group-hover:opacity-100 transition-opacity duration-150 flex items-center justify-center"
+                  aria-label="Dismiss notification"
+                  style={{ alignSelf: 'center' }}
+                >
+                  <span className="sr-only">Dismiss</span>✕
+                </button>
+              )}
             </div>
           ))
         )}

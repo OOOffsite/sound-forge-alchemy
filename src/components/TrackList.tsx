@@ -99,8 +99,37 @@ export default function TrackList({
   return (
     <div className="space-y-4" role="region" aria-label="Playlist Panel">
       <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 gap-2 px-2 pt-2">
+        {/* Inline batch controls - moved to the left */}
+        <div className="flex items-center gap-2 order-1 sm:order-none">
+          <button
+            onClick={toggleSelectAll}
+            aria-label={allOnPageSelected ? 'Deselect all tracks on page' : 'Select all tracks on page'}
+            className={`group/icon-btn flex items-center gap-1 justify-center h-9 px-3 rounded-full transition-all duration-200 bg-accent/10 hover:bg-primary/90 focus:bg-primary/80 text-primary hover:text-white focus:text-white outline-none border border-transparent hover:shadow-lg focus:ring-2 focus:ring-primary/60 ${allOnPageSelected ? 'bg-primary text-white' : ''}`}
+          >
+            <Users className="h-5 w-5" />
+            <span className="hidden sm:inline text-xs font-medium">{allOnPageSelected ? 'Deselect All' : 'Select All'}</span>
+          </button>
+          <button
+            onClick={handleBatchDownload}
+            disabled={!selectedIds.length || isProcessing}
+            aria-label="Add selected tracks to working environment"
+            className="group/icon-btn flex items-center gap-1 justify-center h-9 px-3 rounded-full transition-all duration-200 bg-accent/10 hover:bg-accent/90 focus:bg-accent/80 text-accent hover:text-white focus:text-white outline-none border border-transparent hover:shadow-lg focus:ring-2 focus:ring-accent/60"
+          >
+            <Plus className="h-5 w-5" />
+            <span className="hidden sm:inline text-xs font-medium">Add Selected</span>
+          </button>
+          <button
+            onClick={() => paginatedTracks.forEach(onDownloadTrack)}
+            disabled={isProcessing}
+            aria-label="Add all tracks on page to working environment"
+            className="group/icon-btn flex items-center gap-1 justify-center h-9 px-3 rounded-full transition-all duration-200 bg-accent/10 hover:bg-accent/90 focus:bg-accent/80 text-accent hover:text-white focus:text-white outline-none border border-transparent hover:shadow-lg focus:ring-2 focus:ring-accent/60"
+          >
+            <Users className="h-5 w-5" />
+            <span className="hidden sm:inline text-xs font-medium">Add All</span>
+          </button>
+        </div>
         {/* Autocomplete multi-select filter */}
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap flex-1">
           <div className="relative">
             <select
               value={activeFilterProp}
@@ -162,32 +191,6 @@ export default function TrackList({
               </button>
             </span>
           ))}
-        </div>
-        {/* Inline batch controls */}
-        <div className="flex items-center gap-2 ml-auto">
-          <button
-            onClick={toggleSelectAll}
-            aria-label={allOnPageSelected ? 'Deselect all tracks on page' : 'Select all tracks on page'}
-            className={`group/icon-btn flex items-center justify-center h-9 w-9 rounded-full transition-all duration-200 bg-accent/10 hover:bg-primary/90 focus:bg-primary/80 text-primary hover:text-white focus:text-white outline-none border border-transparent hover:shadow-lg focus:ring-2 focus:ring-primary/60 ${allOnPageSelected ? 'bg-primary text-white' : ''}`}
-          >
-            <Users className="h-5 w-5" />
-          </button>
-          <button
-            onClick={handleBatchDownload}
-            disabled={!selectedIds.length || isProcessing}
-            aria-label="Add selected tracks to working environment"
-            className="group/icon-btn flex items-center justify-center h-9 w-9 rounded-full transition-all duration-200 bg-accent/10 hover:bg-accent/90 focus:bg-accent/80 text-accent hover:text-white focus:text-white outline-none border border-transparent hover:shadow-lg focus:ring-2 focus:ring-accent/60"
-          >
-            <Plus className="h-5 w-5" />
-          </button>
-          <button
-            onClick={() => paginatedTracks.forEach(onDownloadTrack)}
-            disabled={isProcessing}
-            aria-label="Add all tracks on page to working environment"
-            className="group/icon-btn flex items-center justify-center h-9 w-9 rounded-full transition-all duration-200 bg-accent/10 hover:bg-accent/90 focus:bg-accent/80 text-accent hover:text-white focus:text-white outline-none border border-transparent hover:shadow-lg focus:ring-2 focus:ring-accent/60"
-          >
-            <Users className="h-5 w-5" />
-          </button>
         </div>
       </div>
       {/* Track list */}

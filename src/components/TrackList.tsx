@@ -9,7 +9,7 @@ import {
   PaginationPrevious,
   PaginationNext,
 } from './ui/pagination';
-import { Play, Download, FileMusic } from 'lucide-react';
+import { Play, Download, FileMusic, Plus, Users } from 'lucide-react';
 import TrackWaveform from './TrackWaveform';
 import { Input } from './ui/input';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from './ui/select';
@@ -40,11 +40,32 @@ export default function TrackList({
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [filter, setFilter] = useState('');
+  const [activeFilterProp, setActiveFilterProp] = useState<'title' | 'artist'>('title');
+  const [filterValues, setFilterValues] = useState<string[]>([]);
+  const [autocompleteOptions, setAutocompleteOptions] = useState<string[]>([]);
+  const [autocompleteInput, setAutocompleteInput] = useState('');
 
-  // Filtering
-  const filteredTracks = filter
-    ? tracks.filter(t => t.title.toLowerCase().includes(filter.toLowerCase()) || t.artist.toLowerCase().includes(filter.toLowerCase()))
+  // Compute unique values for each property
+  const uniqueArtists = Array.from(new Set(tracks.map(t => t.artist))).sort();
+  const uniqueTitles = Array.from(new Set(tracks.map(t => t.title))).sort();
+
+  // Autocomplete logic
+  React.useEffect(() => {
+    let options: string[] = [];
+    if (activeFilterProp === 'artist') {
+      options = uniqueArtists.filter(a => a.toLowerCase().includes(autocompleteInput.toLowerCase()));
+    } else {
+      options = uniqueTitles.filter(t => t.toLowerCase().includes(autocompleteInput.toLowerCase()));
+    }
+    setAutocompleteOptions(options);
+  }, [autocompleteInput, activeFilterProp, uniqueArtists, uniqueTitles]);
+
+  // Filtering logic
+  const filteredTracks = filterValues.length
+    ? tracks.filter(t => filterValues.every(val =>
+        (activeFilterProp === 'artist' && t.artist === val) ||
+        (activeFilterProp === 'title' && t.title === val)
+      ))
     : tracks;
 
   // Pagination
@@ -77,47 +98,100 @@ export default function TrackList({
 
   return (
     <div className="space-y-4" role="region" aria-label="Playlist Panel">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4 px-2 pt-2">
-        <Input
-          type="text"
-          placeholder="Filter by title or artist"
-          value={filter}
-          onChange={e => setFilter(e.target.value)}
-          className="max-w-xs"
-          aria-label="Filter tracks"
-        />
-      </div>
-      {/* Batch controls row */}
-      <div className="flex items-center gap-2 px-2 pb-2">
-        <button
-          onClick={toggleSelectAll}
-          aria-label={allOnPageSelected ? 'Deselect all tracks on page' : 'Select all tracks on page'}
-          className={`group/icon-btn flex items-center justify-center h-9 w-9 rounded-full transition-all duration-200 bg-accent/10 hover:bg-primary/90 focus:bg-primary/80 text-primary hover:text-white focus:text-white outline-none border border-transparent hover:shadow-lg focus:ring-2 focus:ring-primary/60 ${allOnPageSelected ? 'bg-primary text-white' : ''}`}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="4" y="4" width="16" height="16" rx="2" strokeWidth="2" /><path d="M9 12l2 2 4-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-        </button>
-        <button
-          onClick={handleBatchDownload}
-          disabled={!selectedIds.length || isProcessing}
-          aria-label="Download selected tracks"
-          className="group/icon-btn flex items-center justify-center h-9 w-9 rounded-full transition-all duration-200 bg-accent/10 hover:bg-accent/90 focus:bg-accent/80 text-accent hover:text-white focus:text-white outline-none border border-transparent hover:shadow-lg focus:ring-2 focus:ring-accent/60"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 4v12m0 0l-4-4m4 4l4-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><rect x="4" y="20" width="16" height="2" rx="1" strokeWidth="2" /></svg>
-        </button>
-        <button
-          onClick={() => paginatedTracks.forEach(onDownloadTrack)}
-          disabled={isProcessing}
-          aria-label="Download all tracks on page"
-          className="group/icon-btn flex items-center justify-center h-9 w-9 rounded-full transition-all duration-200 bg-accent/10 hover:bg-accent/90 focus:bg-accent/80 text-accent hover:text-white focus:text-white outline-none border border-transparent hover:shadow-lg focus:ring-2 focus:ring-accent/60"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 4v12m0 0l-4-4m4 4l4-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><rect x="4" y="20" width="16" height="2" rx="1" strokeWidth="2" /></svg>
-        </button>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 gap-2 px-2 pt-2">
+        {/* Autocomplete multi-select filter */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="relative">
+            <select
+              value={activeFilterProp}
+              onChange={e => setActiveFilterProp(e.target.value as 'title' | 'artist')}
+              className="border rounded px-2 py-1 text-xs mr-2 bg-background"
+              aria-label="Filter property"
+            >
+              <option value="title">Title</option>
+              <option value="artist">Artist</option>
+            </select>
+            <input
+              type="text"
+              value={autocompleteInput}
+              onChange={e => setAutocompleteInput(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && autocompleteOptions[0]) {
+                  setFilterValues(vals => vals.includes(autocompleteOptions[0]) ? vals : [...vals, autocompleteOptions[0]]);
+                  setAutocompleteInput('');
+                }
+                if (e.key === 'Tab' && autocompleteOptions[0]) {
+                  setFilterValues(vals => vals.includes(autocompleteOptions[0]) ? vals : [...vals, autocompleteOptions[0]]);
+                  setAutocompleteInput('');
+                  setActiveFilterProp(activeFilterProp === 'artist' ? 'title' : 'artist');
+                  e.preventDefault();
+                }
+              }}
+              placeholder={`Filter by ${activeFilterProp}`}
+              className="border rounded px-2 py-1 text-xs w-40"
+              aria-label={`Filter by ${activeFilterProp}`}
+              autoComplete="off"
+            />
+            {autocompleteInput && autocompleteOptions.length > 0 && (
+              <ul className="absolute z-10 bg-popover border rounded mt-1 w-full text-xs max-h-32 overflow-auto">
+                {autocompleteOptions.map(opt => (
+                  <li
+                    key={opt}
+                    className="px-2 py-1 hover:bg-accent cursor-pointer"
+                    onClick={() => {
+                      setFilterValues(vals => vals.includes(opt) ? vals : [...vals, opt]);
+                      setAutocompleteInput('');
+                    }}
+                  >
+                    {opt}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          {/* Show selected filter values as chips */}
+          {filterValues.map(val => (
+            <span key={val} className="inline-flex items-center bg-accent text-xs rounded px-2 py-1 mr-1">
+              {val}
+              <button
+                className="ml-1 text-muted-foreground hover:text-red-500"
+                onClick={() => setFilterValues(vals => vals.filter(v => v !== val))}
+                aria-label={`Remove filter ${val}`}
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+        {/* Inline batch controls */}
+        <div className="flex items-center gap-2 ml-auto">
+          <button
+            onClick={toggleSelectAll}
+            aria-label={allOnPageSelected ? 'Deselect all tracks on page' : 'Select all tracks on page'}
+            className={`group/icon-btn flex items-center justify-center h-9 w-9 rounded-full transition-all duration-200 bg-accent/10 hover:bg-primary/90 focus:bg-primary/80 text-primary hover:text-white focus:text-white outline-none border border-transparent hover:shadow-lg focus:ring-2 focus:ring-primary/60 ${allOnPageSelected ? 'bg-primary text-white' : ''}`}
+          >
+            <Users className="h-5 w-5" />
+          </button>
+          <button
+            onClick={handleBatchDownload}
+            disabled={!selectedIds.length || isProcessing}
+            aria-label="Add selected tracks to working environment"
+            className="group/icon-btn flex items-center justify-center h-9 w-9 rounded-full transition-all duration-200 bg-accent/10 hover:bg-accent/90 focus:bg-accent/80 text-accent hover:text-white focus:text-white outline-none border border-transparent hover:shadow-lg focus:ring-2 focus:ring-accent/60"
+          >
+            <Plus className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => paginatedTracks.forEach(onDownloadTrack)}
+            disabled={isProcessing}
+            aria-label="Add all tracks on page to working environment"
+            className="group/icon-btn flex items-center justify-center h-9 w-9 rounded-full transition-all duration-200 bg-accent/10 hover:bg-accent/90 focus:bg-accent/80 text-accent hover:text-white focus:text-white outline-none border border-transparent hover:shadow-lg focus:ring-2 focus:ring-accent/60"
+          >
+            <Users className="h-5 w-5" />
+          </button>
+        </div>
       </div>
       {/* Track list */}
       <div className="grid gap-4" role="listbox" aria-label="Track list">
-        <div className="flex items-center px-4 py-2 border-b">
-          <input type="checkbox" checked={allOnPageSelected} onChange={toggleSelectAll} className="mr-2" aria-label="Select all tracks on page" />
-        </div>
         {paginatedTracks.map((track) => {
           const isActive = selectedTrackId === track.id;
           return (
@@ -129,13 +203,6 @@ export default function TrackList({
             >
               <CardContent className="p-0">
                 <div className="flex items-center p-4 gap-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.includes(track.id)}
-                    onChange={() => setSelectedIds(ids => ids.includes(track.id) ? ids.filter(id => id !== track.id) : [...ids, track.id])}
-                    className="mr-2"
-                    aria-label={`Select track ${track.title} by ${track.artist}`}
-                  />
                   <div className="w-12 h-12 mr-2 flex-shrink-0 bg-secondary flex items-center justify-center rounded overflow-hidden">
                     {track.albumArt ? (
                       <img src={track.albumArt} alt={`${track.title} album art`} className="w-full h-full object-cover" />
@@ -171,12 +238,12 @@ export default function TrackList({
                     <button
                       onClick={() => onDownloadTrack(track)}
                       disabled={isProcessing}
-                      aria-label={`Download track ${track.title}`}
+                      aria-label={`Add track ${track.title} to working environment`}
                       className="group/icon-btn relative flex items-center justify-center h-9 w-9 rounded-full transition-all duration-200 bg-accent/10 hover:bg-accent/90 focus:bg-accent/80 text-accent hover:text-white focus:text-white outline-none border border-transparent hover:shadow-lg focus:ring-2 focus:ring-accent/60"
                     >
-                      <Download className="h-5 w-5 transition-transform duration-200 group-hover/icon-btn:scale-110 group-focus/icon-btn:scale-110" />
+                      <Plus className="h-5 w-5 transition-transform duration-200 group-hover/icon-btn:scale-110 group-focus/icon-btn:scale-110" />
                       <span className="absolute left-full ml-2 whitespace-nowrap bg-background text-accent text-xs font-semibold px-2 py-1 rounded shadow-lg opacity-0 group-hover/icon-btn:opacity-100 group-focus/icon-btn:opacity-100 transition-opacity duration-200 pointer-events-none">
-                        Download
+                        Add
                       </span>
                     </button>
                   </div>

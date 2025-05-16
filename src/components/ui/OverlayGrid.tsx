@@ -1,5 +1,9 @@
-import React, { useState } from 'react';
-import Draggable from 'react-draggable';
+import React from 'react';
+import {
+  DndContext,
+  useDraggable,
+  closestCenter,
+} from '@dnd-kit/core';
 
 export interface OverlayPane {
   id: string;
@@ -20,32 +24,57 @@ interface OverlayGridProps {
 }
 
 const minimizedPaneWidth = 220;
+const paneWidth = 420;
+const baseOffset = 24;
+
+function DraggableOverlayPane({
+  id,
+  children,
+  defaultPosition,
+  style,
+  ...props
+}: {
+  id: string;
+  children: React.ReactNode;
+  defaultPosition: { x: number; y: number };
+  style?: React.CSSProperties;
+  [key: string]: unknown;
+}) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({ id });
+  const finalStyle = {
+    ...style,
+    transform: transform
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+      : `translate3d(${defaultPosition.x}px, ${defaultPosition.y}px, 0)`
+  };
+  return (
+    <div ref={setNodeRef} style={finalStyle} {...attributes} {...listeners} {...props}>
+      {children}
+    </div>
+  );
+}
 
 const OverlayGrid: React.FC<OverlayGridProps> = ({ panes, onUpdatePane, stickyPlayerActive = false, stickyPlayerHeight = 72 }) => {
   const openPanes = panes.filter(p => !p.minimized);
   const minimizedPanes = panes.filter(p => p.minimized);
-  const baseOffset = 24;
-  const paneWidth = 420;
-  // Calculate bottom offset for overlays/minimized bar
   const bottomOffset = stickyPlayerActive ? stickyPlayerHeight + 16 : 16;
 
   return (
-    <>
+    <DndContext collisionDetection={closestCenter}>
       {/* Overlay grid for open panes, bottom right, tiled right-to-left, draggable */}
       <div
         className="fixed right-4 z-50 flex flex-row-reverse gap-4 pointer-events-none"
         style={{ bottom: bottomOffset }}
       >
         {openPanes.map((pane, idx) => (
-          <Draggable
+          <DraggableOverlayPane
             key={pane.id}
-            handle=".overlay-drag-handle"
+            id={pane.id}
             defaultPosition={{ x: -idx * (paneWidth + baseOffset), y: 0 }}
-            bounds="body"
+            style={{ marginLeft: idx * baseOffset }}
           >
             <div
               className="bg-popover border border-border rounded-lg shadow-lg w-[420px] min-h-[200px] flex flex-col relative pointer-events-auto animate-fade-in"
-              style={{ marginLeft: idx * baseOffset }}
               role="dialog"
               aria-modal="true"
               aria-label={pane.title}
@@ -62,7 +91,7 @@ const OverlayGrid: React.FC<OverlayGridProps> = ({ panes, onUpdatePane, stickyPl
               </div>
               <div className="flex-1 overflow-auto">{pane.content}</div>
             </div>
-          </Draggable>
+          </DraggableOverlayPane>
         ))}
       </div>
       {/* Minimized panes, sticky above player if active, draggable bar */}
@@ -71,15 +100,14 @@ const OverlayGrid: React.FC<OverlayGridProps> = ({ panes, onUpdatePane, stickyPl
         style={{ bottom: bottomOffset }}
       >
         {minimizedPanes.map((pane, idx) => (
-          <Draggable
+          <DraggableOverlayPane
             key={pane.id}
-            axis="x"
-            bounds="body"
+            id={pane.id + '-min'}
             defaultPosition={{ x: -idx * (minimizedPaneWidth + 12), y: 0 }}
+            style={{ marginRight: idx * 12 }}
           >
             <div
               className="bg-popover border border-border rounded-t-lg shadow-lg w-[220px] h-10 flex items-center justify-between px-3 cursor-pointer overlay-drag-handle"
-              style={{ marginRight: idx * 12 }}
               onClick={() => onUpdatePane(pane.id, { minimized: false })}
               role="button"
               tabIndex={0}
@@ -99,10 +127,10 @@ const OverlayGrid: React.FC<OverlayGridProps> = ({ panes, onUpdatePane, stickyPl
                 ✕
               </button>
             </div>
-          </Draggable>
+          </DraggableOverlayPane>
         ))}
       </div>
-    </>
+    </DndContext>
   );
 };
 

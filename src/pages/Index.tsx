@@ -266,59 +266,61 @@ const Index = () => {
       isProcessing={isProcessing}
       isWorkingWithStems={separatedStems.length > 0}
     >
-      {/* Two-column layout: left = input/playlist, right = processing */}
-      <aside className="flex flex-col w-full max-w-xs min-w-[320px] border-r border-border bg-background sticky top-0 h-[calc(100vh-0px)] z-10">
-        <InputPanel onFetchPlaylist={handleFetchPlaylist} isLoading={isLoading} />
-        <div className="flex-1 overflow-y-auto">
-          <PlaylistPanel
-            tracks={tracks}
-            onSelectTrack={handleSelectTrack}
-            onDownloadTrack={handleDownloadTrack}
-            selectedTrackId={selectedTrack?.id}
-            isProcessing={isProcessing}
-          />
-        </div>
-      </aside>
-      <section className="flex-1 min-w-0 max-w-full px-8 py-8">
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold mb-4">Audio Source Separation</h1>
-            <p className="text-muted-foreground">
-              Enter a Spotify playlist URL to get started. We'll retrieve the tracks and then you can separate them into stems.
-            </p>
+      {/* Full-width row: aside (max-w-1/4vw) + main section */}
+      <div className="flex w-full min-h-0">
+        <aside className="flex flex-col w-full max-w-[25vw] min-w-[320px] border-r border-border bg-background sticky top-0 h-[calc(100vh-0px)] z-10">
+          <InputPanel onFetchPlaylist={handleFetchPlaylist} isLoading={isLoading} />
+          <div className="flex-1 overflow-y-auto">
+            <PlaylistPanel
+              tracks={tracks}
+              onSelectTrack={handleSelectTrack}
+              onDownloadTrack={handleDownloadTrack}
+              selectedTrackId={selectedTrack?.id}
+              isProcessing={isProcessing}
+            />
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            <div className="lg:col-span-5 space-y-6">
-              <AudioProcessor 
-                selectedTrack={selectedTrack}
-                isProcessing={isProcessing}
-                onSeparate={handleSeparate}
-                analysisResult={analysisResult}
-                onAnalyze={(trackId) => analyzeTrackMutation.mutate(trackId)}
-              />
-              {separatedStems.length > 0 && (
-                <>
-                  <StemVisualizer 
-                    track={selectedTrack}
-                    stems={separatedStems}
-                    isPlaying={isPlaying}
-                    onPlayPause={handlePlayPause}
-                  />
-                  <ExportStemsPanel 
-                    stems={separatedStems.map(stem => ({
-                      id: stem.id,
-                      type: stem.type,
-                      name: stem.name
-                    }))}
-                    isExporting={isExporting}
-                    onExport={handleExport}
-                  />
-                </>
-              )}
+        </aside>
+        <section className="flex-1 min-w-0 max-w-full px-8 py-8">
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-3xl font-bold mb-4">Audio Source Separation</h1>
+              <p className="text-muted-foreground">
+                Enter a Spotify playlist URL to get started. We'll retrieve the tracks and then you can separate them into stems.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+              <div className="lg:col-span-5 space-y-6">
+                <AudioProcessor 
+                  selectedTrack={selectedTrack}
+                  isProcessing={isProcessing}
+                  onSeparate={handleSeparate}
+                  analysisResult={analysisResult}
+                  onAnalyze={(trackId) => analyzeTrackMutation.mutate(trackId)}
+                />
+                {separatedStems.length > 0 && (
+                  <>
+                    <StemVisualizer 
+                      track={selectedTrack}
+                      stems={separatedStems}
+                      isPlaying={isPlaying}
+                      onPlayPause={handlePlayPause}
+                    />
+                    <ExportStemsPanel 
+                      stems={separatedStems.map(stem => ({
+                        id: stem.id,
+                        type: stem.type,
+                        name: stem.name
+                      }))}
+                      isExporting={isExporting}
+                      onExport={handleExport}
+                    />
+                  </>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </MainLayout>
   );
 };

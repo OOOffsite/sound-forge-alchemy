@@ -1,6 +1,21 @@
 # Sound Forge Alchemy
 
+## Version & Document Control
+
+| Version | Date       | Author      | Description                |
+|---------|------------|-------------|----------------------------|
+| 1.0.0   | 2025-05-16 | peguesj     | Initial consolidated docs  |
+
+---
+
+## Overview
+
 Sound Forge Alchemy is a powerful web application for audio source separation and analysis. It allows users to separate music tracks into individual stems (vocals, drums, bass, other), and perform detailed audio analysis.
+
+- [Documentation](./docs/DOCUMENTATION.md)
+- [Changelog](./CHANGELOG)
+
+---
 
 ## Features
 
@@ -10,6 +25,8 @@ Sound Forge Alchemy is a powerful web application for audio source separation an
 - Real-time audio analysis (BPM, key detection, and more)
 - Stem visualization and playback
 - Export functionality
+
+---
 
 ## Architecture
 
@@ -27,6 +44,39 @@ This project uses a microservices architecture:
   - Redis (caching, pub/sub)
   - PostgreSQL (database)
   - Supabase (auth, storage, database)
+
+<details>
+<summary>📦 <b>Microservices & Containerization (Mermaid)</b></summary>
+
+```mermaid
+graph TD
+  FE[Frontend]
+  AG[API Gateway]
+  SP[Spotify Service]
+  DL[Download Service]
+  PR[Processing Service]
+  AN[Analysis Service]
+  WS[WebSocket Service]
+  RD[Redis]
+  PG[PostgreSQL]
+  SB[Supabase]
+  FE --> AG
+  AG --> SP
+  AG --> DL
+  AG --> PR
+  AG --> AN
+  AG --> WS
+  AG --> PG
+  AG --> SB
+  SP --> RD
+  DL --> RD
+  PR --> RD
+  AN --> RD
+  WS --> RD
+```
+</details>
+
+---
 
 ## Setup and Installation
 
@@ -70,6 +120,8 @@ npm run dev
 
 For backend services, see the [backend README](backend/README.md).
 
+---
+
 ## Usage
 
 1. Enter a Spotify playlist URL in the input field
@@ -78,6 +130,14 @@ For backend services, see the [backend README](backend/README.md).
 4. Click "Separate Audio" to start processing
 5. View the separated stems and visualization
 6. Export the stems in your preferred format
+
+---
+
+## API Reference
+
+See [docs/DOCUMENTATION.md#api-reference](./docs/DOCUMENTATION.md#api-reference) for endpoints and usage.
+
+---
 
 ## License
 

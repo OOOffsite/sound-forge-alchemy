@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Bell, Settings } from 'lucide-react';
+import { Terminal, Bell as BellIcon } from 'lucide-react';
 import { Toaster } from "../components/ui/toaster";
 import { Toaster as Sonner } from "../components/ui/sonner";
 import { TooltipProvider } from "../components/ui/tooltip";
-import NotificationLog from '../components/ui/NotificationLog';
-import SettingsDropdown from '../components/ui/SettingsDropdown';
+import NotificationLog from '../components/ui/NotificationLog.tsx';
+import SettingsDropdown from '../components/ui/SettingsDropdown.tsx';
 import DebugConsoleOverlay from '../components/ui/DebugConsoleOverlay';
 import StickyPlayer from '../components/ui/StickyPlayer';
+import OverlayGrid, { OverlayPane } from '../components/ui/OverlayGrid';
 
 type MainLayoutProps = {
   children: React.ReactNode;
@@ -31,9 +33,49 @@ const NavigationLink = ({ href, label }: { href: string; label: string }) => (
 );
 
 export default function MainLayout({ children, currentTrack, isProcessing = false, isWorkingWithStems = false }: MainLayoutProps) {
-  const [showNotifications, setShowNotifications] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [debugConsoleEnabled, setDebugConsoleEnabled] = useState(false);
+  const [overlayPanes, setOverlayPanes] = useState<OverlayPane[]>([
+    {
+      id: 'debug',
+      title: 'Debug Console',
+      icon: <Terminal className="h-5 w-5 text-primary" />,
+      minimized: false,
+      content: (
+        <DebugConsoleOverlay
+          minimized={false}
+          onClose={() => handleClosePane('debug')}
+          onMinimize={() => handleMinimizePane('debug')}
+        />
+      ),
+    },
+    {
+      id: 'notifications',
+      title: 'Notifications',
+      icon: <BellIcon className="h-5 w-5 text-yellow-500" />,
+      minimized: false,
+      content: (
+        <NotificationLog
+          minimized={false}
+          onClose={() => handleClosePane('notifications')}
+          onMinimize={() => handleMinimizePane('notifications')}
+        />
+      ),
+    },
+  ]);
+
+  // Helper functions for pane state
+  function handleMinimizePane(id: string) {
+    setOverlayPanes((panes) => panes.map(p => p.id === id ? { ...p, minimized: true } : p));
+  }
+  function handleClosePane(id: string) {
+    setOverlayPanes((panes) => panes.filter(p => p.id !== id));
+  }
+  function handleExpandPane(id: string) {
+    setOverlayPanes((panes) => panes.map(p => p.id === id ? { ...p, minimized: false } : p));
+  }
+  function handleUpdatePane(id: string, updates: Partial<OverlayPane>) {
+    setOverlayPanes((panes) => panes.map(p => p.id === id ? { ...p, ...updates } : p));
+  }
 
   return (
     <TooltipProvider>
@@ -50,10 +92,10 @@ export default function MainLayout({ children, currentTrack, isProcessing = fals
               </ul>
               <button
                 className="ml-4 relative"
-                onClick={() => setShowNotifications((v) => !v)}
+                onClick={() => handleExpandPane('notifications')}
                 aria-label="Show notifications"
               >
-                <Bell className="h-6 w-6" />
+                <BellIcon className="h-6 w-6" />
               </button>
               <button
                 className="ml-2 relative"
@@ -63,12 +105,36 @@ export default function MainLayout({ children, currentTrack, isProcessing = fals
                 <Settings className="h-6 w-6" />
               </button>
             </nav>
-            {showNotifications && <NotificationLog onClose={() => setShowNotifications(false)} />}
             {showSettings && (
               <SettingsDropdown
                 onClose={() => setShowSettings(false)}
-                debugConsoleEnabled={debugConsoleEnabled}
-                onToggleDebugConsole={setDebugConsoleEnabled}
+                debugConsoleEnabled={overlayPanes.some(p => p.id === 'debug' && !p.minimized)}
+                onToggleDebugConsole={(enabled) => {
+                  if (enabled) {
+                    if (!overlayPanes.some(p => p.id === 'debug')) {
+                      setOverlayPanes((panes) => [
+                        ...panes,
+                        {
+                          id: 'debug',
+                          title: 'Debug Console',
+                          icon: <Terminal className="h-5 w-5 text-primary" />,
+                          minimized: false,
+                          content: (
+                            <DebugConsoleOverlay
+                              minimized={false}
+                              onClose={() => handleClosePane('debug')}
+                              onMinimize={() => handleMinimizePane('debug')}
+                            />
+                          ),
+                        },
+                      ]);
+                    } else {
+                      handleExpandPane('debug');
+                    }
+                  } else {
+                    handleClosePane('debug');
+                  }
+                }}
               />
             )}
           </div>
@@ -81,17 +147,15 @@ export default function MainLayout({ children, currentTrack, isProcessing = fals
             <p>© {new Date().getFullYear()} SoundForge. All rights reserved.</p>
           </div>
         </footer>
+        <OverlayGrid panes={overlayPanes} onUpdatePane={handleUpdatePane} />
+        <StickyPlayer
+          track={currentTrack}
+          isProcessing={isProcessing}
+          isWorkingWithStems={isWorkingWithStems}
+        />
+        <Toaster />
+        <Sonner />
       </div>
-      {debugConsoleEnabled && (
-        <DebugConsoleOverlay onClose={() => setDebugConsoleEnabled(false)} />
-      )}
-      <StickyPlayer
-        track={currentTrack}
-        isProcessing={isProcessing}
-        isWorkingWithStems={isWorkingWithStems}
-      />
-      <Toaster />
-      <Sonner />
     </TooltipProvider>
   );
 }

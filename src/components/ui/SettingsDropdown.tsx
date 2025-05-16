@@ -9,7 +9,8 @@ interface SettingsDropdownProps {
 
 export default function SettingsDropdown({ onClose, debugConsoleEnabled, onToggleDebugConsole }: SettingsDropdownProps) {
   return (
-    <div className="absolute right-0 mt-2 w-80 bg-popover border border-border rounded shadow-lg z-50">
+    <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-80 bg-popover border border-border rounded shadow-lg z-50"
+         style={{ top: '3.5rem' }}>
       <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted-foreground/10">
         <span className="font-semibold">Settings</span>
         <button onClick={onClose} aria-label="Close settings">

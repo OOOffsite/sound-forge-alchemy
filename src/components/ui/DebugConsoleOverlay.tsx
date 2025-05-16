@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 interface DebugConsoleOverlayProps {
+  minimized?: boolean;
   onClose: () => void;
+  onMinimize: () => void;
 }
 
-const DebugConsoleOverlay: React.FC<DebugConsoleOverlayProps> = ({ onClose }) => {
+const DebugConsoleOverlay: React.FC<DebugConsoleOverlayProps> = ({ onClose, onMinimize, minimized }) => {
   const [logs, setLogs] = useState<string[]>([]);
   const logEndRef = useRef<HTMLDivElement>(null);
 
@@ -23,11 +25,18 @@ const DebugConsoleOverlay: React.FC<DebugConsoleOverlayProps> = ({ onClose }) =>
     logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
 
+  if (minimized) {
+    return null;
+  }
+
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-70 flex flex-col">
+    <div className="w-full h-full flex flex-col">
       <div className="flex justify-between items-center p-4 bg-gray-900 border-b border-gray-700">
         <span className="text-lg font-semibold text-white">Debug Console</span>
-        <button onClick={onClose} className="text-white hover:text-red-400">✕</button>
+        <div className="flex gap-2">
+          <button onClick={onMinimize} className="text-white hover:text-yellow-400">&#8211;</button>
+          <button onClick={onClose} className="text-white hover:text-red-400">✕</button>
+        </div>
       </div>
       <div className="flex-1 overflow-y-auto p-4 text-mono text-xs text-green-200 bg-gray-950">
         {logs.length === 0 ? (

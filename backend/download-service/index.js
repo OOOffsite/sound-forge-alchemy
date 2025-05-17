@@ -167,7 +167,7 @@ async function downloadTrack(jobId, trackId, spotifyUrl, trackInfo, trackDir) {
     const outputPath = path.join(trackDir, "original.mp3");
 
     // Prepare spotdl args
-    const spotdlArgs = ["-m", "spotdl", downloadUrl, "--output", trackDir];
+    const spotdlArgs = ["-m", "spotdl", downloadUrl, "--format", "mp3", "--output", trackDir];
     // If YOUTUBE_COOKIES_PATH env var is set, add --cookies argument
     if (process.env.YOUTUBE_COOKIES_PATH) {
       spotdlArgs.push("--cookies", process.env.YOUTUBE_COOKIES_PATH);

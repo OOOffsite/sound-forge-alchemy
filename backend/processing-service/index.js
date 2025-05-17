@@ -205,9 +205,21 @@ app.get("/track/:trackId", async (req, res) => {
     const jobIds = await redis.smembers(`track:${trackId}:processing:jobs`);
 
     if (!jobIds || jobIds.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "No processing jobs found for this track" });
+      // No jobs found, check if audio file exists
+      const trackDir = path.join(AUDIO_DATA_PATH, trackId);
+      const originalFile = path.join(trackDir, "original.mp3");
+      if (fs.existsSync(originalFile)) {
+        return res.json({
+          status: "file-only",
+          trackId,
+          message: "Audio file exists but no processing jobs found.",
+          audioUrl: `/audio_data/${trackId}/original.mp3`,
+        });
+      } else {
+        return res
+          .status(404)
+          .json({ error: "No processing jobs or audio file found for this track" });
+      }
     }
 
     // Get the latest job
@@ -404,8 +416,7 @@ async function processSeparation(
       "--mp3",
       "--mp3-bitrate",
       "320",
-      "--two-stems",
-      options.twoStems ? "vocals" : "no",
+      ...(options.twoStems ? ["--two-stems", "vocals"] : []),
       "-o",
       path.dirname(outputPath),
       inputPath,

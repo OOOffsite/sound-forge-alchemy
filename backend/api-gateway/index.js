@@ -68,6 +68,9 @@ app.use("/api/process", processingServiceProxy);
 app.use("/api/analyze", analysisServiceProxy);
 app.use("/api/models", modelsProxy);
 
+// Serve audio files statically
+app.use("/audio_data", express.static("/app/audio_data"));
+
 // Health check endpoint (no body parser needed)
 app.get("/health", (req, res) => {
   res.status(200).send({

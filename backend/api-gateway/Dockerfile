@@ -39,6 +39,8 @@ RUN mkdir -p $TMP_PATH $CACHE_PATH
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:3000/health || exit 1
 
+
+VOLUME [ "/app/audio_data" ]    
 # Expose API Gateway port
 EXPOSE 3000
 

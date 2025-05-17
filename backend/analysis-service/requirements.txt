@@ -1,11 +1,13 @@
-librosa==0.10.1
-# Removing essentia which is causing build issues
-# essentia==2.1b5
-# Adding alternatives that don't require complex build dependencies
+librosa>=0.9.2
+# Using essentia from the Docker image (already provided in the base image)
+# essentia>=2.1.0
 audioread>=2.1.9
 soundfile>=0.12.1
 redis==5.0.1
 requests==2.31.0
 python-dotenv==1.0.1
-numpy==1.26.4
-scipy==1.13.0
+numpy>=1.19.5
+scipy>=1.7.0
+matplotlib>=3.5.0
+pretty_midi>=0.2.10
+psutil>=5.9.0

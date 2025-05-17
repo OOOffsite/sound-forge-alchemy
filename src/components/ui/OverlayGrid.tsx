@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { CSSProperties, useRef, useState } from 'react';
 import {
   DndContext,
   useDraggable,
   closestCenter,
+  DragEndEvent,
 } from '@dnd-kit/core';
 
 export interface OverlayPane {
@@ -32,23 +33,52 @@ function DraggableOverlayPane({
   children,
   defaultPosition,
   style,
+  position,
+  setPosition,
   ...props
 }: {
   id: string;
   children: React.ReactNode;
   defaultPosition: { x: number; y: number };
-  style?: React.CSSProperties;
+  style?: CSSProperties;
+  position: { x: number; y: number };
+  setPosition: (pos: { x: number; y: number }) => void;
   [key: string]: unknown;
 }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({ id });
+  const nodeRef = useRef<HTMLDivElement>(null);
+
+  // Calculate the final position with transform
   const finalStyle = {
     ...style,
+    position: 'absolute' as const,
+    zIndex: 1000,
+    left: position.x,
+    top: position.y,
     transform: transform
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
-      : `translate3d(${defaultPosition.x}px, ${defaultPosition.y}px, 0)`
+      : undefined,
+    cursor: 'move',
+    minWidth: 200,
+    maxWidth: 480,
+    pointerEvents: 'auto' as React.CSSProperties['pointerEvents'],
   };
+
   return (
-    <div ref={setNodeRef} style={finalStyle} {...attributes} {...listeners} {...props}>
+    <div
+      ref={setNodeRef}
+      style={finalStyle}
+      {...attributes}
+      {...listeners}
+      tabIndex={0}
+      aria-grabbed="true"
+      role="dialog"
+      onMouseDown={e => {
+        // Bring to front on click
+        if (nodeRef.current) nodeRef.current.style.zIndex = '2000';
+      }}
+      {...props}
+    >
       {children}
     </div>
   );
@@ -59,18 +89,54 @@ const OverlayGrid: React.FC<OverlayGridProps> = ({ panes, onUpdatePane, stickyPl
   const minimizedPanes = panes.filter(p => p.minimized);
   const bottomOffset = stickyPlayerActive ? stickyPlayerHeight + 16 : 16;
 
+  // Track positions for each pane by id
+  const [positions, setPositions] = useState<{ [id: string]: { x: number; y: number } }>(() => {
+    const pos: { [id: string]: { x: number; y: number } } = {};
+    openPanes.forEach((pane, idx) => {
+      pos[pane.id] = {
+        x: window.innerWidth - (paneWidth + baseOffset) * (idx + 1),
+        y: window.innerHeight - 320 - bottomOffset,
+      };
+    });
+    minimizedPanes.forEach((pane, idx) => {
+      pos[pane.id + '-min'] = {
+        x: window.innerWidth - (minimizedPaneWidth + 12) * (idx + 1),
+        y: window.innerHeight - 80 - bottomOffset,
+      };
+    });
+    return pos;
+  });
+
+  // Handle drag end to update position
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, delta } = event;
+    if (!active || !active.id) return;
+    setPositions(prev => {
+      const prevPos = prev[active.id as string] || { x: 0, y: 0 };
+      return {
+        ...prev,
+        [active.id as string]: {
+          x: prevPos.x + delta.x,
+          y: prevPos.y + delta.y,
+        },
+      };
+    });
+  };
+
+  // Use absolute positioning for draggable overlays
   return (
-    <DndContext collisionDetection={closestCenter}>
-      {/* Overlay grid for open panes, bottom right, tiled right-to-left, draggable */}
+    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <div
         className="fixed right-4 z-50 flex flex-row-reverse gap-4 pointer-events-none"
-        style={{ bottom: bottomOffset }}
+        style={{ bottom: bottomOffset, left: 0, width: '100vw', height: '100vh', pointerEvents: 'none' }}
       >
         {openPanes.map((pane, idx) => (
           <DraggableOverlayPane
             key={pane.id}
             id={pane.id}
-            defaultPosition={{ x: -idx * (paneWidth + baseOffset), y: 0 }}
+            defaultPosition={{ x: window.innerWidth - (paneWidth + baseOffset) * (idx + 1), y: window.innerHeight - 320 - bottomOffset }}
+            position={positions[pane.id] || { x: 100 + idx * 40, y: 100 }}
+            setPosition={pos => setPositions(prev => ({ ...prev, [pane.id]: pos }))}
             style={{ marginLeft: idx * baseOffset }}
           >
             <div
@@ -79,14 +145,35 @@ const OverlayGrid: React.FC<OverlayGridProps> = ({ panes, onUpdatePane, stickyPl
               aria-modal="true"
               aria-label={pane.title}
             >
-              <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted-foreground/10 overlay-drag-handle cursor-move rounded-t-lg">
+              <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted-foreground/10 overlay-drag-handle cursor-move rounded-t-lg select-none">
                 <div className="flex items-center gap-2">
                   {pane.icon}
                   <span className="font-semibold text-base">{pane.title}</span>
                 </div>
                 <div className="flex gap-1">
-                  <button onClick={pane.onMinimize || (() => onUpdatePane(pane.id, { minimized: true }))} className="text-muted-foreground hover:text-primary" title="Minimize"><span style={{fontWeight:600}}>&#8211;</span></button>
-                  <button onClick={pane.onClose} className="text-muted-foreground hover:text-red-500" title="Close">✕</button>
+                  <button
+                    onClick={e => {
+                      e.stopPropagation();
+                      if (pane.onMinimize) {
+                        pane.onMinimize();
+                      } else {
+                        onUpdatePane(pane.id, { minimized: true });
+                      }
+                    }}
+                    className="text-muted-foreground hover:text-primary"
+                    title="Minimize"
+                    tabIndex={0}
+                  >
+                    <span style={{fontWeight:600}}>&#8211;</span>
+                  </button>
+                  <button
+                    onClick={pane.onClose}
+                    className="text-muted-foreground hover:text-red-500"
+                    title="Close"
+                    tabIndex={0}
+                  >
+                    ✕
+                  </button>
                 </div>
               </div>
               <div className="flex-1 overflow-auto">{pane.content}</div>
@@ -94,7 +181,6 @@ const OverlayGrid: React.FC<OverlayGridProps> = ({ panes, onUpdatePane, stickyPl
           </DraggableOverlayPane>
         ))}
       </div>
-      {/* Minimized panes, sticky above player if active, draggable bar */}
       <div
         className="fixed right-4 z-50 flex flex-row-reverse gap-2 pointer-events-auto"
         style={{ bottom: bottomOffset }}
@@ -103,11 +189,13 @@ const OverlayGrid: React.FC<OverlayGridProps> = ({ panes, onUpdatePane, stickyPl
           <DraggableOverlayPane
             key={pane.id}
             id={pane.id + '-min'}
-            defaultPosition={{ x: -idx * (minimizedPaneWidth + 12), y: 0 }}
+            defaultPosition={{ x: window.innerWidth - (minimizedPaneWidth + 12) * (idx + 1), y: window.innerHeight - 80 - bottomOffset }}
+            position={positions[pane.id + '-min'] || { x: 100 + idx * 40, y: 100 }}
+            setPosition={pos => setPositions(prev => ({ ...prev, [pane.id + '-min']: pos }))}
             style={{ marginRight: idx * 12 }}
           >
             <div
-              className="bg-popover border border-border rounded-t-lg shadow-lg w-[220px] h-10 flex items-center justify-between px-3 cursor-pointer overlay-drag-handle"
+              className="bg-popover border border-border rounded-t-lg shadow-lg w-[220px] h-10 flex items-center justify-between px-3 cursor-pointer overlay-drag-handle select-none"
               onClick={() => onUpdatePane(pane.id, { minimized: false })}
               role="button"
               tabIndex={0}
@@ -122,7 +210,7 @@ const OverlayGrid: React.FC<OverlayGridProps> = ({ panes, onUpdatePane, stickyPl
                   e.stopPropagation();
                   if (pane.onClose) pane.onClose();
                 }}
-                className="text-muted-foreground hover:text-red-500" title="Close"
+                className="text-muted-foreground hover:text-red-500" title="Close" tabIndex={0}
               >
                 ✕
               </button>

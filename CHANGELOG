@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.2] - 2025-05-17
+
+### Fixed
+
+- Fixed memory consumption issues in analysis service for large audio files
+- Implemented memory-efficient processing in Python analyzer
+- Added memory monitoring and adaptive resource usage
+- Improved error handling for analysis job failures
+- Updated Docker configuration for more reliable operation
+
+## [1.0.0] - 2025-05-16ngelog
+
+All notable changes to this project will be documented in this file.
+
+## [1.9.2] - 2025-05-17
+### Fixed
+- Fixed memory consumption issues in analysis service for large audio files
+- Implemented memory-efficient processing in Python analyzer
+- Added memory monitoring and adaptive resource usage
+- Improved error handling for analysis job failures
+- Updated Docker configuration for more reliable operation
+
 ## [1.0.0] - 2025-05-16
 ### Added
 - Consolidated documentation into root README and docs/DOCUMENTATION.md

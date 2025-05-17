@@ -55,10 +55,12 @@ services:
       - SUPABASE_URL=${SUPABASE_URL}
       - SUPABASE_KEY=${SUPABASE_KEY}
       - REDIS_URL=redis://redis:6379
+
     networks:
       - sound-forge-network
       - data-network
     volumes:
+      - ./docker-shared/audio_data:/app/audio_data
       - ./backend/config/logging.js:/app/config/logging.js:ro
 
   # Spotify Service - Handles Spotify API interactions
@@ -139,7 +141,7 @@ services:
     ports:
       - "3004:3004"
     volumes:
-      - audio_data:/app/audio_data
+      - ./docker-shared/audio_data:/app/audio_data
       - ./backend/config/logging.js:/app/config/logging.js:ro
     environment:
       - PORT=3004

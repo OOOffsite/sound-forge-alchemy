@@ -1,44 +1,35 @@
 # Dockerfile.analysis-service
-# Service for audio analysis
+# Service for audio analysis using prebuilt Essentia image
 
-FROM sound-forge-alchemy-python-node-base AS builder
+FROM mtgupf/essentia:latest
 
-# Set working directory
-WORKDIR /build
+# Install Node.js (LTS) and system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl \
+    ffmpeg \
+    python3-pip \
+    ca-certificates \
+    gnupg \
+    tini \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copy package files
-COPY package*.json ./
-USER root
-RUN npm install 
-RUN npm install express
-RUN npm ci
-USER soundforge
-
-# Copy Python requirements
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy TypeScript configuration files
-COPY tsconfig.app.json ./
-COPY tsconfig.node.json ./
-
-# Copy source code
-COPY . .
-
-# Production stage
-FROM sound-forge-alchemy-python-node-base
 # Set working directory
 WORKDIR /app
 
+# Copy Python requirements and install dependencies
+COPY requirements.txt ./
+RUN pip3 install --upgrade pip && pip3 install --no-cache-dir -r requirements.txt
+
 # Copy application code
-COPY --chown=soundforge:soundforge . .
+COPY . .
 
 # Create directories with proper permissions
 ENV TMP_PATH=/app/tmp \
     CACHE_PATH=/app/cache
-
-RUN mkdir -p $TMP_PATH $CACHE_PATH /app/audio_data && \
-    chown -R soundforge:soundforge /app/audio_data
+RUN mkdir -p $TMP_PATH $CACHE_PATH /app/audio_data
 
 # Environment variables
 ENV PORT=3004 \
@@ -51,10 +42,13 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
 
 # Expose port
 EXPOSE 3004
-RUN npm install express
 
 # Define volumes
 VOLUME ["/app/audio_data"]
+RUN npm install
+RUN npm install express
+# Use tini as entrypoint for proper signal handling
+ENTRYPOINT ["/usr/bin/tini", "--"]
 
 # Command to run the service
 CMD ["npm", "start"]

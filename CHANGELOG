@@ -1,0 +1,49 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [1.9.2] - 2025-05-17
+
+### Fixed
+
+- Fixed memory consumption issues in analysis service for large audio files
+- Implemented memory-efficient processing in Python analyzer
+- Added memory monitoring and adaptive resource usage
+- Improved error handling for analysis job failures
+- Updated Docker configuration for more reliable operation
+
+## [1.0.0] - 2025-05-16ngelog
+
+All notable changes to this project will be documented in this file.
+
+## [1.9.2] - 2025-05-17
+### Fixed
+- Fixed memory consumption issues in analysis service for large audio files
+- Implemented memory-efficient processing in Python analyzer
+- Added memory monitoring and adaptive resource usage
+- Improved error handling for analysis job failures
+- Updated Docker configuration for more reliable operation
+
+## [1.0.0] - 2025-05-16
+### Added
+- Consolidated documentation into root README and docs/DOCUMENTATION.md
+- Added version/document control table
+- Added mermaid and PlantUML diagrams for architecture, microservices, data flow, and containerization
+- Added Next Steps & Future Enhancements section
+- Improved documentation structure and anchors
+
+### Changed
+- Updated .gitignore to ensure logic files are tracked
+- Improved backend model status and error handling
+- Added notification and settings UI components to frontend
+
+### Fixed
+- Fixed model import bug in processing service
+- Fixed download service error handling for spotdl
+
+---
+
+## Next Steps
+- Continue UI/UX improvements (notification log, settings, debug console, player, playlist enhancements)
+- Add more diagrams and advanced documentation
+- Expand test coverage and CI/CD

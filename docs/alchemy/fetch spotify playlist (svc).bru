@@ -1,0 +1,17 @@
+meta {
+  name: fetch spotify playlist (svc)
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://0.0.0.0:3001/fetch
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "url": "https://open.spotify.com/playlist/3HjYns6TljNiDwwQWeymKL?si=cb9bf6eb99c24b60"
+  }
+}

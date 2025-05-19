@@ -1,0 +1,41 @@
+# Dockerfile.sound-forge-base
+# This is the base image for all Sound Forge Alchemy services
+# It provides common utilities and security configurations
+
+FROM alpine:3.18
+
+# Add non-root user
+RUN addgroup -S soundforge && \
+    adduser -S -G soundforge -h /app soundforge
+
+# Install common packages and security updates
+RUN apk update && \
+    apk upgrade && \
+    apk add --no-cache \
+        ca-certificates \
+        tzdata \
+        curl \
+        bash \
+        tini && \
+    rm -rf /var/cache/apk/*
+
+# Set working directory
+WORKDIR /app
+
+# Set proper permissions
+RUN chown -R soundforge:soundforge /app
+
+# Set environment variables
+ENV TZ=UTC \
+    NODE_ENV=production \
+    PYTHONUNBUFFERED=1
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-3000}/health || exit 1
+
+# Use tini as entrypoint for proper signal handling
+ENTRYPOINT ["/sbin/tini", "--"]
+
+# Switch to non-root user
+USER soundforge

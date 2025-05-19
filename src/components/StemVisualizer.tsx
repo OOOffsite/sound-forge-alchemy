@@ -1,13 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Slider } from '../components/ui/slider';
+import { Switch } from '../components/ui/switch';
+import { Label } from '../components/ui/label';
 import { Play, Pause, SkipBack, SkipForward, Clock } from 'lucide-react';
 import { Track } from './TrackList';
-import { formatTime } from '@/lib/utils';
+import { formatTime } from '../lib/utils';
 
 interface StemVisualizerProps {
   track: Track | null;
@@ -22,6 +21,7 @@ export interface StemTrack {
   name: string;
   active: boolean;
   color: string;
+  audioUrl: string; // Added audioUrl property
 }
 
 export interface CuePoint {
@@ -47,6 +47,7 @@ const StemVisualizer: React.FC<StemVisualizerProps> = ({
     { id: '4', time: 90, label: 'Bridge', type: 'bridge' },
     { id: '5', time: 110, label: 'Outro', type: 'outro' }
   ]);
+  const audioRefs = React.useRef<{ [id: string]: HTMLAudioElement | null }>({});
 
   useEffect(() => {
     // Parse duration from string format like "3:22" to seconds
@@ -56,21 +57,47 @@ const StemVisualizer: React.FC<StemVisualizerProps> = ({
     }
   }, [track]);
 
-  // Simulate playback progression when isPlaying is true
+  // Sync play/pause for all stems (do not pause on mute, just mute)
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-    
-    if (isPlaying) {
-      interval = setInterval(() => {
-        setCurrentTime(prevTime => {
-          const newTime = prevTime + 0.1;
-          return newTime >= duration ? 0 : newTime;
-        });
-      }, 100);
-    }
-    
-    return () => clearInterval(interval);
-  }, [isPlaying, duration]);
+    stems.forEach(stem => {
+      const audio = audioRefs.current[stem.id];
+      if (!audio) return;
+      if (isPlaying) {
+        audio.play();
+      } else {
+        audio.pause();
+      }
+    });
+  }, [isPlaying, stems]);
+
+  // Sync mute for each stem
+  useEffect(() => {
+    stems.forEach(stem => {
+      const audio = audioRefs.current[stem.id];
+      if (!audio) return;
+      audio.muted = !activeStems.includes(stem.id);
+    });
+  }, [activeStems, stems]);
+
+  // Seek all stems when user seeks
+  const handleSeek = (newPosition: number[]) => {
+    setCurrentTime(newPosition[0]);
+    stems.forEach(stem => {
+      const audio = audioRefs.current[stem.id];
+      if (audio) audio.currentTime = newPosition[0];
+    });
+  };
+
+  // Keep currentTime in sync with first active stem
+  useEffect(() => {
+    const firstActive = stems.find(stem => activeStems.includes(stem.id));
+    if (!firstActive) return;
+    const audio = audioRefs.current[firstActive.id];
+    if (!audio) return;
+    const onTimeUpdate = () => setCurrentTime(audio.currentTime);
+    audio.addEventListener('timeupdate', onTimeUpdate);
+    return () => audio.removeEventListener('timeupdate', onTimeUpdate);
+  }, [activeStems, stems]);
 
   const handleStemToggle = (stemId: string) => {
     setActiveStems(prev => 
@@ -80,13 +107,8 @@ const StemVisualizer: React.FC<StemVisualizerProps> = ({
     );
   };
 
-  const handleSeek = (newPosition: number[]) => {
-    setCurrentTime(newPosition[0]);
-  };
-  
   const addCuePoint = () => {
     if (cuePoints.length >= 5) return;
-    
     const newId = `cue-${Date.now()}`;
     setCuePoints([...cuePoints, { 
       id: newId, 
@@ -114,6 +136,16 @@ const StemVisualizer: React.FC<StemVisualizerProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Hidden audio elements for each stem */}
+        {stems.map(stem => (
+          <audio
+            key={stem.id}
+            ref={el => (audioRefs.current[stem.id] = el)}
+            src={stem.audioUrl}
+            preload="auto"
+            style={{ display: 'none' }}
+          />
+        ))}
         {/* Waveform and timeline */}
         <div className="relative h-32 bg-secondary/20 rounded-md">
           {/* Stem layers */}

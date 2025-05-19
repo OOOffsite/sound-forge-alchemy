@@ -1,21 +1,28 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Music, Headphones, FileMusic, Volume2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
+import { Label } from './ui/label';
+import { Separator } from './ui/separator';
+import { Slider } from './ui/slider';
+import { Switch } from './ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Music, Headphones, FileMusic, Volume2, Info, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
 import { Track } from './TrackList';
-import { toast } from '@/components/ui/sonner';
+import { toast } from './ui/sonner';
 import StepDisplay from './StepDisplay';
-import { calculateBPM, detectKey } from '@/lib/utils';
+import { calculateBPM, detectKey } from '../lib/utils';
+import { processingApi } from '../lib/api';
+import { useQuery } from '@tanstack/react-query';
+import { Icon } from '@radix-ui/react-select';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from './ui/dialog';
 
 interface AudioProcessorProps {
   selectedTrack: Track | null;
   isProcessing: boolean;
   onSeparate: (options: SeparationOptions) => void;
+  analysisResult: AnalysisResult | null;
+  onAnalyze: (trackId: string) => void;
 }
 
 export interface SeparationOptions {
@@ -37,18 +44,130 @@ export interface AnalysisResult {
   }[];
 }
 
-export default function AudioProcessor({ selectedTrack, isProcessing, onSeparate }: AudioProcessorProps) {
+export interface Model {
+  id: string;
+  name: string;
+  isDefault?: boolean;
+  installed: boolean;
+}
+
+export interface ProcessingApi {
+  getModels: () => Promise<Model[]>;
+}
+
+// Reusable component for rendering model buttons
+const ModelButton = ({ model, isSelected, onClick }: { model: Model; isSelected: boolean; onClick: () => void }) => (
+  <Button 
+    variant={isSelected ? "default" : "outline"}
+    onClick={onClick}
+    className="flex-1"
+  >
+    {model.name}
+  </Button>
+);
+
+// Reusable component for rendering stem switches
+const StemSwitch = ({ id, label, icon, isChecked, onChange }: { id: string; label: string; icon: React.ComponentType; isChecked: boolean; onChange: (checked: boolean) => void }) => (
+  <div className="flex items-center justify-between">
+    <Label htmlFor={id} className="flex items-center gap-2">
+      {icon && <Icon className="h-4 w-4" />} {label}
+    </Label>
+    <Switch 
+      id={id}
+      checked={isChecked} 
+      onCheckedChange={onChange} 
+    />
+  </div>
+);
+
+// Reusable component for rendering labeled sliders
+const LabeledSlider = ({ id, label, value, onChange, min, max, step }: { id: string; label: string; value: number; onChange: (value: number) => void; min: number; max: number; step: number }) => (
+  <div className="space-y-2">
+    <Label htmlFor={id}>{label}</Label>
+    <Slider
+      id={id}
+      value={[value]}
+      onValueChange={(values) => onChange(values[0])}
+      min={min}
+      max={max}
+      step={step}
+    />
+  </div>
+);
+
+export default function AudioProcessor({ 
+  selectedTrack, 
+  isProcessing, 
+  onSeparate,
+  analysisResult,
+  onAnalyze
+}: AudioProcessorProps) {
   const [separationOptions, setSeparationOptions] = useState<SeparationOptions>({
-    model: 'demucs',
+    model: 'htdemucs',
     extractVocals: true,
     extractBass: true,
     extractDrums: true,
     extractOther: true,
   });
   
-  const [volume, setVolume] = useState<number[]>([75]);
+  const [volume, setVolume] = useState<number>(75);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const [showModelDetails, setShowModelDetails] = useState(false);
+  
+  // Fetch available models
+  const { data: models = [] } = useQuery({
+    queryKey: ['processingModels'],
+    queryFn: async () => {
+      try {
+        const response = await processingApi.getModels();
+        return response;
+      } catch (error) {
+        console.error('Error fetching models:', error);
+        return [];
+      }
+    },
+    enabled: !!selectedTrack, // Only run when a track is selected
+  });
+
+  // Model status logic
+  const installedModels = models.filter(m => m.installed);
+  const totalModels = models.length;
+  let modelStatus: 'none' | 'partial' | 'all' = 'none';
+  if (installedModels.length === 0) modelStatus = 'none';
+  else if (installedModels.length === totalModels) modelStatus = 'all';
+  else modelStatus = 'partial';
+
+  let statusIcon = <AlertTriangle className="text-yellow-500 inline-block mr-1" />;
+  let statusText = 'No Models Loaded!';
+  if (modelStatus === 'all') {
+    statusIcon = <CheckCircle2 className="text-green-500 inline-block mr-1" />;
+    statusText = 'All pretrained models loaded';
+  } else if (modelStatus === 'partial') {
+    statusIcon = <AlertTriangle className="text-yellow-500 inline-block mr-1" />;
+    statusText = `${installedModels.length} of ${totalModels} models loaded`;
+  }
+
+  // Toast for model errors
+  useEffect(() => {
+    if (totalModels === 0) {
+      toast.error('No audio processing models are available. Please check your backend.');
+    }
+  }, [totalModels]);
+
+  // Set first available model when models are loaded and none is selected
+  useEffect(() => {
+    if (models.length > 0 && !models.some(m => m.id === separationOptions.model)) {
+      // Try to find the default model first
+      const defaultModel = models.find(m => m.isDefault && m.installed);
+      
+      if (defaultModel) {
+        setSeparationOptions(prev => ({ ...prev, model: defaultModel.id }));
+      } else if (models[0]) {
+        // Otherwise use the first available model
+        setSeparationOptions(prev => ({ ...prev, model: models[0].id }));
+      }
+    }
+  }, [models, separationOptions.model]);
 
   const handleSeparate = () => {
     if (!selectedTrack) {
@@ -76,31 +195,8 @@ export default function AudioProcessor({ selectedTrack, isProcessing, onSeparate
     setIsAnalyzing(true);
     toast.info(`Analyzing "${selectedTrack.title}"...`);
     
-    // In a real app, this would call a backend API for audio analysis
-    // For now, let's simulate the analysis with a delay and random data
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Parse duration from string format like "3:22" to seconds
-      const [minutes, seconds] = selectedTrack.duration.split(':').map(Number);
-      const duration = minutes * 60 + seconds;
-      
-      // Generate simulated analysis result
-      const result: AnalysisResult = {
-        bpm: calculateBPM([]),
-        key: detectKey([]),
-        loudness: Math.floor(Math.random() * -20) - 3, // Random value between -23 and -3 dB
-        cuePoints: [
-          { time: 0, label: 'Intro', type: 'intro' },
-          { time: Math.floor(duration * 0.2), label: 'Verse 1', type: 'verse' },
-          { time: Math.floor(duration * 0.4), label: 'Chorus', type: 'chorus' },
-          { time: Math.floor(duration * 0.6), label: 'Verse 2', type: 'verse' },
-          { time: Math.floor(duration * 0.8), label: 'Outro', type: 'outro' }
-        ]
-      };
-      
-      setAnalysisResult(result);
-      toast.success(`Analysis complete for "${selectedTrack.title}"`);
+      onAnalyze(selectedTrack.id);
     } catch (error) {
       toast.error('Failed to analyze track');
       console.error('Error analyzing track:', error);
@@ -124,14 +220,57 @@ export default function AudioProcessor({ selectedTrack, isProcessing, onSeparate
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="flex items-center">
-          <Headphones className="mr-2 h-5 w-5" />
-          Audio Processing
+        <CardTitle className="flex items-center relative justify-between group">
+          <span className="flex items-center">
+            <Headphones className="mr-2 h-5 w-5" />
+            Audio Processing
+          </span>
+          <span className="flex items-center ml-2 text-xs font-medium cursor-pointer border-dotted border-b border-muted-foreground/60 float-right"
+            style={{ textDecoration: 'underline dotted', transition: 'color 0.2s', display: 'inline-block' }}
+            onClick={() => setShowModelDetails(true)}
+          >
+            {statusIcon}{statusText}
+          </span>
+          {/* Details Button (appears on hover via CSS) */}
+          <button
+            className="ml-2 px-2 py-1 text-xs rounded bg-muted-foreground/10 hover:bg-muted-foreground/20 transition-opacity opacity-0 group-hover:opacity-100"
+            style={{ float: 'right' }}
+            onClick={() => setShowModelDetails(true)}
+            tabIndex={-1}
+          >
+            Details
+          </button>
         </CardTitle>
         <CardDescription>
           Separate and analyze "{selectedTrack.title}" by {selectedTrack.artist}
         </CardDescription>
       </CardHeader>
+      <Dialog open={showModelDetails} onOpenChange={setShowModelDetails}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Audio Separation Models</DialogTitle>
+            <DialogDescription>
+              Manage and view details about available audio separation models.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            {models.length === 0 && <div className="text-red-500">No models available.</div>}
+            {models.map(model => (
+              <div key={model.id} className="flex items-center gap-2">
+                {model.installed ? <CheckCircle2 className="text-green-500 h-4 w-4" /> : <XCircle className="text-red-500 h-4 w-4" />}
+                <span className="font-medium">{model.name}</span>
+                {model.isDefault && <span className="text-xs text-muted-foreground ml-2">(default)</span>}
+                <span className="ml-auto text-xs text-muted-foreground">{model.installed ? 'Loaded' : 'Not loaded'}</span>
+              </div>
+            ))}
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Close</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <CardContent>
         <Tabs defaultValue="separate" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
@@ -143,20 +282,28 @@ export default function AudioProcessor({ selectedTrack, isProcessing, onSeparate
               <div>
                 <Label>Separation Model</Label>
                 <div className="flex gap-2 mt-2">
-                  <Button 
-                    variant={separationOptions.model === 'demucs' ? "default" : "outline"}
-                    onClick={() => setSeparationOptions({...separationOptions, model: 'demucs'})}
-                    className="flex-1"
-                  >
-                    Demucs
-                  </Button>
-                  <Button 
-                    variant={separationOptions.model === 'htdemucs' ? "default" : "outline"}
-                    onClick={() => setSeparationOptions({...separationOptions, model: 'htdemucs'})}
-                    className="flex-1"
-                  >
-                    HTDemucs
-                  </Button>
+                  {models.length > 0 ? (
+                    models.filter(model => model.installed).map(model => (
+                      <ModelButton 
+                        key={model.id}
+                        model={model}
+                        isSelected={separationOptions.model === model.id}
+                        onClick={() => setSeparationOptions({...separationOptions, model: model.id})}
+                      />
+                    ))
+                  ) : (
+                    [
+                      { id: 'htdemucs', name: 'HTDemucs' },
+                      { id: 'mdx_extra', name: 'MDX-Extra' }
+                    ].map(model => (
+                      <ModelButton 
+                        key={model.id}
+                        model={{ ...model, installed: false }}
+                        isSelected={separationOptions.model === model.id}
+                        onClick={() => setSeparationOptions({...separationOptions, model: model.id})}
+                      />
+                    ))
+                  )}
                 </div>
               </div>
 
@@ -164,78 +311,34 @@ export default function AudioProcessor({ selectedTrack, isProcessing, onSeparate
 
               <div className="space-y-4">
                 <Label>Select Stems to Extract</Label>
-                
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="vocals" className="flex items-center gap-2">
-                    <Music className="h-4 w-4" /> Vocals
-                  </Label>
-                  <Switch 
-                    id="vocals" 
-                    checked={separationOptions.extractVocals} 
-                    onCheckedChange={(checked) => 
-                      setSeparationOptions({...separationOptions, extractVocals: checked})
-                    } 
+                {[
+                  { id: 'vocals', label: 'Vocals', icon: Music, isChecked: separationOptions.extractVocals, onChange: (checked: boolean) => setSeparationOptions({...separationOptions, extractVocals: checked}) },
+                  { id: 'bass', label: 'Bass', icon: Music, isChecked: separationOptions.extractBass, onChange: (checked: boolean) => setSeparationOptions({...separationOptions, extractBass: checked}) },
+                  { id: 'drums', label: 'Drums', icon: Music, isChecked: separationOptions.extractDrums, onChange: (checked: boolean) => setSeparationOptions({...separationOptions, extractDrums: checked}) },
+                  { id: 'other', label: 'Other', icon: Music, isChecked: separationOptions.extractOther, onChange: (checked: boolean) => setSeparationOptions({...separationOptions, extractOther: checked}) }
+                ].map(stem => (
+                  <StemSwitch 
+                    key={stem.id}
+                    id={stem.id}
+                    label={stem.label}
+                    icon={stem.icon}
+                    isChecked={stem.isChecked}
+                    onChange={stem.onChange}
                   />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="bass" className="flex items-center gap-2">
-                    <Music className="h-4 w-4" /> Bass
-                  </Label>
-                  <Switch 
-                    id="bass" 
-                    checked={separationOptions.extractBass} 
-                    onCheckedChange={(checked) => 
-                      setSeparationOptions({...separationOptions, extractBass: checked})
-                    } 
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="drums" className="flex items-center gap-2">
-                    <Music className="h-4 w-4" /> Drums
-                  </Label>
-                  <Switch 
-                    id="drums" 
-                    checked={separationOptions.extractDrums} 
-                    onCheckedChange={(checked) => 
-                      setSeparationOptions({...separationOptions, extractDrums: checked})
-                    } 
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="other" className="flex items-center gap-2">
-                    <Music className="h-4 w-4" /> Other
-                  </Label>
-                  <Switch 
-                    id="other" 
-                    checked={separationOptions.extractOther} 
-                    onCheckedChange={(checked) => 
-                      setSeparationOptions({...separationOptions, extractOther: checked})
-                    } 
-                  />
-                </div>
+                ))}
               </div>
 
               <Separator />
 
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="volume" className="flex items-center gap-2">
-                    <Volume2 className="h-4 w-4" /> Playback Volume
-                  </Label>
-                  <span className="text-sm text-muted-foreground">{volume}%</span>
-                </div>
-                <Slider
-                  id="volume"
-                  min={0}
-                  max={100}
-                  step={1}
-                  value={volume}
-                  onValueChange={setVolume}
-                />
-              </div>
+              <LabeledSlider 
+                id="volume-slider" 
+                label="Playback Volume" 
+                value={volume} 
+                onChange={setVolume} 
+                min={0} 
+                max={100} 
+                step={1} 
+              />
 
               <div className="space-y-2 mt-6">
                 <Label>Processing Status</Label>

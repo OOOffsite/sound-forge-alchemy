@@ -147,6 +147,7 @@ services:
       - PORT=3004
       - REDIS_URL=redis://redis:6379
       - AUDIO_DATA_PATH=/app/audio_data
+
     networks:
       - sound-forge-network
       - data-network

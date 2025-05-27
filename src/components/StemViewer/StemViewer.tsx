@@ -1,3 +1,14 @@
+/*
+ * Author: Sound Forge Team <word@iite.bet>, Jeremiah Pegues <jeremiah@pegues.io>
+ * Version: 1.0.0
+ * License: MIT
+ *
+ * StemViewer component for Sound Forge Alchemy frontend.
+ * Visualizes audio stems and supports MIDI integration.
+ *
+ * Logging is maximized at all levels for MIDI, UI, and error events.
+ */
+
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 // import { useTheme } from '../../hooks/useTheme';
 import { Button } from '../ui/button';
@@ -10,6 +21,7 @@ import WaveSurfer, { WaveSurferOptions } from 'wavesurfer.js';
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions';
 import { formatTime } from '../../lib/utils';
 import { useMIDIControlChange, useMIDINoteOn } from './midiHandlers';
+import logger from '../../lib/logger';
 
 export interface Stem {
   id: string;
@@ -182,12 +194,12 @@ const StemViewer: React.FC<StemViewerProps> = ({
           });
         });
 
-        console.log('MIDI enabled successfully!');
+        logger.info('MIDI enabled successfully!');
       } catch (err) {
-        console.error('Failed to enable MIDI:', err);
+        logger.error('Failed to enable MIDI:', err);
       }
     } else {
-      console.warn('Web MIDI API is not supported in this browser');
+      logger.warn('Web MIDI API is not supported in this browser');
     }
   }, [handleMIDIControlChange, handleMIDINoteOn]);
 

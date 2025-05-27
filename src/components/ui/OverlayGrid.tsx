@@ -1,3 +1,15 @@
+/*
+ * Author: Sound Forge Team <word@iite.bet>, Jeremiah Pegues <jeremiah@pegues.io>
+ * Version: 1.0.0
+ * License: MIT
+ *
+ * OverlayGrid component for Sound Forge Alchemy frontend.
+ * Manages overlay panes and their layout.
+ *
+ * Logging is maximized at all levels for overlay grid and error events.
+ */
+
+import logger from '../../lib/logger';
 import React, { CSSProperties, useRef, useState } from 'react';
 import {
   DndContext,

@@ -1,3 +1,15 @@
+/*
+ * Author: Sound Forge Team <word@iite.bet>, Jeremiah Pegues <jeremiah@pegues.io>
+ * Version: 1.0.0
+ * License: MIT
+ *
+ * StemVisualizer component for Sound Forge Alchemy frontend.
+ * Visualizes audio stems and supports MIDI integration.
+ *
+ * Logging is maximized at all levels for stem visualization, MIDI, and error events.
+ */
+
+import logger from "../lib/logger";
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';

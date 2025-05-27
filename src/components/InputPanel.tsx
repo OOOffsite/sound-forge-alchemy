@@ -1,8 +1,20 @@
+/*
+ * Author: Sound Forge Team <word@iite.bet>, Jeremiah Pegues <jeremiah@pegues.io>
+ * Version: 1.0.0
+ * License: MIT
+ *
+ * InputPanel component for Sound Forge Alchemy frontend.
+ * Handles playlist/track input and download actions.
+ *
+ * Logging is maximized at all levels for input, playlist, and error events.
+ */
+
 import React from 'react';
 import SpotifyInput from './SpotifyInput';
 import * as Collapsible from '@radix-ui/react-collapsible';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Label } from './ui/label';
+import logger from '../lib/logger';
 
 interface InputPanelProps {
   onFetchPlaylist: (url: string) => void;

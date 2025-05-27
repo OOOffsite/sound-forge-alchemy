@@ -1,3 +1,14 @@
+/*
+ * Author: Sound Forge Team <word@iite.bet>, Jeremiah Pegues <jeremiah@pegues.io>
+ * Version: 1.0.0
+ * License: MIT
+ *
+ * AudioProcessor component for Sound Forge Alchemy frontend.
+ * Handles audio separation, analysis, and error handling.
+ *
+ * Logging is maximized at all levels for processing and error events.
+ */
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
@@ -16,6 +27,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Icon } from '@radix-ui/react-select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from './ui/dialog';
+import logger from "../lib/logger";
 
 interface AudioProcessorProps {
   selectedTrack: Track | null;

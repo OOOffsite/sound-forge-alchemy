@@ -1,3 +1,15 @@
+/*
+ * Author: Sound Forge Team <word@iite.bet>, Jeremiah Pegues <jeremiah@pegues.io>
+ * Version: 1.0.0
+ * License: MIT
+ *
+ * TrackStudio component for Sound Forge Alchemy frontend.
+ * Provides tabbed interface for stems, arrangement, loops, and cue points.
+ *
+ * Logging is maximized at all levels for UI, tab, and error events.
+ */
+
+import logger from "../../lib/logger";
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';

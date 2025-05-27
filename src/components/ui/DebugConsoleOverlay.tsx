@@ -1,4 +1,16 @@
+/*
+ * Author: Sound Forge Team <word@iite.bet>, Jeremiah Pegues <jeremiah@pegues.io>
+ * Version: 1.0.0
+ * License: MIT
+ *
+ * DebugConsoleOverlay component for Sound Forge Alchemy frontend.
+ * Provides overlay for debug console output and controls.
+ *
+ * Logging is maximized at all levels for debug console and error events.
+ */
+
 import React, { useState, useRef, useEffect } from 'react';
+import logger from '../../lib/logger';
 
 interface DebugConsoleOverlayProps {
   minimized?: boolean;

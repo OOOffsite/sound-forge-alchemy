@@ -1,3 +1,14 @@
+/*
+ * Author: Sound Forge Team <word@iite.bet>, Jeremiah Pegues <jeremiah@pegues.io>
+ * Version: 1.0.0
+ * License: MIT
+ *
+ * ExportStemsPanel component for Sound Forge Alchemy frontend.
+ * Provides export options for audio stems.
+ *
+ * Logging is maximized at all levels for export actions and error events.
+ */
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
@@ -8,6 +19,7 @@ import { Separator } from './ui/separator';
 import { Switch } from './ui/switch';
 import { Download, FileMusic, Tags } from 'lucide-react';
 import { toast } from './ui/sonner';
+import logger from "../lib/logger";
 
 interface Stem {
   id: string;
@@ -59,6 +71,8 @@ export default function ExportStemsPanel({ stems, isExporting, onExport }: Expor
       toast.error('Please select at least one stem to export');
       return;
     }
+    
+    logger.info('Export started', { selectedStems, exportFormat, sampleRate, bitDepth, includeMetadata, normalizeAudio });
     
     onExport({
       stems: selectedStems,

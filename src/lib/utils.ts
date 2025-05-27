@@ -1,18 +1,31 @@
+/*
+ * Author: Sound Forge Team <word@iite.bet>, Jeremiah Pegues <jeremiah@pegues.io>
+ * Version: 1.0.0
+ * License: MIT
+ *
+ * Utility functions for Sound Forge Alchemy frontend.
+ *
+ * Logging is maximized at all levels for utility function calls and errors.
+ */
 
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+import logger from "./logger";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  logger.debug("cn utility called", { inputs });
+  return twMerge(clsx(inputs));
 }
 
 export function formatTime(seconds: number): string {
+  logger.debug("formatTime utility called", { seconds });
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
 export function formatTimeToSMPTE(seconds: number, frameRate: number = 30): string {
+  logger.debug("formatTimeToSMPTE utility called", { seconds, frameRate });
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   const s = Math.floor(seconds % 60);
@@ -22,12 +35,14 @@ export function formatTimeToSMPTE(seconds: number, frameRate: number = 30): stri
 }
 
 export function calculateBPM(audioData: number[]): number {
+  logger.info("calculateBPM utility called", { audioDataLength: audioData.length });
   // In a real implementation, this would use a BPM detection algorithm
   // For now we'll return a simulated value
   return Math.floor(Math.random() * (160 - 70) + 70);
 }
 
 export function detectKey(audioData: number[]): string {
+  logger.info("detectKey utility called", { audioDataLength: audioData.length });
   // In a real implementation, this would use a key detection algorithm
   // For now we'll return a simulated value
   const keys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -40,6 +55,7 @@ export function detectKey(audioData: number[]): string {
 }
 
 export function detectArrangement(audioData: number[], duration: number): { time: number, label: string, type: string }[] {
+  logger.info("detectArrangement utility called", { audioDataLength: audioData.length, duration });
   // In a real implementation, this would analyze the audio for structural changes
   // For now we'll generate simulated cue points based on duration
   

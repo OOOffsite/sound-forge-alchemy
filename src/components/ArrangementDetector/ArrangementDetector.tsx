@@ -1,3 +1,15 @@
+/*
+ * Author: Sound Forge Team <word@iite.bet>, Jeremiah Pegues <jeremiah@pegues.io>
+ * Version: 1.0.0
+ * License: MIT
+ *
+ * ArrangementDetector component for Sound Forge Alchemy frontend.
+ * Detects and visualizes song arrangement structure.
+ *
+ * Logging is maximized at all levels for detection and error events.
+ */
+
+import logger from "../../lib/logger";
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
@@ -119,6 +131,7 @@ const ArrangementDetector: React.FC<ArrangementDetectorProps> = ({
       }
     } catch (error) {
       console.error('Error detecting arrangement:', error);
+      logger.error('Error detecting arrangement:', error);
       
       // Fallback to a basic arrangement if detection fails
       const fallbackArrangement = generateFallbackArrangement();

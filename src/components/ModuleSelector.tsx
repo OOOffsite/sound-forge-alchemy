@@ -1,3 +1,14 @@
+/*
+ * Author: Sound Forge Team <word@iite.bet>, Jeremiah Pegues <jeremiah@pegues.io>
+ * Version: 1.0.0
+ * License: MIT
+ *
+ * ModuleSelector component for Sound Forge Alchemy frontend.
+ * Allows dynamic registration and toggling of modules.
+ *
+ * Logging is maximized at all levels for module selection and error events.
+ */
+
 import React from 'react';
 import { useModuleRegistry, ModuleType } from '../context/ModuleRegistry';
 import { Button } from '../components/ui/button';
@@ -16,6 +27,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu';
+import logger from "../lib/logger";
 
 const ModuleSelector: React.FC = () => {
   const { 

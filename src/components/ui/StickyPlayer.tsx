@@ -1,6 +1,18 @@
+/*
+ * Author: Sound Forge Team <word@iite.bet>, Jeremiah Pegues <jeremiah@pegues.io>
+ * Version: 1.0.0
+ * License: MIT
+ *
+ * StickyPlayer component for Sound Forge Alchemy frontend.
+ * Provides persistent audio playback controls and media session integration.
+ *
+ * Logging is maximized at all levels for playback, UI, and error events.
+ */
+
 import React, { useState, useRef } from 'react';
 import { ChevronUp, ChevronDown, Pause, Play, Volume2, SkipBack, SkipForward } from 'lucide-react';
 import VolumeVisualizer from './VolumeVisualizer';
+import logger from '../../lib/logger';
 
 interface StickyPlayerProps {
   track?: {
@@ -15,6 +27,7 @@ interface StickyPlayerProps {
 }
 
 const StickyPlayer: React.FC<StickyPlayerProps> = ({ track, isProcessing, isWorkingWithStems }) => {
+  logger.info('StickyPlayer rendered', { track });
   const [expanded, setExpanded] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -137,7 +150,18 @@ const StickyPlayer: React.FC<StickyPlayerProps> = ({ track, isProcessing, isWork
     }
   };
 
-  if (!track || !track.audioUrl) return null;
+  // Log playback events
+  React.useEffect(() => {
+    logger.debug('StickyPlayer effect: track or playback state changed', { track, playing });
+  }, [track, playing]);
+
+  // Log errors
+  try {
+    if (!track || !track.audioUrl) return null;
+  } catch (error) {
+    logger.error('Error in StickyPlayer', { error });
+    throw error;
+  }
 
   return (
     <div className={`fixed left-0 right-0 bottom-0 z-40 transition-all ${expanded ? 'h-64' : 'h-20'} bg-background border-t border-border shadow-lg flex flex-col`}>

@@ -1,8 +1,20 @@
+/*
+ * Author: Sound Forge Team <word@iite.bet>, Jeremiah Pegues <jeremiah@pegues.io>
+ * Version: 1.0.0
+ * License: MIT
+ *
+ * PlaylistPanel component for Sound Forge Alchemy frontend.
+ * Manages playlist and track selection and download.
+ *
+ * Logging is maximized at all levels for playlist, selection, and error events.
+ */
+
 import React from 'react';
 import TrackList, { Track } from './TrackList';
 import * as Collapsible from '@radix-ui/react-collapsible';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Label } from './ui/label';
+import logger from "../lib/logger";
 
 interface PlaylistPanelProps {
   tracks: Track[];

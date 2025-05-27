@@ -1,3 +1,15 @@
+/*
+ * Author: Sound Forge Team <word@iite.bet>, Jeremiah Pegues <jeremiah@pegues.io>
+ * Version: 1.0.0
+ * License: MIT
+ *
+ * TrackList component for Sound Forge Alchemy frontend.
+ * Provides paginated, filterable, and multi-selectable track list UI.
+ *
+ * Logging is maximized at all levels for UI, selection, filtering, and error events.
+ */
+
+import logger from "../lib/logger";
 import React, { useState } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
@@ -38,6 +50,7 @@ export default function TrackList({
   selectedTrackId,
   isProcessing
 }: TrackListProps) {
+  logger.info("TrackList rendered", { trackCount: tracks.length });
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10); // default page size is 10
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -76,6 +89,7 @@ export default function TrackList({
 
   // Multi-select logic
   const handleTrackClick = (track: Track, e: React.MouseEvent | React.KeyboardEvent) => {
+    logger.debug("Track clicked", { trackId: track.id, eventType: e.type });
     if (e.shiftKey && selectedIds.length > 0) {
       // Range select
       const lastIdx = paginatedTracks.findIndex(t => t.id === selectedIds[selectedIds.length - 1]);
@@ -97,6 +111,7 @@ export default function TrackList({
   };
 
   const handleSelectionAction = () => {
+    logger.info("Selection action triggered", { action: selectionAction, selectedIds });
     if (selectionAction === 'add') {
       paginatedTracks.filter(t => selectedIds.includes(t.id)).forEach(onDownloadTrack);
     } else if (selectionAction === 'process') {
@@ -107,6 +122,7 @@ export default function TrackList({
   };
 
   if (!tracks.length) {
+    logger.warn("No tracks found in TrackList");
     return (
       <div className="mt-8 text-center py-12">
         <FileMusic className="mx-auto h-16 w-16 text-muted-foreground" />

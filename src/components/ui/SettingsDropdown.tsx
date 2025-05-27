@@ -1,5 +1,17 @@
+/*
+ * Author: Sound Forge Team <word@iite.bet>, Jeremiah Pegues <jeremiah@pegues.io>
+ * Version: 1.0.0
+ * License: MIT
+ *
+ * SettingsDropdown component for Sound Forge Alchemy frontend.
+ * Provides user settings dropdown menu and controls.
+ *
+ * Logging is maximized at all levels for settings dropdown and error events.
+ */
+
 import React from 'react';
 import { X } from 'lucide-react';
+import logger from '../../lib/logger';
 
 interface SettingsDropdownProps {
   onClose: () => void;

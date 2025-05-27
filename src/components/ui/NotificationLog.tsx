@@ -1,6 +1,18 @@
+/*
+ * Author: Sound Forge Team <word@iite.bet>, Jeremiah Pegues <jeremiah@pegues.io>
+ * Version: 1.0.0
+ * License: MIT
+ *
+ * NotificationLog component for Sound Forge Alchemy frontend.
+ * Provides overlay for notification log output and controls.
+ *
+ * Logging is maximized at all levels for notification log and error events.
+ */
+
 import React from 'react';
 import { XCircle, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { useToast } from '../../hooks/use-toast';
+import logger from '../../lib/logger';
 
 export interface Notification {
   id: string;

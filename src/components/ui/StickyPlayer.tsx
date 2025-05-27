@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { ChevronUp, ChevronDown, Pause, Play, Volume2 } from 'lucide-react';
+import { ChevronUp, ChevronDown, Pause, Play, Volume2, SkipBack, SkipForward } from 'lucide-react';
+import VolumeVisualizer from './VolumeVisualizer';
 
 interface StickyPlayerProps {
   track?: {
@@ -35,6 +36,83 @@ const StickyPlayer: React.FC<StickyPlayerProps> = ({ track, isProcessing, isWork
       }
     }
   }, [playing]);
+  
+  // Set up media session API integration
+  React.useEffect(() => {
+    if (!track || !track.title || !('mediaSession' in navigator)) return;
+    
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: track.title,
+      artist: track.artist,
+      artwork: track.albumArt ? [{ src: track.albumArt }] : []
+    });
+    
+    // Action handlers
+    navigator.mediaSession.setActionHandler('play', () => {
+      setPlaying(true);
+    });
+    
+    navigator.mediaSession.setActionHandler('pause', () => {
+      setPlaying(false);
+    });
+    
+    navigator.mediaSession.setActionHandler('seekto', (details) => {
+      if (audioRef.current && details.seekTime !== undefined) {
+        audioRef.current.currentTime = details.seekTime;
+        setProgress(details.seekTime / (audioRef.current.duration || 1));
+      }
+    });
+    
+    navigator.mediaSession.setActionHandler('seekforward', (details) => {
+      if (audioRef.current) {
+        const skipTime = details?.seekOffset || 10;
+        const newTime = Math.min(audioRef.current.currentTime + skipTime, audioRef.current.duration);
+        audioRef.current.currentTime = newTime;
+        setProgress(newTime / (audioRef.current.duration || 1));
+      }
+    });
+    
+    navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+      if (audioRef.current) {
+        const skipTime = details?.seekOffset || 10;
+        const newTime = Math.max(audioRef.current.currentTime - skipTime, 0);
+        audioRef.current.currentTime = newTime;
+        setProgress(newTime / (audioRef.current.duration || 1));
+      }
+    });
+    
+    return () => {
+      // Clear handlers when component unmounts
+      navigator.mediaSession.setActionHandler('play', null);
+      navigator.mediaSession.setActionHandler('pause', null);
+      navigator.mediaSession.setActionHandler('seekto', null);
+      navigator.mediaSession.setActionHandler('seekforward', null);
+      navigator.mediaSession.setActionHandler('seekbackward', null);
+    };
+  }, [track]);
+
+  // Update media session playback state and position
+  React.useEffect(() => {
+    if (!('mediaSession' in navigator)) return;
+    
+    navigator.mediaSession.playbackState = playing ? 'playing' : 'paused';
+    
+    const updatePosition = () => {
+      if (audioRef.current) {
+        navigator.mediaSession.setPositionState({
+          duration: audioRef.current.duration || 0,
+          position: audioRef.current.currentTime || 0,
+          playbackRate: audioRef.current.playbackRate
+        });
+      }
+    };
+    
+    if (playing) {
+      updatePosition();
+      const interval = setInterval(updatePosition, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [playing, progress]);
 
   // Sync volume
   React.useEffect(() => {
@@ -84,7 +162,17 @@ const StickyPlayer: React.FC<StickyPlayerProps> = ({ track, isProcessing, isWork
         </button>
         <div className="flex items-center gap-2">
           <Volume2 className="w-4 h-4" />
-          <input type="range" min={0} max={1} step={0.01} value={volume} onChange={e => setVolume(Number(e.target.value))} className="w-20" />
+          <div className="flex flex-col gap-1">
+            <input type="range" min={0} max={1} step={0.01} value={volume} onChange={e => setVolume(Number(e.target.value))} className="w-20" />
+            {/* Volume visualizer */}
+            <VolumeVisualizer 
+              audioRef={audioRef}
+              playing={playing}
+              volume={volume}
+              width={80}
+              height={20}
+            />
+          </div>
         </div>
       </div>
       <div className="flex items-center px-4">

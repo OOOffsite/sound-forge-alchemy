@@ -134,6 +134,7 @@ export default function TrackList({
                 }
               }}
               aria-label="Select all tracks on page"
+              disabled={isProcessing}
             />
             <div className="inline-flex rounded-full bg-accent/30 border border-accent overflow-hidden" role="group" aria-label="Selection action">
               <button
@@ -268,6 +269,7 @@ export default function TrackList({
                     }}
                     aria-label={`Select track ${track.title}`}
                     className="mr-2"
+                    disabled={isProcessing}
                   />
                   <div className="w-12 h-12 mr-2 flex-shrink-0 bg-secondary flex items-center justify-center rounded overflow-hidden">
                     {track.albumArt ? (

@@ -1,0 +1,105 @@
+# Analysis Service Dockerfile
+# Handles audio analysis (BPM, key detection, spectral analysis, etc.)
+
+FROM node:20-alpine AS base
+
+# Install Python and audio analysis dependencies
+USER root
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    python3-dev \
+    ffmpeg \
+    sox \
+    build-base \
+    libc6-compat \
+    linux-headers \
+    curl \
+    git \
+    make \
+    g++ && \
+    addgroup -g 1001 -S soundforge && \
+    adduser -S soundforge -u 1001 -G soundforge && \
+    pip3 install --no-cache-dir --break-system-packages \
+        numpy \
+        scipy \
+        soundfile \
+        pydub
+
+# Set service-specific environment variables
+ENV SERVICE_NAME=analysis \
+    PORT=3004
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files from the analysis service directory
+COPY package*.json ./
+
+# Create shared directory and copy shared module (will be mounted as volume in dev)
+RUN mkdir -p /app/shared
+
+# Install service-specific dependencies
+RUN npm install --force && npm cache clean --force
+
+# Copy service source code from backend/analysis
+COPY src ./src
+COPY config ./config
+
+# Create service-specific directories (as root)
+RUN mkdir -p \
+    /app/logs \
+    /app/temp \
+    /app/cache \
+    && chown -R soundforge:soundforge /app
+
+# Switch to soundforge user
+USER soundforge
+
+# Health check specific to Analysis Service
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:3004/health || exit 1
+
+# Expose Analysis Service port
+EXPOSE 3004
+
+# Default production command
+CMD ["node", "src/index.js"]
+
+
+# Development stage
+FROM base AS development
+
+# Switch to root for development setup
+USER root
+
+# Install development dependencies
+RUN npm install && npm cache clean --force
+
+# Install nodemon globally for development
+RUN npm install -g nodemon
+
+# Set development permissions
+RUN chown -R soundforge:soundforge /app
+
+# Switch back to service user
+USER soundforge
+
+# Development environment
+ENV NODE_ENV=development
+
+# Development command with auto-reload
+CMD ["nodemon", "--watch", "src/", "--ignore", "node_modules/", "--ignore", "logs/", "src/index.js"]
+
+
+# Production stage
+FROM base AS production
+
+# Ensure we're using the service user
+USER soundforge
+
+# Production environment
+ENV NODE_ENV=production
+
+# Production command
+CMD ["node", "src/index.js"]

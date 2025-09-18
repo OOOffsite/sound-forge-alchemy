@@ -1,0 +1,23 @@
+# Optimized API Gateway Dockerfile
+# Uses shared node-base for efficiency
+
+ARG BASE_IMAGE=sound-forge-node-base:latest
+FROM ${BASE_IMAGE} AS base
+
+# Service-specific configuration
+ENV SERVICE_NAME=api-gateway \
+    PORT=3000
+
+WORKDIR /app
+
+# Copy service files
+COPY --chown=soundforge:soundforge src ./src
+COPY --chown=soundforge:soundforge config ./config
+
+# Production stage
+FROM base AS production
+CMD ["node", "src/index.js"]
+
+# Development stage
+FROM base AS development
+CMD ["nodemon", "--watch", "src", "--watch", "config", "src/index.js"]

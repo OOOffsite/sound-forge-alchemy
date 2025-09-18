@@ -1,0 +1,101 @@
+# Base Node.js image for all Sound Forge Alchemy services
+# Provides common Node.js environment, security updates, and utilities
+
+FROM node:20-alpine AS base
+
+# Install system dependencies and security updates
+RUN apk add --no-cache \
+    curl \
+    git \
+    python3 \
+    make \
+    g++ \
+    && apk update \
+    && apk upgrade
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S soundforge && \
+    adduser -S soundforge -u 1001 -G soundforge
+
+# Set working directory
+WORKDIR /app
+
+# Create required directories
+RUN mkdir -p \
+    /app/audio_data \
+    /app/cache \
+    /app/tmp \
+    /app/logs \
+    /app/models \
+    && chown -R soundforge:soundforge /app
+
+# Copy package files for caching
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Set proper permissions
+RUN chown -R soundforge:soundforge /app/node_modules
+
+# Switch to non-root user
+USER soundforge
+
+# Default environment variables
+ENV NODE_ENV=production \
+    PORT=3000 \
+    PATH="/app/node_modules/.bin:${PATH}"
+
+# Health check command (to be overridden by services)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/health || exit 1
+
+# Default expose port
+EXPOSE ${PORT}
+
+# Default command (to be overridden by services)
+CMD ["node", "index.js"]
+
+
+# Development stage
+FROM base AS development
+
+# Switch back to root for development installations
+USER root
+
+# Install development dependencies
+RUN npm install && npm cache clean --force
+
+# Install nodemon for development
+RUN npm install -g nodemon
+
+# Create development volumes with proper permissions
+RUN mkdir -p \
+    /app/src \
+    /app/public \
+    && chown -R soundforge:soundforge /app
+
+# Switch back to non-root user
+USER soundforge
+
+# Override environment for development
+ENV NODE_ENV=development
+
+# Default development command
+CMD ["nodemon", "--watch", "src", "--watch", "public", "index.js"]
+
+
+# Production stage
+FROM base AS production
+
+# Copy application code
+COPY --chown=soundforge:soundforge . .
+
+# Build application if build script exists
+RUN if [ -f "package.json" ] && npm run-script build > /dev/null 2>&1; then npm run build; fi
+
+# Production environment
+ENV NODE_ENV=production
+
+# Production command
+CMD ["node", "index.js"]

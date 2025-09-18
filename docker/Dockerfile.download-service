@@ -1,0 +1,81 @@
+# Download Service Dockerfile
+# Handles audio file downloads using spotdl
+
+FROM sound-forge-node-base:latest AS base
+
+# Install additional dependencies for audio download
+USER root
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    ffmpeg \
+    && pip3 install spotdl
+
+USER soundforge
+
+# Set service-specific environment variables
+ENV SERVICE_NAME=download-service \
+    PORT=3002
+
+# Copy package files for this service
+COPY package*.json ./
+
+# Install service-specific dependencies
+RUN npm ci && npm cache clean --force
+
+# Copy service source code
+COPY --chown=soundforge:soundforge . .
+
+# Create service-specific directories
+RUN mkdir -p \
+    /app/tmp \
+    /app/downloads \
+    && chown -R soundforge:soundforge /app
+
+# Health check specific to Download Service
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:3002/health || exit 1
+
+# Expose Download Service port
+EXPOSE 3002
+
+# Default production command
+CMD ["node", "index.js"]
+
+
+# Development stage
+FROM base AS development
+
+# Switch to root for development setup
+USER root
+
+# Install development dependencies
+RUN npm install && npm cache clean --force
+
+# Install nodemon globally for development
+RUN npm install -g nodemon
+
+# Set development permissions
+RUN chown -R soundforge:soundforge /app
+
+# Switch back to service user
+USER soundforge
+
+# Development environment
+ENV NODE_ENV=development
+
+# Development command with auto-reload
+CMD ["nodemon", "--watch", ".", "--ignore", "node_modules/", "--ignore", "logs/", "--ignore", "tmp/", "index.js"]
+
+
+# Production stage
+FROM base AS production
+
+# Ensure we're using the service user
+USER soundforge
+
+# Production environment
+ENV NODE_ENV=production
+
+# Production command
+CMD ["node", "index.js"]

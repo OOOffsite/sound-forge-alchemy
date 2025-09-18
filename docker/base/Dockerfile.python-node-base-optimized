@@ -1,0 +1,126 @@
+# Optimized Python + Node.js base image for ML/Processing services
+# Builds on top of node-base for consistency
+
+FROM alpine:3.19 AS alpine-python
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    py3-numpy \
+    py3-scipy \
+    ffmpeg \
+    sox \
+    gfortran \
+    openblas-dev \
+    lapack-dev \
+    libc6-compat
+
+# Node + Python combined base
+FROM node:20-alpine AS node-python-system
+# Install Python and ML dependencies efficiently
+RUN apk add --no-cache \
+    curl \
+    git \
+    python3 \
+    py3-pip \
+    py3-numpy \
+    py3-scipy \
+    ffmpeg \
+    sox \
+    build-base \
+    gfortran \
+    openblas-dev \
+    lapack-dev \
+    libc6-compat \
+    make \
+    g++ \
+    && apk update \
+    && apk upgrade
+
+# Create virtual environment for Python
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:${PATH}"
+
+# User setup stage
+FROM node-python-system AS user-setup
+RUN addgroup -g 1001 -S soundforge && \
+    adduser -S soundforge -u 1001 -G soundforge
+
+# Python dependencies builder
+FROM user-setup AS python-deps
+WORKDIR /python-deps
+COPY requirements.txt* ./
+RUN --mount=type=cache,target=/root/.cache/pip \
+    if [ -f requirements.txt ]; then \
+        pip install --no-cache-dir -r requirements.txt; \
+    fi
+
+# Runtime base
+FROM user-setup AS runtime-base
+WORKDIR /app
+
+# Copy Python environment
+COPY --from=python-deps /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:${PATH}"
+
+# Create directories
+RUN mkdir -p \
+    /app/audio_data \
+    /app/cache \
+    /app/tmp \
+    /app/logs \
+    /app/models \
+    /app/src \
+    /app/config \
+    /app/scripts \
+    && chown -R soundforge:soundforge /app /opt/venv
+
+USER soundforge
+
+# Environment
+ENV NODE_ENV=production \
+    PORT=3003 \
+    PYTHONUNBUFFERED=1 \
+    NPM_CONFIG_LOGLEVEL=warn \
+    PATH="/opt/venv/bin:/app/node_modules/.bin:${PATH}"
+
+# Production dependencies stage
+FROM runtime-base AS prod-deps
+USER root
+COPY --chown=soundforge:soundforge package*.json ./
+RUN --mount=type=cache,target=/app/.npm-cache \
+    npm ci --only=production --prefer-offline --no-audit
+USER soundforge
+
+# Development dependencies stage  
+FROM prod-deps AS dev-deps
+USER root
+RUN --mount=type=cache,target=/app/.npm-cache \
+    npm install --prefer-offline --no-audit && \
+    npm install -g nodemon
+USER soundforge
+ENV NODE_ENV=development
+
+# Final production stage
+FROM runtime-base AS production
+COPY --from=prod-deps --chown=soundforge:soundforge /app/node_modules /app/node_modules
+COPY --chown=soundforge:soundforge package*.json ./
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/health || exit 1
+
+EXPOSE ${PORT}
+CMD ["node", "src/index.js"]
+
+# Final development stage
+FROM runtime-base AS development  
+COPY --from=dev-deps --chown=soundforge:soundforge /app/node_modules /app/node_modules
+COPY --from=dev-deps /usr/local/bin/nodemon /usr/local/bin/nodemon
+COPY --chown=soundforge:soundforge package*.json ./
+
+ENV NODE_ENV=development
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/health || exit 1
+
+EXPOSE ${PORT}
+CMD ["nodemon", "--watch", "src", "--watch", "config", "--watch", "scripts", "src/index.js"]

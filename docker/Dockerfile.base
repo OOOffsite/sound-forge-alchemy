@@ -1,0 +1,7 @@
+FROM node:20-alpine
+RUN apk add --no-cache curl git python3 make g++ && \
+    addgroup -g 1001 -S soundforge && \
+    adduser -S soundforge -u 1001 -G soundforge
+WORKDIR /app
+RUN chown -R soundforge:soundforge /app
+USER soundforge

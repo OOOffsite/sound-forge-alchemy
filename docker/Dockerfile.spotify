@@ -1,0 +1,93 @@
+# Spotify Service Dockerfile
+# Handles Spotify API integration and playlist fetching
+
+FROM node:20-alpine AS base
+
+# Install Python and Spotify-related dependencies
+USER root
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    build-base \
+    curl \
+    git \
+    make \
+    g++ && \
+    addgroup -g 1001 -S soundforge && \
+    adduser -S soundforge -u 1001 -G soundforge
+
+# Set service-specific environment variables
+ENV SERVICE_NAME=spotify \
+    PORT=3002
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files from the spotify service directory
+COPY package*.json ./
+
+# Create shared directory and copy shared module (will be mounted as volume in dev)
+RUN mkdir -p /app/shared
+
+# Install service-specific dependencies
+RUN npm install --force && npm cache clean --force
+
+# Copy service source code from backend/spotify
+COPY src ./src
+COPY config ./config
+
+# Create service-specific directories (as root)
+RUN mkdir -p \
+    /app/logs \
+    && chown -R soundforge:soundforge /app
+
+# Switch to soundforge user
+USER soundforge
+
+# Health check specific to Spotify Service
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:3002/health || exit 1
+
+# Expose Spotify Service port
+EXPOSE 3002
+
+# Default production command
+CMD ["node", "src/index.js"]
+
+
+# Development stage
+FROM base AS development
+
+# Switch to root for development setup
+USER root
+
+# Install development dependencies
+RUN npm install && npm cache clean --force
+
+# Install nodemon globally for development
+RUN npm install -g nodemon
+
+# Set development permissions
+RUN chown -R soundforge:soundforge /app
+
+# Switch back to service user
+USER soundforge
+
+# Development environment
+ENV NODE_ENV=development
+
+# Development command with auto-reload
+CMD ["nodemon", "--watch", "src/", "--ignore", "node_modules/", "--ignore", "logs/", "src/index.js"]
+
+
+# Production stage
+FROM base AS production
+
+# Ensure we're using the service user
+USER soundforge
+
+# Production environment
+ENV NODE_ENV=production
+
+# Production command
+CMD ["node", "src/index.js"]

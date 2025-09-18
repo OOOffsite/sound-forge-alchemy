@@ -1,0 +1,39 @@
+{
+  "name": "@sound-forge-alchemy/backend",
+  "version": "1.0.0",
+  "description": "Sound Forge Alchemy Backend Services Workspace",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "api-gateway",
+    "spotify",
+    "download",
+    "processing", 
+    "analysis",
+    "websocket"
+  ],
+  "scripts": {
+    "build": "./build-all.sh",
+    "install-all": "npm install --workspaces",
+    "dev": "concurrently \"npm run dev --workspace=api-gateway\" \"npm run dev --workspace=spotify\" \"npm run dev --workspace=download\" \"npm run dev --workspace=processing\" \"npm run dev --workspace=analysis\" \"npm run dev --workspace=websocket\"",
+    "start": "concurrently \"npm start --workspace=api-gateway\" \"npm start --workspace=spotify\" \"npm start --workspace=download\" \"npm start --workspace=processing\" \"npm start --workspace=analysis\" \"npm start --workspace=websocket\"",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces",
+    "format": "npm run format --workspaces",
+    "clean": "rm -rf */node_modules */dist */build && npm run clean --workspace=shared",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "keywords": ["microservices", "backend", "sound-processing", "spotify", "audio"],
+  "author": "Sound Forge Alchemy Team",
+  "license": "MIT"
+}

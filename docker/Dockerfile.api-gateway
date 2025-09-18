@@ -1,0 +1,62 @@
+# API Gateway Dockerfile
+FROM node:20-alpine AS base
+
+# Install dependencies
+RUN apk add --no-cache curl git
+
+# Create app user
+RUN addgroup -g 1001 -S soundforge && \
+    adduser -S soundforge -u 1001 -G soundforge
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install && npm cache clean --force
+
+# Copy source files
+COPY src ./src
+COPY config ./config
+
+# Set ownership
+RUN chown -R soundforge:soundforge /app
+
+# Switch to non-root user
+USER soundforge
+
+# Environment
+ENV NODE_ENV=production \
+    PORT=3000 \
+    SERVICE_NAME=api-gateway
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+
+# Expose port
+EXPOSE 3000
+
+# Start service
+CMD ["node", "src/index.js"]
+
+
+# Development stage
+FROM base AS development
+
+# Switch back to root to install dev tools
+USER root
+
+# Install nodemon globally
+RUN npm install -g nodemon
+
+# Switch back to non-root user
+USER soundforge
+
+# Environment
+ENV NODE_ENV=development
+
+# Development command
+CMD ["nodemon", "--watch", "src/", "--ignore", "node_modules/", "--ignore", "logs/", "src/index.js"]

@@ -1,196 +1,478 @@
+# Docker Compose v3.9
+
+# Unified Docker Compose file for Sound Forge Alchemy
+# Uses profiles to separate dev/prod environments
+# Simplified network architecture: external (frontend) and internal (services)
+
 services:
-  # Base images
+  # ===================
+  # BASE IMAGES
+  # ===================
   node-base:
     build:
       context: .
-      dockerfile: ./docker/base-images/Dockerfile.node-base
+      dockerfile: docker/Dockerfile.node-base
+    image: sound-forge-node-base:latest
+    profiles: ["build"]
 
-  python-node-base:
-    build:
-      context: .
-      dockerfile: ./docker/base-images/Dockerfile.python-node-base
-
-  gpu-base:
-    build:
-      context: .
-      dockerfile: docker/base-images/Dockerfile.gpu-base
-
-  # Frontend service
+  # ===================
+  # FRONTEND SERVICE
+  # ===================
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile.frontend
+      dockerfile: docker/Dockerfile.frontend
+      target: ${NODE_ENV:-development}
     ports:
       - "8001:8001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - VITE_API_URL=http://localhost:3000
+      - VITE_WEBSOCKET_URL=ws://localhost:3006
+    networks:
+      - external
+      - internal
+    volumes:
+      # Development volumes (only mounted in dev profile)
+      - type: bind
+        source: ./src
+        target: /app/src
+        bind:
+          create_host_path: true
+        # Only mount in development
+        consistency: cached
+      - type: bind
+        source: ./public
+        target: /app/public
+        bind:
+          create_host_path: true
+        consistency: cached
+      - shared_cache:/root/.npm
     depends_on:
       - api-gateway
-    environment:
-      - VITE_API_URL=http://api-gateway:3000
-      - VITE_WEBSOCKET_URL=ws://websocket-service:3006
-    networks:
-      - sound-forge-network
-    volumes:
-      - ./docker-shared/npm-cache:/root/.npm
-      - ./docker-shared/tmp:/app/tmp
+    profiles: ["dev", "prod"]
+    # Development overrides
+    command:
+      - sh
+      - -c
+      - |
+        if [ "$NODE_ENV" = "production" ]; then
+          npm run preview -- --port 8001 --host 0.0.0.0
+        else
+          npm run dev -- --port 8001 --host 0.0.0.0
+        fi
+    deploy:
+      resources:
+        limits:
+          cpus: ${FRONTEND_CPU_LIMIT:-0.8}
+          memory: ${FRONTEND_MEMORY_LIMIT:-1G}
 
-  # API Gateway - Entry point for all client requests
+  # ===================
+  # BACKEND SERVICES
+  # ===================
+  
+  # API Gateway - Main entry point
   api-gateway:
     build:
       context: ./backend/api-gateway
-      dockerfile: Dockerfile
+      dockerfile: ../../docker/Dockerfile.api-gateway
     ports:
       - "3000:3000"
-    depends_on:
-      - spotify-service
-      - download-service
-      - processing-service
-      - analysis-service
     environment:
+      - NODE_ENV=${NODE_ENV:-development}
       - PORT=3000
-      - SPOTIFY_SERVICE_URL=http://spotify-service:3001
-      - DOWNLOAD_SERVICE_URL=http://download-service:3002
+      - SERVICE_NAME=api-gateway
+      - SPOTIFY_SERVICE_URL=http://localhost:3001
+      - DOWNLOAD_SERVICE_URL=http://localhost:3002
       - PROCESSING_SERVICE_URL=http://processing-service:3003
-      - ANALYSIS_SERVICE_URL=http://analysis-service:3004
-      - WEBSOCKET_SERVICE_URL=http://websocket-service:3006
+      - ANALYSIS_SERVICE_URL=http://localhost:3004
+      - WEBSOCKET_SERVICE_URL=http://localhost:3006
+      - REDIS_URL=redis://redis:6379
       - SUPABASE_URL=${SUPABASE_URL}
       - SUPABASE_KEY=${SUPABASE_KEY}
-      - REDIS_URL=redis://redis:6379
-
     networks:
-      - sound-forge-network
-      - data-network
+      - external
+      - internal
     volumes:
-      - ./docker-shared/audio_data:/app/audio_data
-      - ./backend/config/logging.js:/app/config/logging.js:ro
+      - shared_audio:/app/audio_data
+      - shared_logs:/app/logs
+      - ./backend/config:/app/config:ro
+      # Development volume mounts
+      - type: bind
+        source: ./backend/api-gateway
+        target: /app
+        bind:
+          create_host_path: true
+        consistency: cached
+      - /app/node_modules
+    depends_on:
+      - redis
+      - spotify-service
+      - download-service
+      - analysis-service
+      - websocket-service
+      - processing-service
 
-  # Spotify Service - Handles Spotify API interactions
+    profiles: ["dev", "prod"]
+    command:
+      - sh
+      - -c
+      - |
+        if [ "$NODE_ENV" = "production" ]; then
+          node index.js
+        else
+          npm run dev
+        fi
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: ${API_GATEWAY_CPU_LIMIT:-0.5}
+          memory: ${API_GATEWAY_MEMORY_LIMIT:-512M}
+
+  # Spotify Service
   spotify-service:
     build:
-      context: ./backend/spotify-service
-      dockerfile: Dockerfile
+      context: ./backend/spotify
+      dockerfile: ../../docker/Dockerfile.spotify
     ports:
       - "3001:3001"
     environment:
+      - NODE_ENV=${NODE_ENV:-development}
       - PORT=3001
+      - SERVICE_NAME=spotify-service
       - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
       - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
       - REDIS_URL=redis://redis:6379
       - SPOTIFY_API_MODE=spotdl
     networks:
-      - sound-forge-network
-      - data-network
+      - internal
+    volumes:
+      - shared_logs:/app/logs
+      - ./backend/config:/app/config:ro
+      # Development volume mounts
+      - type: bind
+        source: ./backend/spotify
+        target: /app
+        bind:
+          create_host_path: true
+        consistency: cached
+      - /app/node_modules
     depends_on:
       - redis
-    volumes:
-      - ./backend/config/logging.js:/app/config/logging.js:ro
+    profiles: ["dev", "prod"]
+    command:
+      - sh
+      - -c
+      - |
+        if [ "$NODE_ENV" = "production" ]; then
+          node index.js
+        else
+          npm run dev
+        fi
+    deploy:
+      resources:
+        limits:
+          cpus: ${SPOTIFY_CPU_LIMIT:-0.3}
+          memory: ${SPOTIFY_MEMORY_LIMIT:-256M}
 
-  # Download Service - Handles track downloading with spotdl
+  # Download Service
   download-service:
     build:
-      context: ./backend/download-service
-      dockerfile: Dockerfile
+      context: ./backend/download
+      dockerfile: ../../docker/Dockerfile.download
     ports:
       - "3002:3002"
-    volumes:
-      - ./docker-shared/audio_data:/app/audio_data
-      - ./docker-shared/tmp:/app/tmp
-      - ./backend/config/logging.js:/app/config/logging.js:ro
     environment:
+      - NODE_ENV=${NODE_ENV:-development}
       - PORT=3002
+      - SERVICE_NAME=download-service
       - REDIS_URL=redis://redis:6379
       - AUDIO_DATA_PATH=/app/audio_data
       - TMP_PATH=/app/tmp
     networks:
-      - sound-forge-network
-      - data-network
+      - internal
+    volumes:
+      - shared_audio:/app/audio_data
+      - shared_tmp:/app/tmp
+      - shared_logs:/app/logs
+      - ./backend/config:/app/config:ro
+      # Development volume mounts
+      - type: bind
+        source: ./backend/download
+        target: /app
+        bind:
+          create_host_path: true
+        consistency: cached
+      - /app/node_modules
+      - /app/audio_data
     depends_on:
       - redis
+    profiles: ["dev", "prod"]
+    command:
+      - sh
+      - -c
+      - |
+        if [ "$NODE_ENV" = "production" ]; then
+          node index.js
+        else
+          npm run dev
+        fi
+    deploy:
+      resources:
+        limits:
+          cpus: ${DOWNLOAD_CPU_LIMIT:-0.5}
+          memory: ${DOWNLOAD_MEMORY_LIMIT:-512M}
 
-  # Processing Service - Handles audio separation with Demucs
+  # Processing Service
   processing-service:
     build:
-      context: ./backend/processing-service
-      dockerfile: Dockerfile
+      context: ./backend/processing
+      dockerfile: ../../docker/Dockerfile.processing
+      target: base
     ports:
       - "3003:3003"
-    volumes:
-      - ./docker-shared/audio_data:/app/audio_data
-      - ./docker-shared/cache:/app/cache
-      - ./backend/config/logging.js:/app/config/logging.js:ro
     environment:
+      - NODE_ENV=${NODE_ENV:-development}
       - PORT=3003
+      - SERVICE_NAME=processing-service
       - REDIS_URL=redis://redis:6379
       - AUDIO_DATA_PATH=/app/audio_data
       - CACHE_PATH=/app/cache
-      - WEBSOCKET_SERVICE_URL=http://websocket-service:3006
+      - WEBSOCKET_SERVICE_URL=http://localhost:3006
       - USE_GPU=${USE_GPU:-false}
-      - GPU_COUNT=all
+      - GPU_COUNT=${GPU_COUNT:-1}
     networks:
-      - sound-forge-network
-      - data-network
+      - internal
+    volumes:
+      - shared_audio:/app/audio_data
+      - shared_cache:/app/cache
+      - shared_logs:/app/logs
+      - ./backend/config:/app/config:ro
+      # Development volume mounts
+      - type: bind
+        source: ./backend/processing
+        target: /app
+        bind:
+          create_host_path: true
+        consistency: cached
+      - /app/node_modules
+      - /app/audio_data
+      - /app/models
     depends_on:
       - redis
       - websocket-service
-      - gpu-base
+      - analysis-service
+      
+    profiles: ["dev", "prod"]
+    command:
+      - sh
+      - -c
+      - |
+        if [ "$NODE_ENV" = "production" ]; then
+          node index.js
+        else
+          npm run dev
+        fi
+    deploy:
+      resources:
+        limits:
+          cpus: ${PROCESSING_CPU_LIMIT:-2.0}
+          memory: ${PROCESSING_MEMORY_LIMIT:-4G}
 
-  # Analysis Service - Handles audio analysis (BPM, key, etc.)
+  # Analysis Service
   analysis-service:
     build:
-      context: ./backend/analysis-service
-      dockerfile: Dockerfile
+      context: ./backend/analysis
+      dockerfile: ../../docker/Dockerfile.analysis
     ports:
       - "3004:3004"
-    volumes:
-      - ./docker-shared/audio_data:/app/audio_data
-      - ./backend/config/logging.js:/app/config/logging.js:ro
     environment:
+      - NODE_ENV=${NODE_ENV:-development}
       - PORT=3004
+      - SERVICE_NAME=analysis-service
       - REDIS_URL=redis://redis:6379
       - AUDIO_DATA_PATH=/app/audio_data
-
     networks:
-      - sound-forge-network
-      - data-network
+      - internal
+    volumes:
+      - shared_audio:/app/audio_data
+      - shared_logs:/app/logs
+      - ./backend/config:/app/config:ro
+      # Development volume mounts
+      - type: bind
+        source: ./backend/analysis
+        target: /app
+        bind:
+          create_host_path: true
+        consistency: cached
+      - /app/node_modules
+      - /app/audio_data
     depends_on:
       - redis
+    profiles: ["dev", "prod"]
+    command:
+      - sh
+      - -c
+      - |
+        if [ "$NODE_ENV" = "production" ]; then
+          node index.js
+        else
+          npm run dev
+        fi
+    deploy:
+      resources:
+        limits:
+          cpus: ${ANALYSIS_CPU_LIMIT:-0.5}
+          memory: ${ANALYSIS_MEMORY_LIMIT:-512M}
 
-  # WebSocket Service - Real-time communication
+  # WebSocket Service
   websocket-service:
     build:
-      context: ./backend/websocket-service
-      dockerfile: Dockerfile
+      context: ./backend/websocket
+      dockerfile: ../../docker/Dockerfile.websocket
     ports:
       - "3006:3006"
     environment:
+      - NODE_ENV=${NODE_ENV:-development}
       - PORT=3006
+      - SERVICE_NAME=websocket-service
       - REDIS_URL=redis://redis:6379
     networks:
-      - sound-forge-network
-      - data-network
+      - internal
+    volumes:
+      - shared_logs:/app/logs
+      - ./backend/config:/app/config:ro
+      # Development volume mounts
+      - type: bind
+        source: ./backend/websocket
+        target: /app
+        bind:
+          create_host_path: true
+        consistency: cached
+      - /app/node_modules
     depends_on:
       - redis
-    volumes:
-      - ./backend/config/logging.js:/app/config/logging.js:ro
+    profiles: ["dev", "prod"]
+    command:
+      - sh
+      - -c
+      - |
+        if [ "$NODE_ENV" = "production" ]; then
+          node index.js
+        else
+          npm run dev
+        fi
+    deploy:
+      resources:
+        limits:
+          cpus: ${WEBSOCKET_CPU_LIMIT:-0.3}
+          memory: ${WEBSOCKET_MEMORY_LIMIT:-256M}
 
-  # Redis service - Including a minimal definition that will work with your setup
+  # ===================
+  # DATA SERVICES
+  # ===================
+  
+  # Redis - Data cache and pub/sub
   redis:
-    image: docker.io/library/redis:latest
-    pull_policy: never
+    image: redis:7.2-alpine
     ports:
       - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
     networks:
-      - sound-forge-network
-      - data-network
+      - internal
+    volumes:
+      - redis_data:/data
+      - ./docker/config/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: >
+      sh -c "
+        if [ -n \"$$REDIS_PASSWORD\" ]; then
+          redis-server /usr/local/etc/redis/redis.conf --requirepass $$REDIS_PASSWORD
+        else
+          redis-server /usr/local/etc/redis/redis.conf
+        fi
+      "
+    profiles: ["dev", "prod"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: ${REDIS_CPU_LIMIT:-0.5}
+          memory: ${REDIS_MEMORY_LIMIT:-1G}
 
+  # ===================
+  # DEVELOPMENT-ONLY SERVICES
+  # ===================
+  
+  # Redis Commander - Redis GUI
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    ports:
+      - "8081:8081"
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    networks:
+      - internal
+    depends_on:
+      - redis
+    profiles: ["dev"]
+
+  # Adminer - Database GUI
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8080:8080"
+    networks:
+      - internal
+    profiles: ["dev"]
+
+# ===================
+# NETWORKS
+# ===================
 networks:
-  sound-forge-network:
-    name: sound-forge-network
-    external: true
-
-  data-network:
-    name: sound-forge-data-network
+  # External network - for frontend and API gateway (public-facing)
+  external:
+    name: sound-forge-external
+    driver: bridge
+    
+  # Internal network - for backend service communication
+  internal:
+    name: sound-forge-internal
     driver: bridge
 
+# ===================
+# VOLUMES
+# ===================
 volumes:
-  audio_data:
+  # Shared data volumes
+  shared_audio:
     name: sound-forge-audio-data
+    driver: local
+    
+  shared_cache:
+    name: sound-forge-cache
+    driver: local
+    
+  shared_tmp:
+    name: sound-forge-tmp
+    driver: local
+    
+  shared_logs:
+    name: sound-forge-logs
+    driver: local
+
+  # Redis persistence
+  redis_data:
+    name: sound-forge-redis-data
+    driver: local

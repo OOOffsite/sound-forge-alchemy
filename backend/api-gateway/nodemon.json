@@ -1,0 +1,5 @@
+{
+  "extends": "../nodemon.json",
+  "exec": "node src/index.js",
+  "watch": ["src"]
+}

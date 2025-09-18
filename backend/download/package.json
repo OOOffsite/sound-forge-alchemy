@@ -1,13 +1,13 @@
 {
-  "name": "api-gateway",
+  "name": "download",
   "version": "1.0.0",
-  "description": "API Gateway for Sound Forge Alchemy",
+  "description": "Download Service for Sound Forge Alchemy",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    "install-deps": "cd ../shared && npm install && cd ../api-gateway && npm install",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
     "build": "echo 'JavaScript service - no build needed'",
+    "install-deps": "cd ../shared && npm install && cd ../download && npm install",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
@@ -17,13 +17,15 @@
     "format:check": "prettier --check src/**/*.js"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.57.2",
+    "express": "^4.18.2",
     "cors": "^2.8.5",
-    "express": "^4.21.2",
-    "http-proxy-middleware": "^2.0.9",
-    "ioredis": "^5.7.0",
-    "morgan": "^1.10.1",
-    "winston": "^3.17.0"
+    "dotenv": "^16.4.5",
+    "axios": "^1.6.7",
+    "ioredis": "^5.3.2",
+    "winston": "^3.12.0",
+    "uuid": "^9.0.1",
+    "joi": "^17.12.2",
+    "child_process": "^1.0.2"
   },
   "devDependencies": {
     "eslint": "^8.57.0",

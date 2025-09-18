@@ -1,0 +1,21 @@
+# GPU-specific override for processing service
+# Use with: docker compose -f docker-compose.optimized.yml -f docker-compose.gpu-optimized.yml up
+
+services:
+  processing-service:
+    build:
+      target: gpu
+    environment:
+      USE_GPU: "true"
+      CUDA_VISIBLE_DEVICES: all
+      NVIDIA_VISIBLE_DEVICES: all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+        limits:
+          cpus: ${PROCESSING_CPU_LIMIT:-4.0}
+          memory: ${PROCESSING_MEMORY_LIMIT:-8G}

@@ -1,0 +1,74 @@
+# Optimized Frontend Dockerfile
+# Multi-stage build with efficient caching
+
+# Dependencies stage
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package*.json ./
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --prefer-offline --no-audit
+
+# Development stage
+FROM node:20-alpine AS development
+WORKDIR /app
+
+RUN addgroup -g 1001 -S soundforge && \
+    adduser -S soundforge -u 1001 -G soundforge && \
+    chown -R soundforge:soundforge /app
+
+# Copy dependencies
+COPY --from=deps --chown=soundforge:soundforge /app/node_modules ./node_modules
+COPY --chown=soundforge:soundforge package*.json ./
+
+# Copy source (will be overridden by volume mount in dev)
+COPY --chown=soundforge:soundforge . .
+
+USER soundforge
+
+ENV NODE_ENV=development \
+    VITE_HOST=0.0.0.0 \
+    VITE_PORT=8001
+
+EXPOSE 8001
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8001 || exit 1
+
+CMD ["npm", "run", "dev", "--", "--port", "8001", "--host", "0.0.0.0"]
+
+# Builder stage
+FROM deps AS builder
+COPY . .
+RUN npm run build && \
+    ls -la /app/dist
+
+# Production stage with nginx
+FROM nginx:alpine AS production
+
+RUN apk add --no-cache curl && \
+    addgroup -g 1001 -S soundforge && \
+    adduser -S soundforge -u 1001 -G soundforge
+
+# Copy nginx config
+COPY docker/config/nginx.conf /etc/nginx/nginx.conf
+
+# Copy built app
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Set permissions
+RUN chown -R soundforge:soundforge /usr/share/nginx/html && \
+    chown -R soundforge:soundforge /var/cache/nginx && \
+    chown -R soundforge:soundforge /var/log/nginx && \
+    mkdir -p /var/run/nginx && \
+    chown -R soundforge:soundforge /var/run/nginx && \
+    touch /var/run/nginx.pid && \
+    chown soundforge:soundforge /var/run/nginx.pid
+
+USER soundforge
+
+EXPOSE 8001
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8001 || exit 1
+
+CMD ["nginx", "-g", "daemon off;"]

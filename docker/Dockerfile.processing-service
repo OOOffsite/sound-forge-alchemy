@@ -1,0 +1,139 @@
+# Processing Service Dockerfile
+# Handles audio separation using Demucs (supports both CPU and GPU modes)
+
+FROM sound-forge-node-base:latest AS base
+
+# Install Python and system dependencies
+USER root
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    ffmpeg \
+    sox \
+    build-base \
+    && pip3 install --upgrade pip
+
+USER soundforge
+
+# Set service-specific environment variables
+ENV SERVICE_NAME=processing-service \
+    PORT=3003
+
+# Copy package files for this service
+COPY package*.json ./
+
+# Install service-specific dependencies
+RUN npm ci && npm cache clean --force
+
+# Copy service source code
+COPY --chown=soundforge:soundforge . .
+
+# Create service-specific directories
+RUN mkdir -p \
+    /app/models \
+    /app/cache \
+    /app/processing \
+    && chown -R soundforge:soundforge /app
+
+# Health check specific to Processing Service
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:3003/health || exit 1
+
+# Expose Processing Service port
+EXPOSE 3003
+
+# Default production command
+CMD ["node", "index.js"]
+
+
+# CPU stage - for CPU-only processing
+FROM base AS cpu
+
+USER root
+
+# Install CPU-only versions of ML libraries
+RUN pip3 install torch torchaudio --index-url https://download.pytorch.org/whl/cpu && \
+    pip3 install demucs
+
+USER soundforge
+
+# CPU-specific environment
+ENV USE_GPU=false \
+    TORCH_DEVICE=cpu
+
+# CPU command
+CMD ["node", "index.js"]
+
+
+# GPU stage - for GPU-accelerated processing
+FROM base AS gpu
+
+USER root
+
+# Install CUDA and GPU libraries
+RUN apk add --no-cache cuda-runtime && \
+    pip3 install torch torchaudio --index-url https://download.pytorch.org/whl/cu118 && \
+    pip3 install demucs
+
+USER soundforge
+
+# GPU-specific environment
+ENV USE_GPU=true \
+    CUDA_VISIBLE_DEVICES=0
+
+# GPU command
+CMD ["node", "index.js"]
+
+
+# Development stage
+FROM cpu AS development
+
+# Switch to root for development setup
+USER root
+
+# Install development dependencies
+RUN npm install && npm cache clean --force
+
+# Install nodemon globally for development
+RUN npm install -g nodemon
+
+# Set development permissions
+RUN chown -R soundforge:soundforge /app
+
+# Switch back to service user
+USER soundforge
+
+# Development environment
+ENV NODE_ENV=development \
+    USE_GPU=false
+
+# Development command with auto-reload
+CMD ["nodemon", "--watch", ".", "--ignore", "node_modules/", "--ignore", "logs/", "--ignore", "cache/", "--ignore", "models/", "index.js"]
+
+
+# Production CPU stage
+FROM cpu AS production-cpu
+
+# Ensure we're using the service user
+USER soundforge
+
+# Production environment
+ENV NODE_ENV=production \
+    USE_GPU=false
+
+# Production command
+CMD ["node", "index.js"]
+
+
+# Production GPU stage
+FROM gpu AS production-gpu
+
+# Ensure we're using the service user
+USER soundforge
+
+# Production environment
+ENV NODE_ENV=production \
+    USE_GPU=true
+
+# Production command
+CMD ["node", "index.js"]

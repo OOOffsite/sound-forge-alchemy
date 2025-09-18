@@ -1,0 +1,33 @@
+# Generic optimized service Dockerfile template
+# Uses shared node-base for maximum efficiency
+# Build args: SERVICE_NAME, SERVICE_PORT
+
+ARG BASE_IMAGE=sound-forge-node-base:latest
+ARG SERVICE_NAME=service
+ARG SERVICE_PORT=3000
+
+FROM ${BASE_IMAGE} AS base
+
+# Service configuration from build args
+ARG SERVICE_NAME
+ARG SERVICE_PORT
+ENV SERVICE_NAME=${SERVICE_NAME} \
+    PORT=${SERVICE_PORT}
+
+WORKDIR /app
+
+# Copy service files (assumes standard structure)
+COPY --chown=soundforge:soundforge src ./src
+COPY --chown=soundforge:soundforge config ./config
+
+# Production stage
+FROM base AS production
+ARG SERVICE_PORT
+EXPOSE ${SERVICE_PORT}
+CMD ["node", "src/index.js"]
+
+# Development stage
+FROM base AS development
+ARG SERVICE_PORT
+EXPOSE ${SERVICE_PORT}
+CMD ["nodemon", "--watch", "src", "--watch", "config", "src/index.js"]

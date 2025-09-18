@@ -1,0 +1,117 @@
+# Frontend Dockerfile for Sound Forge Alchemy React/Vite application
+# Supports both development and production builds
+
+FROM node:20-alpine AS base
+
+# Install system dependencies
+RUN apk add --no-cache curl git
+
+# Create non-root user
+RUN addgroup -g 1001 -S soundforge && \
+    adduser -S soundforge -u 1001 -G soundforge
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci && npm cache clean --force
+
+# Set permissions
+RUN chown -R soundforge:soundforge /app/node_modules
+
+
+# Development stage
+FROM base AS development
+
+# Install development dependencies (if not already installed)
+RUN npm install && npm cache clean --force
+
+# Install vite globally for development
+RUN npm install -g vite
+
+# Create directories for development
+RUN mkdir -p /app/src /app/public /app/dist && \
+    chown -R soundforge:soundforge /app
+
+# Copy source code (will be overridden by volume mounts in development)
+COPY --chown=soundforge:soundforge . .
+
+# Ensure vite binary is executable
+RUN chmod +x /app/node_modules/.bin/vite || true
+
+# Switch to non-root user
+USER soundforge
+
+# Environment variables
+ENV NODE_ENV=development \
+    VITE_HOST=0.0.0.0 \
+    VITE_PORT=8001
+
+# Expose development port
+EXPOSE 8001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8001 || exit 1
+
+# Development command
+CMD ["npm", "run", "dev", "--", "--port", "8001", "--host", "0.0.0.0"]
+
+
+# Build stage
+FROM base AS builder
+
+# Copy source code
+COPY --chown=soundforge:soundforge . .
+
+# Build the application
+RUN npm run build
+
+# Verify build output
+RUN ls -la /app/dist
+
+
+# Production stage
+FROM nginx:alpine AS production
+
+# Install curl for health checks
+RUN apk add --no-cache curl
+
+# Create non-root user for nginx
+RUN addgroup -g 1001 -S soundforge && \
+    adduser -S soundforge -u 1001 -G soundforge
+
+# Copy custom nginx configuration
+COPY docker/config/nginx.conf /etc/nginx/nginx.conf
+
+# Copy built application
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Set proper permissions
+RUN chown -R soundforge:soundforge /usr/share/nginx/html && \
+    chown -R soundforge:soundforge /var/cache/nginx && \
+    chown -R soundforge:soundforge /var/log/nginx && \
+    chown -R soundforge:soundforge /etc/nginx/conf.d
+
+# Create nginx pid directory
+RUN mkdir -p /var/run/nginx && \
+    chown -R soundforge:soundforge /var/run/nginx
+
+# Switch to non-root user
+USER soundforge
+
+# Environment variables
+ENV NODE_ENV=production
+
+# Expose production port
+EXPOSE 8001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8001 || exit 1
+
+# Production command
+CMD ["nginx", "-g", "daemon off;"]

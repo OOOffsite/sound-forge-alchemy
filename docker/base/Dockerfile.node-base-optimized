@@ -1,0 +1,106 @@
+# Optimized Node.js base image for all Sound Forge Alchemy services
+# Multi-stage build with shared layers for maximum efficiency
+
+# Base Alpine with common system dependencies
+FROM alpine:3.19 AS alpine-base
+RUN apk add --no-cache \
+    curl \
+    git \
+    ca-certificates \
+    && apk update \
+    && apk upgrade
+
+# Node.js base with system dependencies
+FROM node:20-alpine AS node-system
+# Copy system packages from alpine-base for consistency
+RUN apk add --no-cache \
+    curl \
+    git \
+    python3 \
+    make \
+    g++ \
+    build-base \
+    && apk update \
+    && apk upgrade
+
+# Create non-root user in separate stage for reusability
+FROM node-system AS user-setup
+RUN addgroup -g 1001 -S soundforge && \
+    adduser -S soundforge -u 1001 -G soundforge
+
+# Dependencies builder stage - shared across all services
+FROM user-setup AS deps-builder
+WORKDIR /deps
+# This stage will be used as a cache mount source
+RUN mkdir -p /deps/cache
+
+# Base runtime stage
+FROM user-setup AS runtime-base
+WORKDIR /app
+
+# Create all required directories
+RUN mkdir -p \
+    /app/audio_data \
+    /app/cache \
+    /app/tmp \
+    /app/logs \
+    /app/models \
+    /app/src \
+    /app/config \
+    && chown -R soundforge:soundforge /app
+
+# Set up npm cache directory
+RUN npm config set cache /app/.npm-cache --global
+
+USER soundforge
+
+# Default environment variables
+ENV NODE_ENV=production \
+    PORT=3000 \
+    NPM_CONFIG_LOGLEVEL=warn \
+    PATH="/app/node_modules/.bin:${PATH}"
+
+# Production dependencies stage
+FROM runtime-base AS prod-deps
+USER root
+COPY --chown=soundforge:soundforge package*.json ./
+# Use cache mount for npm installations
+RUN --mount=type=cache,target=/app/.npm-cache \
+    npm ci --only=production --prefer-offline --no-audit
+USER soundforge
+
+# Development dependencies stage
+FROM prod-deps AS dev-deps
+USER root
+RUN --mount=type=cache,target=/app/.npm-cache \
+    npm install --prefer-offline --no-audit && \
+    npm install -g nodemon
+USER soundforge
+ENV NODE_ENV=development
+
+# Final production stage
+FROM runtime-base AS production
+# Copy production dependencies
+COPY --from=prod-deps --chown=soundforge:soundforge /app/node_modules /app/node_modules
+COPY --chown=soundforge:soundforge package*.json ./
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/health || exit 1
+
+EXPOSE ${PORT}
+CMD ["node", "src/index.js"]
+
+# Final development stage
+FROM runtime-base AS development
+# Copy all dependencies (prod + dev)
+COPY --from=dev-deps --chown=soundforge:soundforge /app/node_modules /app/node_modules
+COPY --from=dev-deps /usr/local/bin/nodemon /usr/local/bin/nodemon
+COPY --chown=soundforge:soundforge package*.json ./
+
+ENV NODE_ENV=development
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/health || exit 1
+
+EXPOSE ${PORT}
+CMD ["nodemon", "--watch", "src", "--watch", "config", "src/index.js"]

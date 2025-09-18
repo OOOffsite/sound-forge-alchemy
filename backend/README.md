@@ -6,15 +6,71 @@ Sound Forge Alchemy is a web application for audio source separation, allowing u
 
 The backend is built as a microservices architecture with the following components:
 
-1. **API Gateway** - Entry point for all client requests, routes to appropriate services
-2. **Spotify Service** - Handles Spotify API interactions
-3. **Download Service** - Handles downloading tracks with `spotdl`
-4. **Processing Service** - Handles audio separation with `demucs`
-5. **Analysis Service** - Handles audio analysis (BPM, key detection, etc.)
-6. **WebSocket Service** - Handles real-time communication with clients
+1. **api-gateway** - Entry point for all client requests, routes to appropriate services
+2. **spotify** - Handles Spotify API interactions
+3. **download** - Handles downloading tracks with `spotdl`
+4. **processing** - Handles audio separation with `demucs`
+5. **analysis** - Handles audio analysis (BPM, key detection, etc.)
+6. **websocket** - Handles real-time communication with clients (TypeScript)
 7. **Redis** - For caching, pub/sub messaging between services
 8. **PostgreSQL** - Database for storing metadata
 9. **Supabase** - For authentication, storage, and database access
+
+## Standardized Service Structure
+
+Each service follows a consistent directory structure:
+
+```
+service-name/
+├── src/                    # Source code
+│   ├── index.js|ts        # Main entry point
+│   ├── logging.js         # Service logging configuration
+│   └── ...                # Other source files
+├── tests/                 # Test files
+│   ├── setup.ts          # Test setup and mocks
+│   └── ...               # Test files (.test.js|ts, .spec.js|ts)
+├── config/               # Service-specific configuration
+├── package.json          # Dependencies and scripts
+├── jest.config.js        # Jest configuration (extends base)
+├── nodemon.json          # Nodemon configuration (extends base)
+├── tsconfig.json         # TypeScript configuration (if TS service)
+├── Dockerfile            # Docker configuration
+└── requirements.txt      # Python dependencies (if applicable)
+```
+
+### Shared Configuration
+
+The backend includes shared configuration files that all services extend:
+
+- `/backend/tsconfig.json` - Base TypeScript configuration
+- `/backend/.eslintrc.js` - ESLint configuration with TypeScript support
+- `/backend/.prettierrc` - Code formatting configuration
+- `/backend/jest.config.js` - Base Jest testing configuration
+- `/backend/nodemon.json` - Base nodemon development configuration
+
+### Package.json Scripts
+
+All services have standardized npm scripts:
+
+- `start` - Production start command
+- `dev` - Development mode with hot reload
+- `build` - Build command (TypeScript compilation or no-op for JS)
+- `test` - Run tests
+- `test:watch` - Run tests in watch mode
+- `test:coverage` - Run tests with coverage report
+- `lint` - Lint code
+- `lint:fix` - Lint and auto-fix code
+- `format` - Format code with Prettier
+- `format:check` - Check code formatting
+
+### Technology Stack
+
+- **JavaScript Services**: api-gateway, spotify, download, processing, analysis
+- **TypeScript Service**: websocket (with full TypeScript configuration)
+- **Testing**: Jest with service-specific setup files
+- **Linting**: ESLint with TypeScript support
+- **Formatting**: Prettier
+- **Development**: Nodemon with hot reload
 
 ## Setup
 
@@ -51,8 +107,10 @@ docker-compose up --build
 To start specific services:
 
 ```bash
-docker-compose up api-gateway spotify-service
+docker-compose up api-gateway spotify
 ```
+
+Note: Docker service names in docker-compose.yml may need to be updated to match the new directory structure.
 
 ### Development
 
@@ -65,33 +123,95 @@ npm install
 npm run dev
 
 # Spotify Service
-cd backend/spotify-service
+cd backend/spotify
 npm install
 npm run dev
 
 # Download Service
-cd backend/download-service
+cd backend/download
 npm install
 pip install -r requirements.txt
 npm run dev
 
 # Processing Service
-cd backend/processing-service
+cd backend/processing
 npm install
 pip install -r requirements.txt
 npm run dev
 
 # Analysis Service
-cd backend/analysis-service
+cd backend/analysis
 npm install
 pip install -r requirements.txt
 npm run dev
 
-# WebSocket Service
-cd backend/websocket-service
+# WebSocket Service (TypeScript)
+cd backend/websocket
 npm install
 npm run dev
 ```
+
+### Development Scripts
+
+Each service supports the following development commands:
+
+```bash
+# Development with hot reload
+npm run dev
+
+# Run tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Generate coverage report
+npm run test:coverage
+
+# Lint code
+npm run lint
+
+# Auto-fix linting issues
+npm run lint:fix
+
+# Format code
+npm run format
+
+# Check code formatting
+npm run format:check
+
+# Build (TypeScript services only)
+npm run build
+```
+
+### Shared Development Workflow
+
+The backend uses shared configuration files to maintain consistency across all services:
+
+1. **Code Style**: All services use the same ESLint and Prettier configurations
+2. **Testing**: Jest configuration is shared with service-specific overrides
+3. **TypeScript**: Base TypeScript configuration is extended by TypeScript services
+4. **Development**: Nodemon configuration is shared for hot reload functionality
+
+To set up a new service:
+
+1. Create the service directory with the standardized structure
+2. Copy package.json from an existing service and update the name/description
+3. Create service-specific configurations that extend the shared ones
+4. Add test setup files with appropriate mocks
+5. Update Docker configurations and docker-compose.yml
+
+### Migration from Old Structure
+
+The services have been renamed and restructured:
+- `analysis-service` → `analysis`
+- `download-service` → `download`
+- `processing-service` → `processing`
+- `spotify-service` → `spotify`
+- `websocket-service` → `websocket`
+- `api-gateway` remains unchanged
+
+All source files have been moved to `src/` directories, and test configurations have been standardized.
 
 ## API Documentation
 

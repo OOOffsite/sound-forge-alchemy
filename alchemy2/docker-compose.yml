@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  supabase-db:
+    image: supabase/postgres:15.1.0.147
+    container_name: alchemy2-db
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: postgres
+    ports:
+      - "54322:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./supabase/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  supabase-studio:
+    image: supabase/studio:20240101.0.0
+    container_name: alchemy2-studio
+    environment:
+      SUPABASE_URL: http://localhost:54321
+      STUDIO_PG_META_URL: http://supabase-db:5432
+    ports:
+      - "54323:3000"
+    depends_on:
+      - supabase-db
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: alchemy2-backend
+    environment:
+      - NODE_ENV=development
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - BACKEND_PORT=3001
+    ports:
+      - "3001:3001"
+      - "3002:3002"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - ./uploads:/tmp/alchemy2/uploads
+      - ./processed:/tmp/alchemy2/processed
+    depends_on:
+      - supabase-db
+    command: npm run dev
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/base/Dockerfile.frontend
+    container_name: alchemy2-frontend
+    environment:
+      - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+      - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+      - VITE_API_URL=http://localhost:3001
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    command: npm run dev
+
+volumes:
+  db-data:
+    driver: local
+
+networks:
+  default:
+    name: alchemy2-network

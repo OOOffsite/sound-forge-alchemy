@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Build outputs
+dist/
+build/
+*/dist/
+*/build/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+coverage/
+*.lcov
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Audio processing temp files
+uploads/
+processed/
+stems/
+
+# Docker
+docker-compose.override.yml
+
+# Supabase
+supabase/.branches
+supabase/.temp
+
+# Claude checkpoints
+.claude/checkpoints/*.checkpoint.json

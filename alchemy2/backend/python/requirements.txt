@@ -1,0 +1,13 @@
+# Audio Processing
+demucs==4.0.1
+torch>=2.0.0
+torchaudio>=2.0.0
+
+# Audio Analysis
+librosa>=0.10.0
+numpy>=1.24.0
+scipy>=1.10.0
+
+# Utilities
+pyyaml>=6.0
+python-dotenv>=1.0.0

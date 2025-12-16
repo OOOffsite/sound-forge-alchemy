@@ -1,0 +1,491 @@
+{
+  "analysis": {
+    "currentState": {
+      "totalComponents": 93,
+      "totalDependencies": 58,
+      "totalDevDependencies": 30,
+      "estimatedBundleSize": "420MB node_modules",
+      "uiComponents": 60,
+      "radixUiPackages": 29,
+      "actuallyUsedRadixComponents": 15,
+      "coreComponents": 20,
+      "customUIComponents": 7
+    },
+    "componentBreakdown": {
+      "shadcn_ui_components": 53,
+      "custom_audio_components": 7,
+      "layout_components": 5,
+      "page_components": 4,
+      "module_components": 4,
+      "utility_components": 20
+    }
+  },
+  "componentsToKeep": {
+    "essential_audio": [
+      "StemViewer",
+      "StemVisualizer",
+      "AudioProcessor",
+      "TrackStudio",
+      "VolumeVisualizer",
+      "StickyPlayer",
+      "ArrangementDetector"
+    ],
+    "essential_layout": [
+      "AppLayout",
+      "MainLayout",
+      "ModuleContainer",
+      "ModuleSelector",
+      "OverlayGrid"
+    ],
+    "essential_pages": [
+      "Home",
+      "Index",
+      "About",
+      "NotFound"
+    ],
+    "essential_ui": [
+      "button",
+      "card",
+      "input",
+      "label",
+      "slider",
+      "select",
+      "dialog",
+      "tooltip",
+      "toast",
+      "sonner",
+      "dropdown-menu",
+      "switch",
+      "toggle"
+    ]
+  },
+  "componentsToReplace": [
+    {
+      "current": "Custom VolumeVisualizer with WaveSurfer",
+      "replaceWith": "@wavesurfer/react",
+      "reason": "Official React wrapper is better maintained, simpler API, smaller bundle",
+      "estimatedSavings": "~50 lines of code, better performance"
+    },
+    {
+      "current": "Multiple custom audio player implementations",
+      "replaceWith": "react-h5-audio-player",
+      "reason": "Industry-standard audio player with built-in controls, theming, waveform support",
+      "estimatedSavings": "~200 lines of code, standardized UI"
+    },
+    {
+      "current": "sidebar (687 lines)",
+      "replaceWith": "@radix-ui/react-collapsible + custom simplified version",
+      "reason": "Massive component that's overly complex for needs",
+      "estimatedSavings": "~500 lines, reduced complexity"
+    },
+    {
+      "current": "chart (363 lines)",
+      "replaceWith": "Keep recharts but simplify wrapper",
+      "reason": "Current wrapper adds complexity without benefits",
+      "estimatedSavings": "~200 lines"
+    },
+    {
+      "current": "menubar (234 lines)",
+      "replaceWith": "Remove entirely, use dropdown-menu",
+      "reason": "Not actively used, dropdown-menu covers use case",
+      "estimatedSavings": "~234 lines, 1 dependency"
+    },
+    {
+      "current": "navigation-menu (128 lines)",
+      "replaceWith": "Simple custom nav with Links",
+      "reason": "Over-engineered for simple navigation needs",
+      "estimatedSavings": "~100 lines, 1 dependency"
+    }
+  ],
+  "componentsToRemove": {
+    "unused_ui": [
+      "accordion",
+      "alert-dialog",
+      "alert",
+      "aspect-ratio",
+      "avatar",
+      "badge",
+      "breadcrumb",
+      "calendar",
+      "carousel",
+      "checkbox",
+      "collapsible",
+      "command",
+      "context-menu",
+      "drawer",
+      "form",
+      "hover-card",
+      "input-otp",
+      "menubar",
+      "navigation-menu",
+      "pagination",
+      "popover",
+      "progress",
+      "radio-group",
+      "resizable",
+      "scroll-area",
+      "separator",
+      "sheet",
+      "skeleton",
+      "table",
+      "tabs",
+      "textarea",
+      "toggle-group"
+    ],
+    "unused_pages": [
+      "Dashboard",
+      "TrackLibrary",
+      "SearchPage",
+      "ErrorPage"
+    ],
+    "reason": "Not imported or used in active application routes"
+  },
+  "dependenciesToRemove": [
+    {
+      "name": "@radix-ui/react-accordion",
+      "reason": "Component not used",
+      "size": "~15kb"
+    },
+    {
+      "name": "@radix-ui/react-alert-dialog",
+      "reason": "Can use dialog instead",
+      "size": "~18kb"
+    },
+    {
+      "name": "@radix-ui/react-aspect-ratio",
+      "reason": "CSS aspect-ratio is widely supported",
+      "size": "~5kb"
+    },
+    {
+      "name": "@radix-ui/react-avatar",
+      "reason": "Not used in active app",
+      "size": "~12kb"
+    },
+    {
+      "name": "@radix-ui/react-checkbox",
+      "reason": "Not used",
+      "size": "~10kb"
+    },
+    {
+      "name": "@radix-ui/react-collapsible",
+      "reason": "Not used",
+      "size": "~8kb"
+    },
+    {
+      "name": "@radix-ui/react-context-menu",
+      "reason": "Not used",
+      "size": "~25kb"
+    },
+    {
+      "name": "@radix-ui/react-hover-card",
+      "reason": "Not used, tooltip covers use case",
+      "size": "~15kb"
+    },
+    {
+      "name": "@radix-ui/react-menubar",
+      "reason": "Not used",
+      "size": "~30kb"
+    },
+    {
+      "name": "@radix-ui/react-navigation-menu",
+      "reason": "Not used, simple nav sufficient",
+      "size": "~28kb"
+    },
+    {
+      "name": "@radix-ui/react-progress",
+      "reason": "Can use simple HTML progress or CSS",
+      "size": "~8kb"
+    },
+    {
+      "name": "@radix-ui/react-radio-group",
+      "reason": "Not used",
+      "size": "~12kb"
+    },
+    {
+      "name": "@radix-ui/react-scroll-area",
+      "reason": "Native overflow works fine",
+      "size": "~20kb"
+    },
+    {
+      "name": "@radix-ui/react-separator",
+      "reason": "CSS border/hr works fine",
+      "size": "~5kb"
+    },
+    {
+      "name": "@dnd-kit/core",
+      "reason": "Not using drag-and-drop features",
+      "size": "~45kb"
+    },
+    {
+      "name": "@dnd-kit/utilities",
+      "reason": "Not using drag-and-drop features",
+      "size": "~12kb"
+    },
+    {
+      "name": "embla-carousel-react",
+      "reason": "Carousel not used",
+      "size": "~35kb"
+    },
+    {
+      "name": "input-otp",
+      "reason": "Not used",
+      "size": "~8kb"
+    },
+    {
+      "name": "vaul",
+      "reason": "Drawer not used (used by drawer component)",
+      "size": "~25kb"
+    },
+    {
+      "name": "react-day-picker",
+      "reason": "Calendar not used",
+      "size": "~60kb"
+    },
+    {
+      "name": "date-fns",
+      "reason": "Only used with calendar which is unused",
+      "size": "~200kb (huge!)"
+    },
+    {
+      "name": "cmdk",
+      "reason": "Command palette not used",
+      "size": "~35kb"
+    },
+    {
+      "name": "react-resizable-panels",
+      "reason": "Not using resizable panels",
+      "size": "~40kb"
+    },
+    {
+      "name": "react-draggable",
+      "reason": "Not actively dragging UI elements",
+      "size": "~25kb"
+    }
+  ],
+  "newDependencies": [
+    {
+      "name": "@wavesurfer/react",
+      "version": "^1.0.0",
+      "purpose": "Replace custom WaveSurfer wrapper with official React integration",
+      "size": "~15kb",
+      "benefits": "Better React integration, hooks API, automatic cleanup"
+    },
+    {
+      "name": "react-h5-audio-player",
+      "version": "^3.9.0",
+      "purpose": "Professional audio player with controls, theming, playlist support",
+      "size": "~25kb",
+      "benefits": "Replaces custom player, better UX, keyboard shortcuts, customizable"
+    },
+    {
+      "name": "tone",
+      "version": "^15.0.0",
+      "purpose": "Advanced audio manipulation, scheduling, effects for stem processing",
+      "size": "~120kb",
+      "benefits": "Professional audio framework, replaces custom audio logic, gain control, effects"
+    },
+    {
+      "name": "nanoid",
+      "version": "^5.0.0",
+      "purpose": "Lightweight unique ID generation (replace custom ID logic)",
+      "size": "~2kb",
+      "benefits": "Tiny, fast, secure IDs"
+    }
+  ],
+  "consolidationOpportunities": [
+    {
+      "category": "Audio Components",
+      "candidates": [
+        "StemViewer",
+        "StemVisualizer",
+        "VolumeVisualizer",
+        "StickyPlayer"
+      ],
+      "recommendation": "Create unified AudioWorkstation component with modular sub-components",
+      "impact": "Reduce code duplication, share state more efficiently"
+    },
+    {
+      "category": "Layout Components",
+      "candidates": [
+        "AppLayout",
+        "MainLayout",
+        "ModuleContainer"
+      ],
+      "recommendation": "Single Layout component with slots pattern",
+      "impact": "Simpler layout hierarchy, easier maintenance"
+    },
+    {
+      "category": "Toast/Notification",
+      "candidates": [
+        "Toaster",
+        "Sonner",
+        "NotificationLog"
+      ],
+      "recommendation": "Keep only Sonner (modern, better UX), remove others",
+      "impact": "Single notification system, less confusion"
+    },
+    {
+      "category": "State Management",
+      "recommendation": "Audit Zustand stores, consolidate overlapping state",
+      "impact": "Clearer state ownership, less prop drilling"
+    }
+  ],
+  "estimatedReductions": {
+    "components": "93 → 35 (-62%)",
+    "uiComponents": "60 → 15 (-75%)",
+    "dependencies": "58 → 38 (-34%)",
+    "radixPackages": "29 → 9 (-69%)",
+    "bundleSize": "420MB → ~250MB node_modules (-40%)",
+    "productionBundle": "Estimated 2.5MB → 1.2MB (-52%)",
+    "linesOfCode": "~9000 → ~4500 (-50%)"
+  },
+  "refactoringStrategy": {
+    "phase1_cleanup": {
+      "priority": "HIGH",
+      "tasks": [
+        "Remove all unused UI components (35 files)",
+        "Remove unused dependencies (24 packages)",
+        "Remove unused page components (Dashboard, TrackLibrary, etc.)",
+        "Clean up unused imports across codebase"
+      ],
+      "estimatedTime": "4 hours",
+      "risk": "LOW - Just deletion"
+    },
+    "phase2_consolidation": {
+      "priority": "HIGH",
+      "tasks": [
+        "Merge layout components into single Layout pattern",
+        "Consolidate notification systems to Sonner only",
+        "Replace custom sidebar with simplified version",
+        "Simplify chart wrapper component"
+      ],
+      "estimatedTime": "6 hours",
+      "risk": "MEDIUM - Requires refactoring"
+    },
+    "phase3_modernization": {
+      "priority": "MEDIUM",
+      "tasks": [
+        "Replace custom WaveSurfer wrapper with @wavesurfer/react",
+        "Integrate react-h5-audio-player for StickyPlayer",
+        "Add Tone.js for advanced audio features",
+        "Migrate to modern React patterns (hooks, composition)"
+      ],
+      "estimatedTime": "8 hours",
+      "risk": "MEDIUM - New libraries"
+    },
+    "phase4_optimization": {
+      "priority": "LOW",
+      "tasks": [
+        "Implement code splitting for routes",
+        "Lazy load heavy components (StemViewer, etc.)",
+        "Optimize WaveSurfer rendering",
+        "Add bundle analysis and monitoring"
+      ],
+      "estimatedTime": "4 hours",
+      "risk": "LOW - Performance wins"
+    }
+  },
+  "recommendations": {
+    "immediate": [
+      "Remove all unused ShadCN UI components (save ~45 files, 24 dependencies)",
+      "Switch to Sonner only for notifications (remove Toaster duplicate)",
+      "Delete unused page components (Dashboard, TrackLibrary, SearchPage, ErrorPage)",
+      "Remove date-fns, react-day-picker, embla-carousel (save ~300kb)",
+      "Audit and remove @dnd-kit packages if not using drag-drop"
+    ],
+    "short_term": [
+      "Replace custom WaveSurfer wrapper with @wavesurfer/react",
+      "Consolidate layout components (AppLayout, MainLayout → Layout)",
+      "Simplify sidebar component (687 lines → ~150 lines)",
+      "Add Tone.js for professional audio handling",
+      "Implement lazy loading for StemViewer and heavy components"
+    ],
+    "long_term": [
+      "Consider migrating from Recharts to lighter alternative (visx, nivo) if charts are critical",
+      "Evaluate if WebMidi integration could use a lighter wrapper",
+      "Consider server-side rendering for better initial load",
+      "Implement proper code splitting strategy",
+      "Add bundle size monitoring to CI/CD"
+    ],
+    "architecture": [
+      "Adopt composition pattern over inheritance for components",
+      "Use compound components for complex UI (StemViewer, AudioProcessor)",
+      "Implement proper error boundaries",
+      "Add loading states and suspense boundaries",
+      "Consider extracting audio logic to custom hooks",
+      "Use Context API for audio state instead of prop drilling"
+    ]
+  },
+  "migrationGuide": {
+    "priority_order": [
+      "1. Remove unused files and dependencies (low risk, high impact)",
+      "2. Consolidate notifications to Sonner (medium risk, medium impact)",
+      "3. Simplify layout components (medium risk, high clarity)",
+      "4. Replace audio components with libraries (medium risk, high quality)",
+      "5. Optimize and code split (low risk, performance gains)"
+    ],
+    "testing_strategy": [
+      "Run existing tests after each phase",
+      "Manual testing of audio playback and stem separation",
+      "Visual regression testing for UI components",
+      "Performance testing with Lighthouse",
+      "Bundle size analysis after each change"
+    ],
+    "rollback_plan": [
+      "Git branches for each phase",
+      "Keep deleted components in archive branch for 30 days",
+      "Document all component replacements",
+      "Maintain version compatibility with API backend"
+    ]
+  },
+  "alchemy2_considerations": {
+    "keep_for_reference": [
+      "StemViewer architecture (good patterns for stem handling)",
+      "MIDI integration approach (WebMidi setup is solid)",
+      "Module system (ModuleRegistry pattern is interesting)",
+      "Audio context management (good separation of concerns)"
+    ],
+    "improve_in_alchemy2": [
+      "Simpler component hierarchy from the start",
+      "Fewer dependencies (start minimal, add as needed)",
+      "Better type safety (strict TypeScript)",
+      "More composition, less inheritance",
+      "Clearer state management strategy",
+      "Built-in code splitting and lazy loading"
+    ],
+    "avoid_in_alchemy2": [
+      "Installing entire ShadCN UI library (only take what's needed)",
+      "Heavy dependencies without evaluation (date-fns was 200kb unused)",
+      "Complex wrapper components that don't add value",
+      "Duplicate notification systems",
+      "Over-engineering simple layouts"
+    ]
+  },
+  "metrics": {
+    "before": {
+      "components": 93,
+      "dependencies": 58,
+      "bundle_size_estimate": "2.5MB",
+      "node_modules": "420MB",
+      "lines_of_code": 9000,
+      "unused_components": 45,
+      "unused_dependencies": 24
+    },
+    "after": {
+      "components": 35,
+      "dependencies": 38,
+      "bundle_size_estimate": "1.2MB",
+      "node_modules": "250MB",
+      "lines_of_code": 4500,
+      "unused_components": 0,
+      "unused_dependencies": 0
+    },
+    "impact": {
+      "initial_load_time": "-50% (estimated)",
+      "bundle_size": "-52%",
+      "node_modules": "-40%",
+      "maintenance_burden": "-60%",
+      "developer_experience": "+80%"
+    }
+  }
+}

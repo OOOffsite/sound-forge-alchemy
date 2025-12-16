@@ -1,0 +1,302 @@
+{
+  "totalModules": 196,
+  "circularDependencies": [
+    {
+      "from": "src/components/StemViewer/midiHandlers.ts",
+      "to": "src/components/StemViewer/StemViewer.tsx",
+      "cycle": [
+        {
+          "name": "src/components/StemViewer/StemViewer.tsx",
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ]
+        },
+        {
+          "name": "src/components/StemViewer/midiHandlers.ts",
+          "dependencyTypes": [
+            "local",
+            "import"
+          ]
+        }
+      ]
+    }
+  ],
+  "orphanModules": [
+    {
+      "module": "src/components/ui/sidebar.tsx",
+      "dependencies": 12
+    },
+    {
+      "module": "src/routes.tsx",
+      "dependencies": 8
+    },
+    {
+      "module": "src/components/ui/command.tsx",
+      "dependencies": 6
+    },
+    {
+      "module": "src/components/ui/form.tsx",
+      "dependencies": 6
+    },
+    {
+      "module": "src/components/ui/calendar.tsx",
+      "dependencies": 5
+    },
+    {
+      "module": "src/components/ui/carousel.tsx",
+      "dependencies": 5
+    },
+    {
+      "module": "src/components/ui/navigation-menu.tsx",
+      "dependencies": 5
+    },
+    {
+      "module": "src/components/ui/toggle-group.tsx",
+      "dependencies": 5
+    },
+    {
+      "module": "src/components/ui/accordion.tsx",
+      "dependencies": 4
+    },
+    {
+      "module": "src/components/ui/alert-dialog.tsx",
+      "dependencies": 4
+    },
+    {
+      "module": "src/components/ui/breadcrumb.tsx",
+      "dependencies": 4
+    },
+    {
+      "module": "src/components/ui/context-menu.tsx",
+      "dependencies": 4
+    },
+    {
+      "module": "src/components/ui/input-otp.tsx",
+      "dependencies": 4
+    },
+    {
+      "module": "src/components/ui/menubar.tsx",
+      "dependencies": 4
+    },
+    {
+      "module": "src/components/ui/radio-group.tsx",
+      "dependencies": 4
+    },
+    {
+      "module": "src/components/ui/alert.tsx",
+      "dependencies": 3
+    },
+    {
+      "module": "src/components/ui/avatar.tsx",
+      "dependencies": 3
+    },
+    {
+      "module": "src/components/ui/chart.tsx",
+      "dependencies": 3
+    },
+    {
+      "module": "src/components/ui/drawer.tsx",
+      "dependencies": 3
+    },
+    {
+      "module": "src/components/ui/hover-card.tsx",
+      "dependencies": 3
+    },
+    {
+      "module": "src/components/ui/popover.tsx",
+      "dependencies": 3
+    },
+    {
+      "module": "src/components/ui/progress.tsx",
+      "dependencies": 3
+    },
+    {
+      "module": "src/components/ui/resizable.tsx",
+      "dependencies": 3
+    },
+    {
+      "module": "src/components/ui/scroll-area.tsx",
+      "dependencies": 3
+    },
+    {
+      "module": "src/components/ui/table.tsx",
+      "dependencies": 2
+    },
+    {
+      "module": "src/components/ui/textarea.tsx",
+      "dependencies": 2
+    },
+    {
+      "module": "src/components/ui/collapsible.tsx",
+      "dependencies": 1
+    },
+    {
+      "module": "src/components/ui/use-toast.ts",
+      "dependencies": 1
+    },
+    {
+      "module": "src/hooks/useTheme.ts",
+      "dependencies": 1
+    },
+    {
+      "module": "src/lib/supabase.ts",
+      "dependencies": 1
+    },
+    {
+      "module": "src/setupTests.ts",
+      "dependencies": 1
+    },
+    {
+      "module": "src/vite-env.d.ts",
+      "dependencies": 1
+    }
+  ],
+  "highCoupling": [
+    {
+      "module": "src/App.tsx",
+      "dependencyCount": 19,
+      "dependencies": [
+        "src/components/ModuleSelector.tsx",
+        "src/components/ui/sonner.tsx",
+        "src/components/ui/toaster.tsx",
+        "src/components/ui/tooltip.tsx",
+        "src/context/ModuleRegistry.tsx",
+        "src/lib/logger.ts",
+        "src/lib/socket.tsx",
+        "src/modules/DebugConsoleModule.tsx",
+        "src/modules/NotificationLogModule.tsx",
+        "src/modules/StemVisualizerModule.tsx",
+        "src/modules/StickyPlayerModule.tsx",
+        "src/pages/About.tsx",
+        "src/pages/Home.tsx",
+        "src/pages/Index.tsx",
+        "src/pages/NotFound.tsx",
+        "src/styles/ModuleRegistry.css",
+        "node_modules/@tanstack/react-query/build/modern/index.d.ts",
+        "node_modules/react/index.js",
+        "node_modules/react-router-dom/dist/index.js"
+      ]
+    },
+    {
+      "module": "src/components/AudioProcessor.tsx",
+      "dependencyCount": 19,
+      "dependencies": [
+        "src/lib/api.ts",
+        "src/lib/logger.ts",
+        "src/lib/utils.ts",
+        "src/components/StepDisplay.tsx",
+        "src/components/TrackList.tsx",
+        "src/components/ui/button.tsx",
+        "src/components/ui/card.tsx",
+        "src/components/ui/dialog.tsx",
+        "src/components/ui/label.tsx",
+        "src/components/ui/separator.tsx",
+        "src/components/ui/slider.tsx",
+        "src/components/ui/sonner.tsx",
+        "src/components/ui/switch.tsx",
+        "src/components/ui/tabs.tsx",
+        "src/components/ui/tooltip.tsx",
+        "node_modules/@radix-ui/react-select/dist/index.d.mts",
+        "node_modules/@tanstack/react-query/build/modern/index.d.ts",
+        "node_modules/lucide-react/dist/esm/lucide-react.js",
+        "node_modules/react/index.js"
+      ]
+    },
+    {
+      "module": "src/layouts/MainLayout.tsx",
+      "dependencyCount": 12,
+      "dependencies": [
+        "src/components/TrackList.tsx",
+        "src/components/ui/DebugConsoleOverlay.tsx",
+        "src/components/ui/NotificationLog.tsx",
+        "src/components/ui/OverlayGrid.tsx",
+        "src/components/ui/SettingsDropdown.tsx",
+        "src/components/ui/sonner.tsx",
+        "src/components/ui/StickyPlayer.tsx",
+        "src/components/ui/toaster.tsx",
+        "src/components/ui/tooltip.tsx",
+        "node_modules/lucide-react/dist/esm/lucide-react.js",
+        "node_modules/react/index.js",
+        "node_modules/react-router-dom/dist/index.js"
+      ]
+    },
+    {
+      "module": "src/pages/Index.tsx",
+      "dependencyCount": 12,
+      "dependencies": [
+        "src/components/AudioProcessor.tsx",
+        "src/components/ExportStemsPanel.tsx",
+        "src/components/InputPanel.tsx",
+        "src/components/PlaylistPanel.tsx",
+        "src/components/StemVisualizer.tsx",
+        "src/components/TrackList.tsx",
+        "src/components/ui/sonner.tsx",
+        "src/layouts/MainLayout.tsx",
+        "src/lib/api.ts",
+        "src/lib/socket.tsx",
+        "node_modules/@tanstack/react-query/build/modern/index.d.ts",
+        "node_modules/react/index.js"
+      ]
+    },
+    {
+      "module": "src/components/StemViewer/StemViewer.tsx",
+      "dependencyCount": 12,
+      "dependencies": [
+        "src/lib/logger.ts",
+        "src/lib/utils.ts",
+        "src/components/ui/button.tsx",
+        "src/components/ui/card.tsx",
+        "src/components/ui/select.tsx",
+        "src/components/ui/slider.tsx",
+        "src/components/ui/toggle.tsx",
+        "src/components/StemViewer/midiHandlers.ts",
+        "node_modules/react/index.js",
+        "node_modules/wavesurfer.js/dist/wavesurfer.esm.js",
+        "node_modules/wavesurfer.js/dist/plugins/regions.js",
+        "node_modules/webmidi/dist/cjs/webmidi.cjs.d.ts"
+      ]
+    },
+    {
+      "module": "src/components/ui/sidebar.tsx",
+      "dependencyCount": 12,
+      "dependencies": [
+        "src/hooks/use-mobile.tsx",
+        "src/lib/utils.ts",
+        "src/components/ui/button.tsx",
+        "src/components/ui/input.tsx",
+        "src/components/ui/separator.tsx",
+        "src/components/ui/sheet.tsx",
+        "src/components/ui/skeleton.tsx",
+        "src/components/ui/tooltip.tsx",
+        "node_modules/@radix-ui/react-slot/dist/index.d.mts",
+        "node_modules/class-variance-authority/dist/index.mjs",
+        "node_modules/lucide-react/dist/esm/lucide-react.js",
+        "node_modules/react/index.js"
+      ]
+    },
+    {
+      "module": "src/components/ExportStemsPanel.tsx",
+      "dependencyCount": 11,
+      "dependencies": [
+        "src/lib/logger.ts",
+        "src/components/ui/button.tsx",
+        "src/components/ui/card.tsx",
+        "src/components/ui/checkbox.tsx",
+        "src/components/ui/label.tsx",
+        "src/components/ui/select.tsx",
+        "src/components/ui/separator.tsx",
+        "src/components/ui/sonner.tsx",
+        "src/components/ui/switch.tsx",
+        "node_modules/lucide-react/dist/esm/lucide-react.js",
+        "node_modules/react/index.js"
+      ]
+    }
+  ],
+  "moduleMetrics": {
+    "averageDependencies": "2.69",
+    "maxDependencies": 19,
+    "minDependencies": 0
+  }
+}

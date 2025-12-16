@@ -1,0 +1,643 @@
+{
+  "timestamp": "2025-12-16T06:30:00.000Z",
+  "agentId": "backend-services-analysis",
+  "project": "sound-forge-alchemy",
+  "status": "completed",
+
+  "executive_summary": {
+    "total_services": 6,
+    "total_endpoints": 23,
+    "total_lines_of_code": 2415,
+    "shared_dependencies_count": 8,
+    "consolidation_opportunity": "HIGH",
+    "recommended_architecture": "Unified Backend Service + Supabase Functions",
+    "reduction_potential": "6 services → 2 services (67% reduction)"
+  },
+
+  "service_analysis": {
+    "api-gateway": {
+      "lines_of_code": 115,
+      "endpoints": 2,
+      "purpose": "HTTP proxy router to other microservices",
+      "business_logic": "NONE - pure routing",
+      "boilerplate_percentage": 100,
+      "dependencies": [
+        "@supabase/supabase-js",
+        "cors",
+        "express",
+        "http-proxy-middleware",
+        "ioredis",
+        "morgan",
+        "winston"
+      ],
+      "unique_dependencies": ["@supabase/supabase-js", "http-proxy-middleware", "morgan"],
+      "endpoints_detail": [
+        "GET /health",
+        "GET /api/config"
+      ],
+      "elimination_strategy": "ELIMINATE - Replace with direct frontend calls to consolidated service"
+    },
+
+    "spotify": {
+      "lines_of_code": 912,
+      "endpoints": 3,
+      "purpose": "Spotify API integration + spotdl metadata fetching",
+      "business_logic": "Medium - Spotify API interaction, URL parsing, data transformation",
+      "boilerplate_percentage": 40,
+      "dependencies": [
+        "express",
+        "cors",
+        "dotenv",
+        "axios",
+        "ioredis",
+        "winston",
+        "uuid",
+        "joi",
+        "spotify-web-api-node"
+      ],
+      "unique_dependencies": ["spotify-web-api-node"],
+      "endpoints_detail": [
+        "GET /health",
+        "POST /fetch",
+        "GET /fetch/stream"
+      ],
+      "consolidation_strategy": "MERGE into unified backend OR move to Supabase Edge Function"
+    },
+
+    "download": {
+      "lines_of_code": 295,
+      "endpoints": 3,
+      "purpose": "spotdl wrapper for downloading tracks from YouTube",
+      "business_logic": "Low - child_process wrapper, job queue management",
+      "boilerplate_percentage": 60,
+      "dependencies": [
+        "express",
+        "cors",
+        "dotenv",
+        "axios",
+        "ioredis",
+        "winston",
+        "uuid",
+        "joi",
+        "child_process"
+      ],
+      "unique_dependencies": ["child_process"],
+      "endpoints_detail": [
+        "GET /health",
+        "POST /track",
+        "GET /job/:jobId",
+        "GET /track/:trackId"
+      ],
+      "consolidation_strategy": "MERGE into unified backend - requires Python spotdl binary"
+    },
+
+    "processing": {
+      "lines_of_code": 609,
+      "endpoints": 5,
+      "purpose": "Demucs wrapper for audio stem separation",
+      "business_logic": "Medium - Demucs orchestration, model management, file handling",
+      "boilerplate_percentage": 50,
+      "dependencies": [
+        "express",
+        "cors",
+        "dotenv",
+        "axios",
+        "ioredis",
+        "winston",
+        "uuid",
+        "joi",
+        "child_process"
+      ],
+      "unique_dependencies": [],
+      "endpoints_detail": [
+        "GET /health",
+        "GET /models",
+        "POST /models/download",
+        "POST /separate",
+        "GET /job/:jobId",
+        "GET /track/:trackId"
+      ],
+      "consolidation_strategy": "MERGE into unified backend - requires Python Demucs + PyTorch"
+    },
+
+    "analysis": {
+      "lines_of_code": 410,
+      "endpoints": 3,
+      "purpose": "librosa wrapper for audio analysis",
+      "business_logic": "Low - child_process wrapper for Python analyzer script",
+      "boilerplate_percentage": 70,
+      "dependencies": [
+        "express",
+        "cors",
+        "dotenv",
+        "axios",
+        "ioredis",
+        "winston",
+        "uuid",
+        "joi",
+        "child_process"
+      ],
+      "unique_dependencies": [],
+      "endpoints_detail": [
+        "GET /health",
+        "POST /analyze",
+        "GET /job/:jobId",
+        "GET /track/:trackId"
+      ],
+      "consolidation_strategy": "MERGE into unified backend OR move to client-side Web Audio API"
+    },
+
+    "websocket": {
+      "lines_of_code": 74,
+      "endpoints": 1,
+      "purpose": "Socket.IO server for real-time progress updates",
+      "business_logic": "Low - message broadcasting from Redis pubsub",
+      "boilerplate_percentage": 80,
+      "dependencies": [
+        "express",
+        "cors",
+        "dotenv",
+        "axios",
+        "ioredis",
+        "winston",
+        "uuid",
+        "joi",
+        "socket.io"
+      ],
+      "unique_dependencies": ["socket.io"],
+      "endpoints_detail": [
+        "GET /health",
+        "WS /socket.io"
+      ],
+      "consolidation_strategy": "MERGE into unified backend OR replace with Supabase Realtime"
+    }
+  },
+
+  "shared_dependencies": {
+    "all_services": [
+      "express",
+      "cors",
+      "ioredis",
+      "winston",
+      "uuid",
+      "joi",
+      "axios",
+      "dotenv"
+    ],
+    "duplication_analysis": {
+      "express": "Used in all 6 services - massive duplication",
+      "cors": "Used in all 6 services - unnecessary with single origin",
+      "ioredis": "Used in all 6 services - Redis connection overhead",
+      "winston": "Used in all 6 services - logging duplication",
+      "uuid": "Used in 5 services - job ID generation",
+      "joi": "Used in 5 services - validation duplication",
+      "axios": "Used in 5 services - HTTP client duplication",
+      "child_process": "Used in 3 services - Python process spawning"
+    },
+    "unique_dependencies": {
+      "@supabase/supabase-js": ["api-gateway"],
+      "http-proxy-middleware": ["api-gateway"],
+      "morgan": ["api-gateway"],
+      "spotify-web-api-node": ["spotify"],
+      "socket.io": ["websocket"]
+    }
+  },
+
+  "integration_patterns": {
+    "communication": {
+      "http": {
+        "pattern": "REST API calls between services via API Gateway",
+        "services": ["api-gateway → spotify, download, processing, analysis"],
+        "overhead": "High - network latency, serialization, gateway routing"
+      },
+      "redis_pubsub": {
+        "pattern": "Redis pub/sub for event-driven communication",
+        "services": ["download → processing", "processing → websocket"],
+        "channels": [
+          "download:job:completed",
+          "processing:job:created",
+          "processing:job:updated",
+          "analysis:job:created",
+          "broadcast:all"
+        ],
+        "usage": "Event broadcasting, job status updates"
+      }
+    },
+    "state_management": {
+      "redis": {
+        "pattern": "Redis as shared state store",
+        "key_prefixes": [
+          "download:job:{jobId}",
+          "processing:job:{jobId}",
+          "analysis:job:{jobId}",
+          "track:{trackId}:jobs",
+          "track:{trackId}:analysis",
+          "spotify:{type}:{id}"
+        ],
+        "purpose": "Job queue, caching, track metadata"
+      }
+    },
+    "error_handling": {
+      "consistency": "Inconsistent - each service implements own error patterns",
+      "logging": "Winston in all services - excessive duplication",
+      "retries": "Not implemented - manual retry logic needed"
+    }
+  },
+
+  "consolidation_plan": {
+    "strategy": "AGGRESSIVE CONSOLIDATION",
+    "target_architecture": {
+      "unified_backend": {
+        "name": "sound-forge-unified-api",
+        "framework": "Express.js",
+        "features": [
+          "All API endpoints in single service",
+          "Single Redis connection",
+          "Shared logging, validation, error handling",
+          "Python subprocess management (spotdl, Demucs, librosa)",
+          "Socket.IO for real-time updates"
+        ],
+        "estimated_loc": 1200,
+        "reduction": "50% code reduction through deduplication"
+      },
+      "supabase_functions": {
+        "candidates": [
+          {
+            "name": "spotify-metadata-fetch",
+            "current_service": "spotify",
+            "runtime": "Deno",
+            "rationale": "Pure API wrapper, no state, can be serverless",
+            "complexity": "Low"
+          },
+          {
+            "name": "realtime-events",
+            "current_service": "websocket",
+            "replacement": "Supabase Realtime",
+            "rationale": "Built-in WebSocket support, no custom code needed",
+            "complexity": "Trivial - use Supabase SDK"
+          }
+        ]
+      }
+    },
+
+    "services_to_eliminate": [
+      {
+        "service": "api-gateway",
+        "reason": "Unnecessary proxy layer - frontend can call unified API directly",
+        "savings": "115 LOC, 1 Docker container, network hop eliminated"
+      },
+      {
+        "service": "websocket",
+        "reason": "Replace with Supabase Realtime or Socket.IO in unified backend",
+        "savings": "74 LOC, 1 Docker container"
+      }
+    ],
+
+    "services_to_merge": [
+      {
+        "services": ["download", "processing", "analysis"],
+        "target": "unified-backend",
+        "reason": "All use same patterns (Express + Redis + child_process)",
+        "shared_code": [
+          "Job queue management",
+          "Redis pub/sub",
+          "Progress tracking",
+          "Error handling"
+        ],
+        "savings": "60% boilerplate reduction"
+      },
+      {
+        "services": ["spotify"],
+        "target": "unified-backend OR supabase-edge-function",
+        "reason": "Stateless API wrapper, can be serverless or merged",
+        "decision": "Merge into unified backend for simplicity"
+      }
+    ],
+
+    "implementation_phases": {
+      "phase_1": {
+        "name": "Create unified backend skeleton",
+        "tasks": [
+          "Create new Express app with modular route structure",
+          "Implement shared middleware (logging, CORS, error handling)",
+          "Setup single Redis connection pool",
+          "Configure Socket.IO for real-time events"
+        ],
+        "duration": "2-3 days"
+      },
+      "phase_2": {
+        "name": "Migrate core features",
+        "tasks": [
+          "Migrate spotify routes and logic",
+          "Migrate download routes and job management",
+          "Migrate processing routes and Demucs integration",
+          "Migrate analysis routes and librosa integration",
+          "Implement unified job queue system"
+        ],
+        "duration": "3-5 days"
+      },
+      "phase_3": {
+        "name": "Testing and deployment",
+        "tasks": [
+          "Integration tests for all endpoints",
+          "Load testing for concurrent jobs",
+          "Docker image optimization",
+          "Update docker-compose to remove old services",
+          "Frontend integration updates"
+        ],
+        "duration": "2-3 days"
+      }
+    }
+  },
+
+  "supabase_opportunities": {
+    "database": {
+      "tables": [
+        {
+          "name": "tracks",
+          "fields": ["id", "spotify_url", "title", "artist", "album_art", "duration", "created_at"],
+          "purpose": "Track metadata storage",
+          "replaces": "Redis track metadata"
+        },
+        {
+          "name": "jobs",
+          "fields": ["id", "track_id", "type", "status", "progress", "error", "result", "created_at", "updated_at"],
+          "purpose": "Job queue and status tracking",
+          "replaces": "Redis job management"
+        },
+        {
+          "name": "stems",
+          "fields": ["id", "track_id", "type", "file_path", "file_size", "created_at"],
+          "purpose": "Stem file metadata",
+          "replaces": "File system scanning"
+        },
+        {
+          "name": "analysis_results",
+          "fields": ["id", "track_id", "tempo", "key", "energy", "features", "created_at"],
+          "purpose": "Audio analysis results",
+          "replaces": "Redis analysis cache"
+        }
+      ],
+      "benefits": [
+        "Persistent storage (no Redis TTL issues)",
+        "SQL queries for complex filtering",
+        "Built-in auth and RLS",
+        "Automatic API generation"
+      ]
+    },
+
+    "storage": {
+      "buckets": [
+        {
+          "name": "audio-files",
+          "purpose": "Original downloaded tracks",
+          "policy": "Private - user-owned",
+          "replaces": "/app/audio_data volume"
+        },
+        {
+          "name": "stems",
+          "purpose": "Separated stem files",
+          "policy": "Private - user-owned",
+          "replaces": "/app/audio_data/{trackId}/stems"
+        }
+      ],
+      "benefits": [
+        "CDN-backed file serving",
+        "Automatic signed URLs",
+        "No Docker volume management",
+        "Scalable storage"
+      ]
+    },
+
+    "realtime": {
+      "channels": [
+        {
+          "name": "job_updates",
+          "events": ["job:created", "job:progress", "job:completed", "job:error"],
+          "replaces": "websocket service + Redis pub/sub"
+        }
+      ],
+      "benefits": [
+        "Built-in WebSocket support",
+        "No custom server needed",
+        "Presence tracking",
+        "Row-level subscriptions"
+      ]
+    },
+
+    "edge_functions": {
+      "candidates": [
+        {
+          "name": "fetch-spotify-metadata",
+          "runtime": "Deno",
+          "code_size": "~200 LOC",
+          "replaces": "spotify service /fetch endpoint",
+          "benefits": ["Serverless", "Auto-scaling", "No container overhead"]
+        }
+      ]
+    },
+
+    "auth": {
+      "current": "None - public API",
+      "proposed": "Supabase Auth",
+      "benefits": [
+        "User accounts",
+        "Track ownership",
+        "Usage limits per user",
+        "Social login"
+      ]
+    }
+  },
+
+  "recommended_final_architecture": {
+    "services": [
+      {
+        "name": "sound-forge-unified-api",
+        "type": "Node.js Express",
+        "responsibilities": [
+          "All API endpoints (Spotify, download, processing, analysis)",
+          "Job queue management",
+          "Python subprocess orchestration (spotdl, Demucs, librosa)",
+          "Socket.IO real-time events",
+          "File upload/download to Supabase Storage"
+        ],
+        "dependencies": [
+          "express",
+          "socket.io",
+          "@supabase/supabase-js",
+          "spotify-web-api-node",
+          "winston",
+          "joi"
+        ],
+        "estimated_loc": 1200,
+        "container_image_size": "~500MB (Node + Python + ML models)"
+      },
+      {
+        "name": "supabase",
+        "type": "Backend-as-a-Service",
+        "responsibilities": [
+          "PostgreSQL database (tracks, jobs, stems, analysis)",
+          "Storage buckets (audio files)",
+          "Realtime subscriptions (job updates)",
+          "Authentication (future)",
+          "Edge Functions (optional - Spotify metadata)"
+        ],
+        "managed_service": true
+      }
+    ],
+
+    "removed_services": [
+      "api-gateway",
+      "spotify",
+      "download",
+      "processing",
+      "analysis",
+      "websocket"
+    ],
+
+    "infrastructure_simplification": {
+      "before": {
+        "containers": 7,
+        "services": 6,
+        "network_hops": 3,
+        "redis_connections": 12
+      },
+      "after": {
+        "containers": 1,
+        "services": 2,
+        "network_hops": 1,
+        "redis_connections": 0
+      }
+    }
+  },
+
+  "migration_risks": {
+    "high_risk": [
+      {
+        "risk": "Python dependency management",
+        "mitigation": "Docker multi-stage build with both Node and Python runtimes",
+        "effort": "Medium"
+      },
+      {
+        "risk": "Concurrent job processing",
+        "mitigation": "Implement proper job queue with worker threads or Bull MQ",
+        "effort": "Medium"
+      }
+    ],
+    "medium_risk": [
+      {
+        "risk": "File storage migration to Supabase",
+        "mitigation": "Gradual migration with fallback to local storage",
+        "effort": "Low-Medium"
+      },
+      {
+        "risk": "WebSocket to Supabase Realtime migration",
+        "mitigation": "Frontend update to use Supabase Realtime SDK",
+        "effort": "Low"
+      }
+    ],
+    "low_risk": [
+      {
+        "risk": "API endpoint consolidation",
+        "mitigation": "Maintain same endpoint paths, just different base URL",
+        "effort": "Low"
+      }
+    ]
+  },
+
+  "performance_impact": {
+    "latency": {
+      "before": "3 network hops (frontend → gateway → service → service)",
+      "after": "1 network hop (frontend → unified API)",
+      "improvement": "~50-70ms reduction per request"
+    },
+    "throughput": {
+      "before": "Limited by gateway proxy overhead",
+      "after": "Direct connection, higher throughput",
+      "improvement": "~2x request capacity"
+    },
+    "resource_usage": {
+      "before": {
+        "memory": "~600MB (6 Node processes + Redis)",
+        "cpu": "~0.3 cores idle (6 processes)",
+        "containers": 7
+      },
+      "after": {
+        "memory": "~200MB (1 Node process)",
+        "cpu": "~0.05 cores idle",
+        "containers": 1
+      },
+      "improvement": "~70% resource reduction"
+    }
+  },
+
+  "cost_analysis": {
+    "development_effort": {
+      "consolidation": "7-10 days",
+      "testing": "3-5 days",
+      "deployment": "1-2 days",
+      "total": "11-17 days"
+    },
+    "ongoing_maintenance": {
+      "before": "6 services × maintenance = high complexity",
+      "after": "1 unified service = low complexity",
+      "reduction": "~80% maintenance effort"
+    },
+    "infrastructure_cost": {
+      "before": "7 containers, complex networking",
+      "after": "1 container + Supabase (free tier sufficient)",
+      "reduction": "Minimal - already self-hosted"
+    }
+  },
+
+  "next_steps": [
+    {
+      "step": 1,
+      "action": "Review and approve consolidation plan",
+      "owner": "Project Lead",
+      "duration": "1 day"
+    },
+    {
+      "step": 2,
+      "action": "Setup Supabase project and schema",
+      "owner": "Backend Developer",
+      "duration": "1 day"
+    },
+    {
+      "step": 3,
+      "action": "Create unified-backend skeleton",
+      "owner": "Backend Developer",
+      "duration": "2 days"
+    },
+    {
+      "step": 4,
+      "action": "Migrate services one-by-one",
+      "owner": "Backend Developer",
+      "duration": "5 days"
+    },
+    {
+      "step": 5,
+      "action": "Integration testing",
+      "owner": "QA + Backend Developer",
+      "duration": "3 days"
+    },
+    {
+      "step": 6,
+      "action": "Frontend integration updates",
+      "owner": "Frontend Developer",
+      "duration": "2 days"
+    },
+    {
+      "step": 7,
+      "action": "Production deployment",
+      "owner": "DevOps",
+      "duration": "1 day"
+    },
+    {
+      "step": 8,
+      "action": "Decommission old services",
+      "owner": "DevOps",
+      "duration": "1 day"
+    }
+  ]
+}

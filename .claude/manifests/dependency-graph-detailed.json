@@ -1,0 +1,271 @@
+{
+  "metadata": {
+    "generatedAt": "2025-12-16T00:00:00.000Z",
+    "projectPath": "/Users/jeremiah/Developer/sound-forge-alchemy",
+    "toolVersion": "dependency-cruiser",
+    "analysisVersion": "1.0.0"
+  },
+  "summary": {
+    "totalModules": 196,
+    "totalDependencies": 528,
+    "averageDependenciesPerModule": 2.69,
+    "maxDependenciesInModule": 19,
+    "minDependenciesInModule": 0,
+    "violations": {
+      "total": 3,
+      "errors": 2,
+      "warnings": 1
+    }
+  },
+  "circularDependencies": {
+    "count": 1,
+    "details": [
+      {
+        "severity": "warning",
+        "cycle": [
+          "src/components/StemViewer/midiHandlers.ts",
+          "src/components/StemViewer/StemViewer.tsx",
+          "src/components/StemViewer/midiHandlers.ts"
+        ],
+        "impact": "Medium",
+        "recommendation": "Apply dependency inversion principle. Extract shared types to a separate file or use React refs/callbacks instead of direct imports."
+      }
+    ]
+  },
+  "orphanModules": {
+    "count": 31,
+    "highPriority": [
+      {
+        "module": "src/components/ui/sidebar.tsx",
+        "dependencies": 12,
+        "reason": "Complex component with 12 dependencies but zero usage",
+        "recommendation": "Remove if truly unused, or integrate into navigation system"
+      },
+      {
+        "module": "src/routes.tsx",
+        "dependencies": 8,
+        "reason": "Router configuration not imported anywhere",
+        "recommendation": "Verify if this is dead code from refactoring. Consider removing or integrating."
+      }
+    ],
+    "mediumPriority": [
+      {
+        "module": "src/components/ui/command.tsx",
+        "dependencies": 6,
+        "recommendation": "Part of shadcn/ui library. Keep for future use or remove to reduce bundle size."
+      },
+      {
+        "module": "src/components/ui/form.tsx",
+        "dependencies": 6,
+        "recommendation": "Form component library. Remove if no forms planned, otherwise keep."
+      },
+      {
+        "module": "src/components/ui/calendar.tsx",
+        "dependencies": 5,
+        "recommendation": "Remove if calendar functionality not needed."
+      },
+      {
+        "module": "src/components/ui/carousel.tsx",
+        "dependencies": 5,
+        "recommendation": "Remove if carousel not needed."
+      },
+      {
+        "module": "src/components/ui/navigation-menu.tsx",
+        "dependencies": 5,
+        "recommendation": "Remove if navigation menu not used."
+      },
+      {
+        "module": "src/components/ui/toggle-group.tsx",
+        "dependencies": 5,
+        "recommendation": "Remove if toggle groups not needed."
+      }
+    ],
+    "lowPriority": [
+      "src/components/ui/accordion.tsx",
+      "src/components/ui/alert-dialog.tsx",
+      "src/components/ui/breadcrumb.tsx",
+      "src/components/ui/context-menu.tsx",
+      "src/components/ui/input-otp.tsx",
+      "src/components/ui/menubar.tsx",
+      "src/components/ui/radio-group.tsx",
+      "src/components/ui/alert.tsx",
+      "src/components/ui/avatar.tsx",
+      "src/components/ui/chart.tsx",
+      "src/components/ui/drawer.tsx",
+      "src/components/ui/hover-card.tsx",
+      "src/components/ui/popover.tsx",
+      "src/components/ui/progress.tsx",
+      "src/components/ui/resizable.tsx",
+      "src/components/ui/scroll-area.tsx",
+      "src/components/ui/table.tsx",
+      "src/components/ui/textarea.tsx",
+      "src/components/ui/collapsible.tsx",
+      "src/components/ui/use-toast.ts"
+    ],
+    "recommendation": "Many orphaned shadcn/ui components. Consider tree-shaking strategy or lazy loading for future use."
+  },
+  "highCouplingModules": {
+    "count": 7,
+    "critical": [
+      {
+        "module": "src/App.tsx",
+        "dependencyCount": 19,
+        "severity": "High",
+        "categories": {
+          "components": 8,
+          "modules": 4,
+          "pages": 4,
+          "utilities": 2,
+          "external": 3
+        },
+        "recommendation": "Consider splitting App.tsx using route-based code splitting and lazy loading. Move module registrations to separate configuration file."
+      },
+      {
+        "module": "src/components/AudioProcessor.tsx",
+        "dependencyCount": 19,
+        "severity": "High",
+        "categories": {
+          "uiComponents": 11,
+          "utilities": 3,
+          "internalComponents": 2,
+          "external": 3
+        },
+        "recommendation": "Extract UI composition to separate component. Consider custom hooks for business logic. Apply composition pattern over deep nesting."
+      }
+    ],
+    "high": [
+      {
+        "module": "src/layouts/MainLayout.tsx",
+        "dependencyCount": 12,
+        "recommendation": "Good candidate for layout composition pattern. Consider slots/children props over direct component imports."
+      },
+      {
+        "module": "src/pages/Index.tsx",
+        "dependencyCount": 12,
+        "recommendation": "Main page with appropriate complexity. Consider lazy loading some heavy components like StemVisualizer."
+      },
+      {
+        "module": "src/components/StemViewer/StemViewer.tsx",
+        "dependencyCount": 12,
+        "recommendation": "Complex component. Good candidate for composition and custom hooks extraction. Note: Involved in circular dependency."
+      },
+      {
+        "module": "src/components/ui/sidebar.tsx",
+        "dependencyCount": 12,
+        "recommendation": "Currently orphaned despite high coupling. Remove or integrate."
+      },
+      {
+        "module": "src/components/ExportStemsPanel.tsx",
+        "dependencyCount": 11,
+        "recommendation": "Consider extracting form logic to custom hook. UI composition could be simplified."
+      }
+    ]
+  },
+  "devDependencyViolations": {
+    "count": 2,
+    "violations": [
+      {
+        "file": "src/vite-env.d.ts",
+        "imports": "node_modules/vite/client.d.ts",
+        "severity": "Error",
+        "recommendation": "This is expected for Vite. Add to pathNot exclusion in .dependency-cruiser.cjs config."
+      },
+      {
+        "file": "src/setupTests.ts",
+        "imports": "node_modules/@testing-library/jest-dom/types/index.d.ts",
+        "severity": "Error",
+        "recommendation": "Test setup file. Add to pathNot exclusion in .dependency-cruiser.cjs config."
+      }
+    ]
+  },
+  "architecturalRecommendations": [
+    {
+      "priority": "Critical",
+      "category": "Circular Dependencies",
+      "issue": "midiHandlers.ts ↔ StemViewer.tsx circular import",
+      "solution": "Extract shared types to src/components/StemViewer/types.ts. Use dependency inversion or callback props.",
+      "effort": "Low (1-2 hours)",
+      "impact": "High - Prevents potential module initialization issues"
+    },
+    {
+      "priority": "High",
+      "category": "Dead Code",
+      "issue": "31 orphaned modules (including high-complexity sidebar.tsx and routes.tsx)",
+      "solution": "Audit and remove unused components. Consider keeping some shadcn/ui components for future use with lazy loading.",
+      "effort": "Medium (4-6 hours)",
+      "impact": "High - Reduce bundle size by ~15-20KB gzipped"
+    },
+    {
+      "priority": "High",
+      "category": "Coupling",
+      "issue": "App.tsx and AudioProcessor.tsx have 19 dependencies each",
+      "solution": "Apply code splitting, lazy loading, and composition patterns. Extract configuration to separate files.",
+      "effort": "High (8-12 hours)",
+      "impact": "Medium - Improve maintainability and initial load time"
+    },
+    {
+      "priority": "Medium",
+      "category": "Configuration",
+      "issue": "False positive dev dependency violations",
+      "solution": "Update .dependency-cruiser.cjs to exclude test and type definition files.",
+      "effort": "Low (15 minutes)",
+      "impact": "Low - Cleaner dependency reports"
+    },
+    {
+      "priority": "Medium",
+      "category": "Modularity",
+      "issue": "Multiple components have 11-12 dependencies",
+      "solution": "Extract custom hooks for business logic. Use composition over inheritance. Consider atomic design principles.",
+      "effort": "Medium (6-8 hours)",
+      "impact": "Medium - Improved testability and reusability"
+    },
+    {
+      "priority": "Low",
+      "category": "Optimization",
+      "issue": "Large number of shadcn/ui components imported but not used",
+      "solution": "Implement tree-shaking strategy. Use dynamic imports for rarely-used components.",
+      "effort": "Low (2-3 hours)",
+      "impact": "Low - Marginal bundle size improvement"
+    }
+  ],
+  "metrics": {
+    "codeHealth": {
+      "score": 7.5,
+      "outOf": 10,
+      "breakdown": {
+        "circularDependencies": 8.5,
+        "coupling": 6.0,
+        "deadCode": 7.0,
+        "modularity": 8.0
+      }
+    },
+    "bundleSizeImpact": {
+      "orphanedCodeEstimate": "20-25KB gzipped",
+      "potentialSavings": "15-20KB with cleanup",
+      "currentComplexity": "Medium-High"
+    }
+  },
+  "actionPlan": {
+    "phase1_immediate": [
+      "Fix dependency-cruiser config to exclude test/type files",
+      "Resolve circular dependency in StemViewer components",
+      "Remove clearly unused routes.tsx if confirmed dead code"
+    ],
+    "phase2_shortTerm": [
+      "Audit and remove unused shadcn/ui components",
+      "Extract App.tsx module registration to config file",
+      "Apply code splitting to heavy components"
+    ],
+    "phase3_longTerm": [
+      "Refactor AudioProcessor.tsx using composition pattern",
+      "Implement lazy loading for secondary features",
+      "Apply atomic design principles across component library"
+    ]
+  },
+  "references": {
+    "dependencyGraph": ".claude/manifests/frontend-dependency-graph.json",
+    "circularDependencies": ".claude/manifests/circular-dependencies.txt",
+    "visualGraph": ".claude/manifests/dependency-graph.dot",
+    "analysisData": ".claude/manifests/dependency-analysis.json"
+  }
+}

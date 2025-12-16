@@ -1,0 +1,1170 @@
+{
+  "project": "Alchemy2 Migration",
+  "version": "2.0.0",
+  "generated": "2025-12-16",
+  "totalPhases": 8,
+  "estimatedWeeks": 8,
+  "parallelizable": true,
+  "phases": [
+    {
+      "phase": 1,
+      "name": "Foundation",
+      "weeks": 1,
+      "priority": "critical",
+      "dependencies": [],
+      "tasks": [
+        {
+          "id": "P1-T1",
+          "name": "Create alchemy2 directory structure",
+          "description": "Create complete alchemy2/ directory with frontend/, supabase/, processing/, docs/, scripts/",
+          "assignable": "agent",
+          "agent_type": "setup-agent",
+          "estimated_hours": 2,
+          "parallel": false,
+          "dependencies": [],
+          "deliverables": [
+            "alchemy2/ directory structure",
+            "README.md",
+            ".gitignore",
+            ".env.example"
+          ],
+          "commands": [
+            "mkdir -p alchemy2/{frontend,supabase,processing,docs,scripts}",
+            "mkdir -p alchemy2/frontend/{src,public}",
+            "mkdir -p alchemy2/frontend/src/{components,lib,hooks,types,pages}",
+            "mkdir -p alchemy2/supabase/{migrations,functions}",
+            "mkdir -p alchemy2/processing/{src,tests}"
+          ]
+        },
+        {
+          "id": "P1-T2",
+          "name": "Initialize Supabase project (local)",
+          "description": "Set up local Supabase instance with CLI",
+          "assignable": "agent",
+          "agent_type": "supabase-agent",
+          "estimated_hours": 1,
+          "parallel": false,
+          "dependencies": ["P1-T1"],
+          "deliverables": [
+            "supabase/config.toml",
+            "Local Supabase running"
+          ],
+          "commands": [
+            "cd alchemy2/supabase && supabase init",
+            "supabase start"
+          ]
+        },
+        {
+          "id": "P1-T3",
+          "name": "Create database schema",
+          "description": "Write SQL migrations for tracks, jobs, stems tables with RLS",
+          "assignable": "agent",
+          "agent_type": "database-agent",
+          "estimated_hours": 4,
+          "parallel": true,
+          "dependencies": ["P1-T2"],
+          "deliverables": [
+            "supabase/migrations/20251216000001_initial_schema.sql",
+            "supabase/migrations/20251216000002_tracks_table.sql",
+            "supabase/migrations/20251216000003_jobs_table.sql",
+            "supabase/migrations/20251216000004_stems_table.sql",
+            "supabase/migrations/20251216000005_rls_policies.sql"
+          ],
+          "validation": [
+            "supabase db push",
+            "supabase db test"
+          ]
+        },
+        {
+          "id": "P1-T4",
+          "name": "Configure Supabase Storage",
+          "description": "Create buckets for tracks, stems, cache with RLS policies",
+          "assignable": "agent",
+          "agent_type": "storage-agent",
+          "estimated_hours": 2,
+          "parallel": true,
+          "dependencies": ["P1-T2"],
+          "deliverables": [
+            "supabase/migrations/20251216000006_storage_buckets.sql",
+            "Storage policies configured"
+          ],
+          "validation": [
+            "Test upload to tracks bucket",
+            "Test RLS policy enforcement"
+          ]
+        },
+        {
+          "id": "P1-T5",
+          "name": "Configure Supabase Auth",
+          "description": "Set up auth providers (email, OAuth)",
+          "assignable": "agent",
+          "agent_type": "auth-agent",
+          "estimated_hours": 2,
+          "parallel": true,
+          "dependencies": ["P1-T2"],
+          "deliverables": [
+            "Auth providers configured",
+            "Email templates customized"
+          ],
+          "validation": [
+            "Test email signup/login",
+            "Test OAuth flow"
+          ]
+        },
+        {
+          "id": "P1-T6",
+          "name": "Initialize frontend with Vite",
+          "description": "Create React + TypeScript + Vite frontend",
+          "assignable": "agent",
+          "agent_type": "frontend-agent",
+          "estimated_hours": 3,
+          "parallel": true,
+          "dependencies": ["P1-T1"],
+          "deliverables": [
+            "frontend/package.json",
+            "frontend/vite.config.ts",
+            "frontend/tsconfig.json",
+            "frontend/src/main.tsx"
+          ],
+          "commands": [
+            "cd alchemy2/frontend && npm create vite@latest . -- --template react-ts",
+            "npm install"
+          ]
+        },
+        {
+          "id": "P1-T7",
+          "name": "Install frontend dependencies",
+          "description": "Install Supabase, TanStack Query, Zustand, shadcn/ui",
+          "assignable": "agent",
+          "agent_type": "frontend-agent",
+          "estimated_hours": 2,
+          "parallel": false,
+          "dependencies": ["P1-T6"],
+          "deliverables": [
+            "Updated package.json with all dependencies"
+          ],
+          "commands": [
+            "npm install @supabase/supabase-js @tanstack/react-query zustand",
+            "npm install -D tailwindcss postcss autoprefixer",
+            "npx tailwindcss init -p",
+            "npx shadcn-ui@latest init"
+          ]
+        },
+        {
+          "id": "P1-T8",
+          "name": "Create Supabase client",
+          "description": "Create configured Supabase client in frontend/src/lib/supabase.ts",
+          "assignable": "agent",
+          "agent_type": "frontend-agent",
+          "estimated_hours": 1,
+          "parallel": false,
+          "dependencies": ["P1-T7"],
+          "deliverables": [
+            "frontend/src/lib/supabase.ts"
+          ]
+        },
+        {
+          "id": "P1-T9",
+          "name": "Create basic UI layout",
+          "description": "Header, sidebar, footer components",
+          "assignable": "agent",
+          "agent_type": "frontend-agent",
+          "estimated_hours": 4,
+          "parallel": true,
+          "dependencies": ["P1-T7"],
+          "deliverables": [
+            "frontend/src/components/layout/Header.tsx",
+            "frontend/src/components/layout/Sidebar.tsx",
+            "frontend/src/components/layout/Footer.tsx"
+          ]
+        },
+        {
+          "id": "P1-T10",
+          "name": "Implement authentication flow",
+          "description": "Login, signup, logout components with Supabase Auth",
+          "assignable": "agent",
+          "agent_type": "frontend-agent",
+          "estimated_hours": 6,
+          "parallel": true,
+          "dependencies": ["P1-T8"],
+          "deliverables": [
+            "frontend/src/components/auth/LoginForm.tsx",
+            "frontend/src/components/auth/SignupForm.tsx",
+            "frontend/src/hooks/useAuth.ts"
+          ],
+          "validation": [
+            "User can sign up",
+            "User can log in",
+            "User can log out",
+            "Protected routes work"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": 2,
+      "name": "Edge Functions",
+      "weeks": 1,
+      "priority": "critical",
+      "dependencies": [1],
+      "tasks": [
+        {
+          "id": "P2-T1",
+          "name": "Create Edge Function: spotify-fetch",
+          "description": "Fetch Spotify playlist/track metadata and store in database",
+          "assignable": "agent",
+          "agent_type": "edge-function-agent",
+          "estimated_hours": 6,
+          "parallel": false,
+          "dependencies": ["P1-T3"],
+          "deliverables": [
+            "supabase/functions/spotify-fetch/index.ts",
+            "supabase/functions/_shared/spotify-client.ts"
+          ],
+          "validation": [
+            "Can fetch Spotify playlist",
+            "Tracks stored in database",
+            "Response time < 500ms"
+          ]
+        },
+        {
+          "id": "P2-T2",
+          "name": "Create Edge Function: track-download",
+          "description": "Create download job and call Processing Service",
+          "assignable": "agent",
+          "agent_type": "edge-function-agent",
+          "estimated_hours": 4,
+          "parallel": true,
+          "dependencies": ["P1-T3"],
+          "deliverables": [
+            "supabase/functions/track-download/index.ts"
+          ],
+          "validation": [
+            "Job created in database",
+            "Processing Service called",
+            "Returns job ID"
+          ]
+        },
+        {
+          "id": "P2-T3",
+          "name": "Create Edge Function: track-process",
+          "description": "Create processing job and call Processing Service",
+          "assignable": "agent",
+          "agent_type": "edge-function-agent",
+          "estimated_hours": 4,
+          "parallel": true,
+          "dependencies": ["P1-T3"],
+          "deliverables": [
+            "supabase/functions/track-process/index.ts"
+          ],
+          "validation": [
+            "Job created in database",
+            "Processing Service called",
+            "Returns job ID"
+          ]
+        },
+        {
+          "id": "P2-T4",
+          "name": "Create shared Edge Function utilities",
+          "description": "Types, validation, Supabase client setup",
+          "assignable": "agent",
+          "agent_type": "edge-function-agent",
+          "estimated_hours": 3,
+          "parallel": true,
+          "dependencies": [],
+          "deliverables": [
+            "supabase/functions/_shared/types.ts",
+            "supabase/functions/_shared/validation.ts",
+            "supabase/functions/_shared/supabase-client.ts"
+          ]
+        },
+        {
+          "id": "P2-T5",
+          "name": "Write Edge Function tests",
+          "description": "Unit tests for all Edge Functions",
+          "assignable": "agent",
+          "agent_type": "testing-agent",
+          "estimated_hours": 4,
+          "parallel": true,
+          "dependencies": ["P2-T1", "P2-T2", "P2-T3"],
+          "deliverables": [
+            "supabase/functions/spotify-fetch/test.ts",
+            "supabase/functions/track-download/test.ts",
+            "supabase/functions/track-process/test.ts"
+          ],
+          "validation": [
+            "All tests passing"
+          ]
+        },
+        {
+          "id": "P2-T6",
+          "name": "Deploy Edge Functions locally",
+          "description": "Deploy and verify all Edge Functions",
+          "assignable": "agent",
+          "agent_type": "deployment-agent",
+          "estimated_hours": 2,
+          "parallel": false,
+          "dependencies": ["P2-T1", "P2-T2", "P2-T3"],
+          "commands": [
+            "supabase functions deploy spotify-fetch",
+            "supabase functions deploy track-download",
+            "supabase functions deploy track-process"
+          ],
+          "validation": [
+            "All functions deployed",
+            "Health checks passing"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": 3,
+      "name": "Processing Service",
+      "weeks": 2,
+      "priority": "critical",
+      "dependencies": [1],
+      "tasks": [
+        {
+          "id": "P3-T1",
+          "name": "Create FastAPI application structure",
+          "description": "Set up FastAPI app with routers, services, models",
+          "assignable": "agent",
+          "agent_type": "backend-agent",
+          "estimated_hours": 4,
+          "parallel": false,
+          "dependencies": ["P1-T1"],
+          "deliverables": [
+            "processing/src/main.py",
+            "processing/src/routers/process.py",
+            "processing/src/routers/health.py",
+            "processing/requirements.txt"
+          ]
+        },
+        {
+          "id": "P3-T2",
+          "name": "Implement spotdl integration",
+          "description": "Create service for downloading tracks with spotdl",
+          "assignable": "agent",
+          "agent_type": "backend-agent",
+          "estimated_hours": 6,
+          "parallel": true,
+          "dependencies": ["P3-T1"],
+          "deliverables": [
+            "processing/src/services/spotdl_service.py"
+          ],
+          "validation": [
+            "Can download track from Spotify URL",
+            "File saved to /tmp"
+          ]
+        },
+        {
+          "id": "P3-T3",
+          "name": "Implement Demucs integration",
+          "description": "Create service for audio separation with Demucs",
+          "assignable": "agent",
+          "agent_type": "backend-agent",
+          "estimated_hours": 8,
+          "parallel": true,
+          "dependencies": ["P3-T1"],
+          "deliverables": [
+            "processing/src/services/demucs_service.py"
+          ],
+          "validation": [
+            "Can separate track into stems",
+            "Stems saved to /tmp"
+          ]
+        },
+        {
+          "id": "P3-T4",
+          "name": "Create Supabase Storage service",
+          "description": "Upload/download files from Supabase Storage",
+          "assignable": "agent",
+          "agent_type": "backend-agent",
+          "estimated_hours": 4,
+          "parallel": true,
+          "dependencies": ["P3-T1"],
+          "deliverables": [
+            "processing/src/services/storage_service.py"
+          ],
+          "validation": [
+            "Can upload file to Storage",
+            "Can download file from Storage",
+            "Can generate signed URL"
+          ]
+        },
+        {
+          "id": "P3-T5",
+          "name": "Implement background job processor",
+          "description": "Process download and separation jobs",
+          "assignable": "agent",
+          "agent_type": "backend-agent",
+          "estimated_hours": 8,
+          "parallel": false,
+          "dependencies": ["P3-T2", "P3-T3", "P3-T4"],
+          "deliverables": [
+            "processing/src/workers/job_processor.py"
+          ],
+          "validation": [
+            "Can process download job",
+            "Can process separation job",
+            "Job status updates in database",
+            "Realtime updates sent"
+          ]
+        },
+        {
+          "id": "P3-T6",
+          "name": "Create Pydantic models",
+          "description": "Request/response models for API",
+          "assignable": "agent",
+          "agent_type": "backend-agent",
+          "estimated_hours": 2,
+          "parallel": true,
+          "dependencies": ["P3-T1"],
+          "deliverables": [
+            "processing/src/models/schemas.py"
+          ]
+        },
+        {
+          "id": "P3-T7",
+          "name": "Add health check endpoint",
+          "description": "Health and readiness checks",
+          "assignable": "agent",
+          "agent_type": "backend-agent",
+          "estimated_hours": 1,
+          "parallel": true,
+          "dependencies": ["P3-T1"],
+          "deliverables": [
+            "processing/src/routers/health.py"
+          ],
+          "validation": [
+            "GET /health returns 200",
+            "Reports Demucs availability"
+          ]
+        },
+        {
+          "id": "P3-T8",
+          "name": "Dockerize Processing Service",
+          "description": "Create Dockerfile with python:3.11-slim",
+          "assignable": "agent",
+          "agent_type": "docker-agent",
+          "estimated_hours": 3,
+          "parallel": true,
+          "dependencies": ["P3-T1"],
+          "deliverables": [
+            "processing/Dockerfile",
+            "docker-compose.yml updated"
+          ],
+          "validation": [
+            "Docker build successful",
+            "Container starts without errors"
+          ]
+        },
+        {
+          "id": "P3-T9",
+          "name": "Test end-to-end processing",
+          "description": "Integration tests for full processing flow",
+          "assignable": "agent",
+          "agent_type": "testing-agent",
+          "estimated_hours": 6,
+          "parallel": false,
+          "dependencies": ["P3-T5", "P3-T8"],
+          "deliverables": [
+            "processing/tests/test_integration.py"
+          ],
+          "validation": [
+            "Can download track",
+            "Can separate track",
+            "Files uploaded to Storage",
+            "Database updated correctly"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": 4,
+      "name": "Frontend - Core Features",
+      "weeks": 1.5,
+      "priority": "high",
+      "dependencies": [2, 3],
+      "tasks": [
+        {
+          "id": "P4-T1",
+          "name": "Create Track Library component",
+          "description": "List, search, filter user tracks",
+          "assignable": "agent",
+          "agent_type": "frontend-agent",
+          "estimated_hours": 8,
+          "parallel": false,
+          "dependencies": ["P1-T10"],
+          "deliverables": [
+            "frontend/src/components/tracks/TrackLibrary.tsx",
+            "frontend/src/components/tracks/TrackCard.tsx",
+            "frontend/src/components/tracks/TrackSearch.tsx",
+            "frontend/src/hooks/useTracks.ts"
+          ],
+          "validation": [
+            "Displays user tracks",
+            "Search works",
+            "Filter works"
+          ]
+        },
+        {
+          "id": "P4-T2",
+          "name": "Create Spotify Import component",
+          "description": "Import playlist from Spotify",
+          "assignable": "agent",
+          "agent_type": "frontend-agent",
+          "estimated_hours": 6,
+          "parallel": true,
+          "dependencies": ["P2-T1"],
+          "deliverables": [
+            "frontend/src/components/tracks/SpotifyImport.tsx"
+          ],
+          "validation": [
+            "Can enter Spotify URL",
+            "Fetches tracks via Edge Function",
+            "Displays imported tracks"
+          ]
+        },
+        {
+          "id": "P4-T3",
+          "name": "Create Audio Player component",
+          "description": "WaveSurfer.js integration for playback",
+          "assignable": "agent",
+          "agent_type": "frontend-agent",
+          "estimated_hours": 10,
+          "parallel": true,
+          "dependencies": ["P1-T7"],
+          "deliverables": [
+            "frontend/src/components/audio/AudioPlayer.tsx",
+            "frontend/src/components/audio/WaveformVisualizer.tsx",
+            "frontend/src/components/audio/PlaybackControls.tsx",
+            "frontend/src/components/audio/VolumeControls.tsx",
+            "frontend/src/hooks/useAudioPlayer.ts"
+          ],
+          "validation": [
+            "Can play audio",
+            "Waveform displays",
+            "Controls work"
+          ]
+        },
+        {
+          "id": "P4-T4",
+          "name": "Create Job Status component",
+          "description": "Real-time job progress updates",
+          "assignable": "agent",
+          "agent_type": "frontend-agent",
+          "estimated_hours": 6,
+          "parallel": true,
+          "dependencies": ["P1-T8"],
+          "deliverables": [
+            "frontend/src/components/jobs/JobStatus.tsx",
+            "frontend/src/components/jobs/JobProgress.tsx",
+            "frontend/src/components/jobs/JobHistory.tsx",
+            "frontend/src/hooks/useRealtime.ts"
+          ],
+          "validation": [
+            "Displays job status",
+            "Updates in real-time",
+            "Shows progress"
+          ]
+        },
+        {
+          "id": "P4-T5",
+          "name": "Create Stem Viewer component",
+          "description": "Grid of stems with individual playback",
+          "assignable": "agent",
+          "agent_type": "frontend-agent",
+          "estimated_hours": 8,
+          "parallel": true,
+          "dependencies": ["P4-T3"],
+          "deliverables": [
+            "frontend/src/components/stems/StemViewer.tsx",
+            "frontend/src/components/stems/StemCard.tsx"
+          ],
+          "validation": [
+            "Displays stems",
+            "Can play individual stems"
+          ]
+        },
+        {
+          "id": "P4-T6",
+          "name": "Create Dashboard page",
+          "description": "Main dashboard with recent tracks, jobs",
+          "assignable": "agent",
+          "agent_type": "frontend-agent",
+          "estimated_hours": 6,
+          "parallel": true,
+          "dependencies": ["P4-T1", "P4-T4"],
+          "deliverables": [
+            "frontend/src/pages/Dashboard.tsx"
+          ]
+        },
+        {
+          "id": "P4-T7",
+          "name": "Create Library page",
+          "description": "Full track library view",
+          "assignable": "agent",
+          "agent_type": "frontend-agent",
+          "estimated_hours": 4,
+          "parallel": true,
+          "dependencies": ["P4-T1"],
+          "deliverables": [
+            "frontend/src/pages/Library.tsx"
+          ]
+        },
+        {
+          "id": "P4-T8",
+          "name": "Create Studio page",
+          "description": "Stem viewer and mixer",
+          "assignable": "agent",
+          "agent_type": "frontend-agent",
+          "estimated_hours": 4,
+          "parallel": true,
+          "dependencies": ["P4-T5"],
+          "deliverables": [
+            "frontend/src/pages/Studio.tsx"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": 5,
+      "name": "Frontend - Advanced Features",
+      "weeks": 1.5,
+      "priority": "medium",
+      "dependencies": [4],
+      "tasks": [
+        {
+          "id": "P5-T1",
+          "name": "Implement BPM detection",
+          "description": "Client-side BPM detection with Tone.js",
+          "assignable": "agent",
+          "agent_type": "frontend-agent",
+          "estimated_hours": 8,
+          "parallel": false,
+          "dependencies": ["P4-T3"],
+          "deliverables": [
+            "frontend/src/lib/audio-analysis.ts",
+            "frontend/src/components/analysis/BPMDetector.tsx"
+          ],
+          "validation": [
+            "BPM detected within ±5 BPM accuracy"
+          ]
+        },
+        {
+          "id": "P5-T2",
+          "name": "Implement key detection",
+          "description": "Client-side key detection with Tone.js",
+          "assignable": "agent",
+          "agent_type": "frontend-agent",
+          "estimated_hours": 8,
+          "parallel": true,
+          "dependencies": ["P4-T3"],
+          "deliverables": [
+            "frontend/src/components/analysis/KeyDetector.tsx"
+          ],
+          "validation": [
+            "Key detected for common songs"
+          ]
+        },
+        {
+          "id": "P5-T3",
+          "name": "Implement waveform analysis",
+          "description": "Client-side waveform analysis",
+          "assignable": "agent",
+          "agent_type": "frontend-agent",
+          "estimated_hours": 6,
+          "parallel": true,
+          "dependencies": ["P4-T3"],
+          "deliverables": [
+            "frontend/src/components/analysis/WaveformAnalysis.tsx"
+          ]
+        },
+        {
+          "id": "P5-T4",
+          "name": "Create Stem Mixer component",
+          "description": "Mix stems together with Web Audio API",
+          "assignable": "agent",
+          "agent_type": "frontend-agent",
+          "estimated_hours": 10,
+          "parallel": false,
+          "dependencies": ["P4-T5"],
+          "deliverables": [
+            "frontend/src/components/stems/StemMixer.tsx"
+          ],
+          "validation": [
+            "Can mix stems",
+            "Volume per stem works",
+            "Pan per stem works"
+          ]
+        },
+        {
+          "id": "P5-T5",
+          "name": "Create Export component",
+          "description": "Download stems and mixed audio",
+          "assignable": "agent",
+          "agent_type": "frontend-agent",
+          "estimated_hours": 6,
+          "parallel": true,
+          "dependencies": ["P5-T4"],
+          "deliverables": [
+            "frontend/src/components/stems/StemExport.tsx"
+          ],
+          "validation": [
+            "Can download stems",
+            "Can download mixed audio"
+          ]
+        },
+        {
+          "id": "P5-T6",
+          "name": "Create visualizations",
+          "description": "Frequency spectrum, waveform",
+          "assignable": "agent",
+          "agent_type": "frontend-agent",
+          "estimated_hours": 8,
+          "parallel": true,
+          "dependencies": ["P4-T3"],
+          "deliverables": [
+            "frontend/src/components/audio/SpectrumVisualizer.tsx"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": 6,
+      "name": "Testing & Optimization",
+      "weeks": 1.5,
+      "priority": "high",
+      "dependencies": [5],
+      "tasks": [
+        {
+          "id": "P6-T1",
+          "name": "Write frontend unit tests",
+          "description": "Vitest tests for components and hooks",
+          "assignable": "agent",
+          "agent_type": "testing-agent",
+          "estimated_hours": 12,
+          "parallel": false,
+          "dependencies": ["P5-T5"],
+          "deliverables": [
+            "frontend/src/**/*.test.tsx",
+            "Test coverage > 80%"
+          ]
+        },
+        {
+          "id": "P6-T2",
+          "name": "Write E2E tests",
+          "description": "Playwright tests for critical flows",
+          "assignable": "agent",
+          "agent_type": "testing-agent",
+          "estimated_hours": 8,
+          "parallel": true,
+          "dependencies": ["P5-T5"],
+          "deliverables": [
+            "frontend/e2e/**/*.spec.ts"
+          ],
+          "validation": [
+            "Login flow",
+            "Import playlist",
+            "Process track",
+            "Play stems"
+          ]
+        },
+        {
+          "id": "P6-T3",
+          "name": "Write backend tests",
+          "description": "pytest tests for Processing Service",
+          "assignable": "agent",
+          "agent_type": "testing-agent",
+          "estimated_hours": 8,
+          "parallel": true,
+          "dependencies": ["P3-T9"],
+          "deliverables": [
+            "processing/tests/**/*.py",
+            "Test coverage > 80%"
+          ]
+        },
+        {
+          "id": "P6-T4",
+          "name": "Optimize bundle size",
+          "description": "Code splitting, lazy loading, tree shaking",
+          "assignable": "agent",
+          "agent_type": "performance-agent",
+          "estimated_hours": 6,
+          "parallel": true,
+          "dependencies": ["P5-T5"],
+          "deliverables": [
+            "Updated vite.config.ts",
+            "Bundle size < 300KB gzipped"
+          ]
+        },
+        {
+          "id": "P6-T5",
+          "name": "Image optimization",
+          "description": "Compress images, use WebP",
+          "assignable": "agent",
+          "agent_type": "performance-agent",
+          "estimated_hours": 2,
+          "parallel": true,
+          "dependencies": [],
+          "deliverables": [
+            "Optimized images in public/"
+          ]
+        },
+        {
+          "id": "P6-T6",
+          "name": "Add accessibility features",
+          "description": "ARIA labels, keyboard navigation, screen reader support",
+          "assignable": "agent",
+          "agent_type": "accessibility-agent",
+          "estimated_hours": 8,
+          "parallel": true,
+          "dependencies": ["P5-T5"],
+          "deliverables": [
+            "WCAG 2.1 AA compliant",
+            "Lighthouse accessibility > 90"
+          ]
+        },
+        {
+          "id": "P6-T7",
+          "name": "Performance audit",
+          "description": "Lighthouse audit and optimization",
+          "assignable": "agent",
+          "agent_type": "performance-agent",
+          "estimated_hours": 4,
+          "parallel": false,
+          "dependencies": ["P6-T4"],
+          "validation": [
+            "Lighthouse Performance > 90",
+            "Time to Interactive < 1.5s",
+            "First Contentful Paint < 1s"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": 7,
+      "name": "Production Deployment",
+      "weeks": 1,
+      "priority": "critical",
+      "dependencies": [6],
+      "tasks": [
+        {
+          "id": "P7-T1",
+          "name": "Create Supabase production project",
+          "description": "Set up production Supabase project",
+          "assignable": "agent",
+          "agent_type": "deployment-agent",
+          "estimated_hours": 2,
+          "parallel": false,
+          "dependencies": ["P6-T7"],
+          "deliverables": [
+            "Production Supabase project created"
+          ]
+        },
+        {
+          "id": "P7-T2",
+          "name": "Apply production migrations",
+          "description": "Push all migrations to production",
+          "assignable": "agent",
+          "agent_type": "deployment-agent",
+          "estimated_hours": 1,
+          "parallel": false,
+          "dependencies": ["P7-T1"],
+          "commands": [
+            "supabase link --project-ref <prod-ref>",
+            "supabase db push"
+          ]
+        },
+        {
+          "id": "P7-T3",
+          "name": "Deploy Edge Functions to production",
+          "description": "Deploy all Edge Functions",
+          "assignable": "agent",
+          "agent_type": "deployment-agent",
+          "estimated_hours": 2,
+          "parallel": false,
+          "dependencies": ["P7-T1"],
+          "commands": [
+            "supabase functions deploy spotify-fetch",
+            "supabase functions deploy track-download",
+            "supabase functions deploy track-process"
+          ]
+        },
+        {
+          "id": "P7-T4",
+          "name": "Deploy Processing Service",
+          "description": "Deploy to Railway or Fly.io",
+          "assignable": "agent",
+          "agent_type": "deployment-agent",
+          "estimated_hours": 4,
+          "parallel": true,
+          "dependencies": ["P6-T3"],
+          "deliverables": [
+            "Processing Service deployed",
+            "Environment variables configured"
+          ]
+        },
+        {
+          "id": "P7-T5",
+          "name": "Deploy Frontend",
+          "description": "Deploy to Vercel or Netlify",
+          "assignable": "agent",
+          "agent_type": "deployment-agent",
+          "estimated_hours": 2,
+          "parallel": true,
+          "dependencies": ["P6-T4"],
+          "deliverables": [
+            "Frontend deployed",
+            "Environment variables configured"
+          ]
+        },
+        {
+          "id": "P7-T6",
+          "name": "Set up error tracking",
+          "description": "Configure Sentry for frontend and backend",
+          "assignable": "agent",
+          "agent_type": "monitoring-agent",
+          "estimated_hours": 3,
+          "parallel": true,
+          "dependencies": ["P7-T4", "P7-T5"],
+          "deliverables": [
+            "Sentry configured",
+            "Error tracking active"
+          ]
+        },
+        {
+          "id": "P7-T7",
+          "name": "Set up analytics",
+          "description": "Configure Google Analytics or Plausible",
+          "assignable": "agent",
+          "agent_type": "monitoring-agent",
+          "estimated_hours": 2,
+          "parallel": true,
+          "dependencies": ["P7-T5"],
+          "deliverables": [
+            "Analytics configured"
+          ]
+        },
+        {
+          "id": "P7-T8",
+          "name": "Set up uptime monitoring",
+          "description": "Configure uptime monitoring (UptimeRobot, Better Uptime)",
+          "assignable": "agent",
+          "agent_type": "monitoring-agent",
+          "estimated_hours": 1,
+          "parallel": true,
+          "dependencies": ["P7-T5"],
+          "deliverables": [
+            "Uptime monitoring configured"
+          ]
+        },
+        {
+          "id": "P7-T9",
+          "name": "Production smoke tests",
+          "description": "Verify all features work in production",
+          "assignable": "agent",
+          "agent_type": "testing-agent",
+          "estimated_hours": 4,
+          "parallel": false,
+          "dependencies": ["P7-T3", "P7-T4", "P7-T5"],
+          "validation": [
+            "Can sign up/login",
+            "Can import playlist",
+            "Can process track",
+            "Can play stems",
+            "Monitoring active"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": 8,
+      "name": "Data Migration",
+      "weeks": 1,
+      "priority": "medium",
+      "dependencies": [7],
+      "tasks": [
+        {
+          "id": "P8-T1",
+          "name": "Export v1 database data",
+          "description": "Export tracks, users from v1 PostgreSQL",
+          "assignable": "agent",
+          "agent_type": "migration-agent",
+          "estimated_hours": 3,
+          "parallel": false,
+          "dependencies": ["P7-T9"],
+          "deliverables": [
+            "scripts/export-v1-data.sql",
+            "data/v1-export.json"
+          ]
+        },
+        {
+          "id": "P8-T2",
+          "name": "Export v1 audio files",
+          "description": "Copy audio files from v1 Docker volumes",
+          "assignable": "agent",
+          "agent_type": "migration-agent",
+          "estimated_hours": 4,
+          "parallel": true,
+          "dependencies": ["P7-T9"],
+          "deliverables": [
+            "scripts/export-v1-files.sh",
+            "Audio files in /tmp/v1-migration/"
+          ]
+        },
+        {
+          "id": "P8-T3",
+          "name": "Transform data for v2",
+          "description": "Map v1 schema to v2 schema",
+          "assignable": "agent",
+          "agent_type": "migration-agent",
+          "estimated_hours": 6,
+          "parallel": false,
+          "dependencies": ["P8-T1"],
+          "deliverables": [
+            "scripts/transform-data.py",
+            "data/v2-import.json"
+          ]
+        },
+        {
+          "id": "P8-T4",
+          "name": "Import data to Supabase",
+          "description": "Insert data into Supabase database",
+          "assignable": "agent",
+          "agent_type": "migration-agent",
+          "estimated_hours": 4,
+          "parallel": false,
+          "dependencies": ["P8-T3"],
+          "deliverables": [
+            "scripts/import-to-supabase.py",
+            "Data imported"
+          ]
+        },
+        {
+          "id": "P8-T5",
+          "name": "Upload files to Supabase Storage",
+          "description": "Upload audio files to Storage buckets",
+          "assignable": "agent",
+          "agent_type": "migration-agent",
+          "estimated_hours": 6,
+          "parallel": false,
+          "dependencies": ["P8-T2", "P8-T4"],
+          "deliverables": [
+            "scripts/upload-files.py",
+            "Files in Storage"
+          ]
+        },
+        {
+          "id": "P8-T6",
+          "name": "Verify migration",
+          "description": "Data integrity checks",
+          "assignable": "agent",
+          "agent_type": "testing-agent",
+          "estimated_hours": 4,
+          "parallel": false,
+          "dependencies": ["P8-T4", "P8-T5"],
+          "validation": [
+            "All tracks migrated",
+            "All files accessible",
+            "No data loss"
+          ]
+        },
+        {
+          "id": "P8-T7",
+          "name": "User acceptance testing",
+          "description": "Verify users can access migrated data",
+          "assignable": "human",
+          "estimated_hours": 4,
+          "parallel": false,
+          "dependencies": ["P8-T6"],
+          "validation": [
+            "Users can log in",
+            "Users can see their tracks",
+            "Users can play stems"
+          ]
+        }
+      ]
+    }
+  ],
+  "agent_types": {
+    "setup-agent": {
+      "description": "Creates directory structures and initial files",
+      "skills": ["file_management", "scripting"]
+    },
+    "supabase-agent": {
+      "description": "Configures Supabase projects and services",
+      "skills": ["supabase_cli", "database", "storage", "auth"]
+    },
+    "database-agent": {
+      "description": "Creates database schemas, migrations, RLS policies",
+      "skills": ["sql", "postgresql", "supabase"]
+    },
+    "storage-agent": {
+      "description": "Configures Supabase Storage buckets and policies",
+      "skills": ["storage", "rls", "security"]
+    },
+    "auth-agent": {
+      "description": "Configures authentication providers",
+      "skills": ["auth", "oauth", "jwt"]
+    },
+    "frontend-agent": {
+      "description": "Builds React components and frontend features",
+      "skills": ["react", "typescript", "tailwind", "vite"]
+    },
+    "edge-function-agent": {
+      "description": "Creates Supabase Edge Functions in Deno/TypeScript",
+      "skills": ["deno", "typescript", "edge_functions"]
+    },
+    "backend-agent": {
+      "description": "Builds Python backend services",
+      "skills": ["python", "fastapi", "demucs", "spotdl"]
+    },
+    "docker-agent": {
+      "description": "Creates Dockerfiles and docker-compose configurations",
+      "skills": ["docker", "containerization"]
+    },
+    "testing-agent": {
+      "description": "Writes unit, integration, and E2E tests",
+      "skills": ["testing", "vitest", "pytest", "playwright"]
+    },
+    "performance-agent": {
+      "description": "Optimizes bundle size, images, performance",
+      "skills": ["optimization", "webpack", "vite", "lighthouse"]
+    },
+    "accessibility-agent": {
+      "description": "Adds ARIA labels, keyboard navigation, screen reader support",
+      "skills": ["accessibility", "wcag", "aria"]
+    },
+    "deployment-agent": {
+      "description": "Deploys services to production",
+      "skills": ["deployment", "ci_cd", "vercel", "railway"]
+    },
+    "monitoring-agent": {
+      "description": "Sets up error tracking, analytics, uptime monitoring",
+      "skills": ["monitoring", "sentry", "analytics"]
+    },
+    "migration-agent": {
+      "description": "Migrates data from v1 to v2",
+      "skills": ["data_migration", "sql", "python"]
+    }
+  },
+  "summary": {
+    "total_tasks": 67,
+    "parallelizable_tasks": 42,
+    "sequential_tasks": 25,
+    "total_estimated_hours": 314,
+    "total_estimated_weeks": 8,
+    "agent_types_required": 15,
+    "critical_path": [
+      "P1: Foundation → P2: Edge Functions → P3: Processing Service → P4: Frontend Core → P6: Testing → P7: Production"
+    ],
+    "success_metrics": {
+      "backend_reduction": "67%",
+      "docker_reduction": "75%",
+      "cost_savings": "86%",
+      "performance_improvement": "70%"
+    }
+  }
+}

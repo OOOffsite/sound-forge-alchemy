@@ -1,0 +1,623 @@
+{
+  "analysis": {
+    "generatedAt": "2025-12-16T00:00:00Z",
+    "agentId": "python-stack-analysis",
+    "projectPath": "/Users/jeremiah/Developer/sound-forge-alchemy",
+    "summary": "Comprehensive analysis of Python integrations in Sound Forge Alchemy"
+  },
+  "pythonTools": {
+    "demucs": {
+      "version": "4.0.1",
+      "service": "processing-service",
+      "repository": "https://github.com/facebookresearch/demucs",
+      "purpose": "AI-powered music source separation",
+      "invocations": [
+        {
+          "file": "backend/processing/src/index.js",
+          "line": 436,
+          "function": "processSeparation()",
+          "command": "python -m demucs.separate",
+          "arguments": {
+            "model": "htdemucs | htdemucs_ft | htdemucs_6s | hdemucs_mmi",
+            "output": "MP3 @ 320kbps",
+            "device": "cuda or cpu based on CUDA_VISIBLE_DEVICES",
+            "twoStems": "Optional: vocals vs accompaniment only"
+          },
+          "progressTracking": "Regex match on stdout: /Separated track (\\d+)\\/(\\d+)/",
+          "errorHandling": "Exit code check, stderr logging"
+        },
+        {
+          "file": "backend/processing/src/models.js",
+          "line": 60,
+          "function": "getInstalledModels()",
+          "command": "python -m demucs.separate -h",
+          "purpose": "List available models from help output"
+        },
+        {
+          "file": "backend/processing/src/models.js",
+          "line": 108,
+          "function": "downloadModel()",
+          "command": "python -c 'import torch; from demucs.pretrained import get_model; get_model(modelName)'",
+          "purpose": "Download pretrained model via PyTorch Hub"
+        }
+      ],
+      "modelManagement": {
+        "availableModels": [
+          {
+            "id": "htdemucs",
+            "name": "HT Demucs",
+            "description": "High performance hybrid transformer model",
+            "default": true,
+            "size": "~150MB"
+          },
+          {
+            "id": "htdemucs_ft",
+            "name": "HT Demucs Fine-tuned",
+            "description": "Fine-tuned hybrid transformer model",
+            "size": "~150MB"
+          },
+          {
+            "id": "htdemucs_6s",
+            "name": "HT Demucs 6-stem",
+            "description": "Hybrid transformer model with 6 source separation",
+            "size": "~200MB"
+          },
+          {
+            "id": "hdemucs_mmi",
+            "name": "HDemucs MMI",
+            "description": "Hybrid Demucs with musical multi-instrument separation",
+            "size": "~150MB"
+          }
+        ],
+        "downloadStrategy": "On-demand via PyTorch Hub",
+        "cachePath": "$PYTORCH_MODEL_PATH or default PyTorch cache",
+        "optimization": "Should pre-download in Docker build to avoid first-run delay"
+      },
+      "gpuUsage": {
+        "enabled": true,
+        "detection": "Based on CUDA_VISIBLE_DEVICES env var",
+        "fallback": "Automatic to CPU if CUDA not available",
+        "dockerConfig": {
+          "baseImage": "pytorch/pytorch:2.2.2-cuda12.1-cudnn8-runtime",
+          "cudaVersion": "12.1",
+          "cudnnVersion": "8",
+          "nvidiaCapabilities": "compute,utility"
+        }
+      },
+      "performance": {
+        "avgProcessingTime": "30-90 seconds for 3-4 minute song",
+        "memoryUsage": "2-4GB with GPU, 4-8GB with CPU",
+        "bottlenecks": [
+          "Model download on first run",
+          "GPU memory allocation",
+          "File I/O for large audio files"
+        ]
+      }
+    },
+    "spotdl": {
+      "version": "4.2.3",
+      "services": ["spotify-service", "download-service"],
+      "repository": "https://github.com/spotDL/spotify-downloader",
+      "purpose": "Spotify track download and metadata extraction",
+      "invocations": [
+        {
+          "service": "spotify-service",
+          "file": "backend/spotify/src/index.js",
+          "line": 240,
+          "function": "getInfoFromSpotdl()",
+          "command": "python3 -m spotdl save URL --save-file OUTPUT --log-level DEBUG",
+          "purpose": "Extract track metadata without downloading",
+          "outputMethod": "JSON file written to /tmp",
+          "progressTracking": "Stdout parsing for 'Found X songs', 'Processing track Y/Z'"
+        },
+        {
+          "service": "spotify-service",
+          "file": "backend/spotify/src/index.js",
+          "line": 643,
+          "function": "streamSpotdlFetch()",
+          "command": "python3 -m spotdl save URL --save-file OUTPUT --log-level DEBUG",
+          "purpose": "Stream metadata fetch with SSE progress updates",
+          "progressEvents": [
+            "fetch_started",
+            "track_found",
+            "track_processed",
+            "progress_update",
+            "fetch_completed",
+            "fetch_error"
+          ]
+        },
+        {
+          "service": "download-service",
+          "file": "backend/download/src/index.js",
+          "line": 176,
+          "function": "downloadTrack()",
+          "command": "python3 -m spotdl URL --format mp3 --output DIR [--cookies PATH]",
+          "purpose": "Download audio from Spotify/YouTube",
+          "outputMethod": "MP3 file written to disk",
+          "progressTracking": "Regex match on stdout: /Progress: (\\d+)%/"
+        }
+      ],
+      "dataPassing": {
+        "metadata": "JSON file in temp directory (/tmp or TMP_DIR)",
+        "audio": "MP3 file in output directory",
+        "cleanup": "Temp JSON files deleted after reading"
+      },
+      "errorHandling": {
+        "detection": [
+          "Exit code !== 0",
+          "Stderr contains 'AudioProviderError'",
+          "Stderr contains 'ERROR:' (excluding 'INFO:')"
+        ],
+        "retry": "Not implemented - fails permanently",
+        "fallback": "Spotify Web API for metadata if spotdl fails"
+      },
+      "alternatives": {
+        "current": "spotdl 4.2.3",
+        "option1": {
+          "name": "yt-dlp + Spotify Web API",
+          "pros": [
+            "Official Spotify metadata",
+            "Better YouTube download control",
+            "Fewer dependencies",
+            "More reliable error handling"
+          ],
+          "cons": [
+            "Two separate integrations",
+            "Need OAuth flow for Spotify",
+            "More complex implementation"
+          ]
+        },
+        "option2": {
+          "name": "Spotify Web Playback SDK (client-side)",
+          "pros": [
+            "No server-side download",
+            "Official Spotify integration",
+            "Real-time streaming"
+          ],
+          "cons": [
+            "Requires Spotify Premium",
+            "No offline/download capability",
+            "Cannot extract stems"
+          ]
+        }
+      }
+    },
+    "librosa": {
+      "version": ">=0.9.2",
+      "service": "analysis-service",
+      "repository": "https://github.com/librosa/librosa",
+      "purpose": "Audio and music signal analysis",
+      "invocation": {
+        "file": "backend/analysis/src/analyzer.py",
+        "type": "Python script",
+        "triggeredBy": "backend/analysis/src/index.js:304 spawn('python3', [analyzer.py, ...])"
+      },
+      "features": {
+        "audioLoading": {
+          "function": "librosa.load()",
+          "options": {
+            "sampleRate": "Variable (22050 for large files, 44100 default)",
+            "mono": "True for files >10MB",
+            "resType": "kaiser_fast for speed"
+          },
+          "memoryOptimization": "Downsample large files, limit duration to 300s for fallback"
+        },
+        "beatTracking": {
+          "function": "librosa.beat.beat_track()",
+          "output": "tempo (BPM) and beat frame indices",
+          "optimization": "Use lower sample rate (11025) if memory usage >60%"
+        },
+        "tempoDetection": {
+          "function": "librosa.beat.beat_track()",
+          "accuracy": "Generally good for electronic/pop, can struggle with complex rhythms",
+          "fallback": "None - returns best estimate"
+        },
+        "spectralAnalysis": {
+          "features": [
+            {
+              "name": "spectralCentroid",
+              "function": "librosa.feature.spectral_centroid()",
+              "purpose": "Measure 'brightness' of sound"
+            },
+            {
+              "name": "spectralContrast",
+              "function": "librosa.feature.spectral_contrast()",
+              "purpose": "Distinguish between harmonic and percussive content"
+            },
+            {
+              "name": "chroma",
+              "function": "librosa.feature.chroma_cqt()",
+              "purpose": "Pitch class profiles for key detection and structure"
+            }
+          ]
+        },
+        "structuralSegmentation": {
+          "method": "Self-similarity matrix from chroma features",
+          "functions": [
+            "librosa.segment.recurrence_matrix()",
+            "librosa.segment.agglomerative()"
+          ],
+          "output": "Cue points with section labels (Intro, Verse, Chorus, etc.)",
+          "accuracy": "Heuristic-based, works well for standard pop/rock structure"
+        },
+        "onsetDetection": {
+          "function": "librosa.onset.onset_detect()",
+          "purpose": "Find note onsets for MIDI extraction",
+          "usage": "Combined with CQT for pitch estimation"
+        },
+        "midiExtraction": {
+          "library": "pretty_midi",
+          "method": "Onset detection + CQT pitch estimation",
+          "limitations": [
+            "Polyphonic audio is challenging",
+            "Only approximate MIDI representation",
+            "Memory intensive (skipped if >80% memory usage)"
+          ],
+          "optimization": "Downsample to 11025 Hz, limit to 30 seconds"
+        }
+      },
+      "memoryManagement": {
+        "limit": "1.5GB (MAX_MEMORY_USAGE)",
+        "monitoring": "psutil.Process().memory_info().rss",
+        "strategies": [
+          "Downsample audio for large files",
+          "Skip MIDI extraction if memory >80%",
+          "Use default time signature if memory >70%",
+          "Force garbage collection after loading audio"
+        ]
+      },
+      "performance": {
+        "avgAnalysisTime": "10-30 seconds for 3-4 minute song",
+        "memoryPeak": "500MB - 1.5GB depending on file size",
+        "bottlenecks": [
+          "Audio loading for large files",
+          "MIDI extraction (CQT computation)",
+          "Structural segmentation (recurrence matrix)"
+        ]
+      }
+    },
+    "essentia": {
+      "version": "2.1+ (commented out in requirements.txt)",
+      "service": "analysis-service",
+      "status": "NOT CURRENTLY USED",
+      "repository": "https://github.com/MTG/essentia",
+      "purpose": "Advanced audio analysis (originally planned for key detection)",
+      "notes": "Commented out in requirements.txt, key detection currently uses librosa chroma features instead",
+      "recommendation": "Remove from Docker base image if not needed, or re-enable for better key detection"
+    },
+    "pretty_midi": {
+      "version": ">=0.2.10",
+      "service": "analysis-service",
+      "repository": "https://github.com/craffel/pretty-midi",
+      "purpose": "MIDI file creation and manipulation",
+      "usage": {
+        "function": "extract_midi_from_audio()",
+        "method": "Create PrettyMIDI object from onset/pitch detection",
+        "output": "Serialized MIDI notes with pitch, start, end, velocity",
+        "instruments": "Mapped from stem type (piano, bass, drums, guitar, vocals)"
+      },
+      "memoryIssues": {
+        "problem": "CQT computation for pitch estimation is memory intensive",
+        "mitigation": "Skip if memory usage >80%, downsample to 11025 Hz, limit to 30s segments"
+      }
+    }
+  },
+  "integrationArchitecture": {
+    "communicationPatterns": {
+      "nodeJsToPython": {
+        "method": "child_process.spawn() or exec()",
+        "dataFlow": "CLI arguments → Python process → stdout/stderr",
+        "resultRetrieval": [
+          "Parse stdout for progress/results",
+          "Read JSON file from disk (spotdl)",
+          "Read from Redis (analysis)"
+        ]
+      },
+      "pythonToNodeJs": {
+        "methods": [
+          {
+            "type": "stdout streaming",
+            "usage": "Progress updates, log messages",
+            "parsing": "Regex matching on output lines"
+          },
+          {
+            "type": "File I/O",
+            "usage": "spotdl metadata JSON",
+            "pattern": "Write to temp file, Node reads, Node deletes"
+          },
+          {
+            "type": "Redis",
+            "usage": "Analysis results",
+            "pattern": "Python writes JSON to Redis key, Node reads and publishes"
+          }
+        ]
+      }
+    },
+    "errorPropagation": {
+      "pythonExitCodes": "0 = success, non-zero = error",
+      "stderrParsing": "Specific error keywords trigger job failure",
+      "redisErrorStorage": "Job status updated to 'error' with message",
+      "websocketNotification": "Error events sent to client via WebSocket service"
+    },
+    "progressTracking": {
+      "patterns": [
+        {
+          "tool": "demucs",
+          "method": "Stdout regex: /Separated track (\\d+)\\/(\\d+)/",
+          "granularity": "Per-stem progress (0-100%)"
+        },
+        {
+          "tool": "spotdl",
+          "method": "Stdout parsing: 'Found X songs', 'Processing', 'Downloaded'",
+          "granularity": "Track-level progress"
+        },
+        {
+          "tool": "analyzer.py",
+          "method": "Explicit print('Progress: X%')",
+          "granularity": "Analysis stage milestones (5%, 15%, 25%, etc.)"
+        }
+      ],
+      "realTimeUpdates": {
+        "mechanism": "Redis pub/sub + WebSocket service",
+        "events": [
+          "processing:job:updated",
+          "download:job:updated",
+          "analysis:job:updated"
+        ]
+      }
+    },
+    "concurrency": {
+      "current": "Unlimited concurrent Python processes",
+      "issue": "No job queue or rate limiting",
+      "risk": "Memory exhaustion if many jobs submitted simultaneously",
+      "recommendation": "Implement job queue with max concurrency (e.g., Bull/BullMQ)"
+    }
+  },
+  "dockerConfiguration": {
+    "baseImages": [
+      {
+        "name": "python-node-base",
+        "path": "docker/base-images/Dockerfile.python-node-base",
+        "pythonVersion": "3.10",
+        "nodeVersion": "20",
+        "os": "Debian Bullseye (slim)",
+        "packages": ["ffmpeg", "curl", "tini", "python3", "python3-pip"],
+        "services": ["analysis-service", "spotify-service", "download-service"]
+      },
+      {
+        "name": "gpu-base",
+        "path": "docker/base-images/Dockerfile.gpu-base",
+        "pythonVersion": "3.10 (via PyTorch image)",
+        "nodeVersion": "20",
+        "os": "Ubuntu (via PyTorch CUDA base)",
+        "gpuSupport": {
+          "cuda": "12.1",
+          "cudnn": "8",
+          "pytorch": "2.2.2"
+        },
+        "packages": ["ffmpeg", "curl", "tini", "git", "gcc", "g++"],
+        "services": ["processing-service"]
+      }
+    ],
+    "pythonPackageInstallation": {
+      "method": "pip install --no-cache-dir -r requirements.txt",
+      "stage": "builder stage in multi-stage build",
+      "caching": "Not implemented - rebuilds every time",
+      "recommendation": "Use BuildKit cache mount: --mount=type=cache,target=/root/.cache/pip"
+    },
+    "permissionIssues": {
+      "problem": "Python packages installed as root, but service runs as soundforge user",
+      "manifestation": "Import errors, permission denied on module load",
+      "currentMitigation": "chown -R soundforge:soundforge /usr/local/lib/python*",
+      "recommendation": "Install packages as soundforge user or use virtual environment"
+    },
+    "modelPreloading": {
+      "current": "Models downloaded on first use",
+      "issue": "First job has 30-60s delay for model download",
+      "recommendation": "Add to Dockerfile: RUN python -c 'from demucs.pretrained import get_model; get_model(\"htdemucs\")'"
+    },
+    "volumeMounts": {
+      "audioData": "/app/audio_data - shared across services",
+      "models": "/app/models - Demucs model cache",
+      "tmp": "/app/tmp - spotdl temp files"
+    }
+  },
+  "performanceAnalysis": {
+    "bottlenecks": [
+      {
+        "component": "Python process spawning",
+        "severity": "medium",
+        "impact": "Cold start overhead: 200-500ms per job",
+        "solution": "Python worker pool with persistent interpreters"
+      },
+      {
+        "component": "librosa audio loading",
+        "severity": "medium",
+        "impact": "Large files (>50MB) take 5-10s to load",
+        "solution": "Already mitigated with downsampling and mono conversion"
+      },
+      {
+        "component": "MIDI extraction",
+        "severity": "high",
+        "impact": "Memory spikes, can cause OOM on large files",
+        "solution": "Already mitigated with memory checks and skipping"
+      },
+      {
+        "component": "Demucs model download",
+        "severity": "high",
+        "impact": "First-run delay of 30-60 seconds",
+        "solution": "Pre-download in Docker build"
+      },
+      {
+        "component": "File I/O for spotdl",
+        "severity": "low",
+        "impact": "Temp file creation/deletion overhead",
+        "solution": "Switch to stdout JSON streaming"
+      }
+    ],
+    "scalability": {
+      "currentLimit": "Single-node, memory-bound",
+      "concurrentJobs": "~2-3 processing jobs on 8GB RAM machine",
+      "recommendation": "Add job queue with worker pool for horizontal scaling"
+    }
+  },
+  "recommendations": {
+    "immediate": [
+      {
+        "priority": 1,
+        "title": "Pre-download Demucs models in Docker",
+        "effort": "1-2 hours",
+        "impact": "high",
+        "implementation": "Add RUN commands to gpu-base Dockerfile"
+      },
+      {
+        "priority": 2,
+        "title": "Add process timeouts",
+        "effort": "2-3 hours",
+        "impact": "high",
+        "implementation": "Wrap spawn() calls with timeout logic, kill on exceed"
+      },
+      {
+        "priority": 3,
+        "title": "Implement retry logic",
+        "effort": "3-4 hours",
+        "impact": "medium",
+        "implementation": "Retry failed Python invocations 2-3 times with exponential backoff"
+      }
+    ],
+    "shortTerm": [
+      {
+        "priority": 4,
+        "title": "Add job queue with concurrency limiting",
+        "effort": "1-2 days",
+        "impact": "high",
+        "implementation": "Integrate Bull/BullMQ, limit concurrent jobs per service"
+      },
+      {
+        "priority": 5,
+        "title": "Implement GPU detection and fallback",
+        "effort": "3-4 hours",
+        "impact": "medium",
+        "implementation": "Check CUDA availability, log warnings, auto-fallback to CPU"
+      },
+      {
+        "priority": 6,
+        "title": "Replace spotdl temp files with stdout",
+        "effort": "1 day",
+        "impact": "medium",
+        "implementation": "Modify spotdl invocation, parse JSON from stdout"
+      }
+    ],
+    "longTerm": [
+      {
+        "priority": 7,
+        "title": "Python worker pool for analysis",
+        "effort": "1 week",
+        "impact": "high",
+        "implementation": "Create Python worker process pool, job distribution via Redis"
+      },
+      {
+        "priority": 8,
+        "title": "Migrate to yt-dlp + Spotify Web API",
+        "effort": "2 weeks",
+        "impact": "medium",
+        "implementation": "Separate download and metadata, use official Spotify API"
+      },
+      {
+        "priority": 9,
+        "title": "Hybrid client/server analysis",
+        "effort": "2 weeks",
+        "impact": "medium",
+        "implementation": "Web Audio API for basic features, Python for advanced"
+      }
+    ]
+  },
+  "drtw": {
+    "spotdlReplacement": {
+      "feasible": true,
+      "complexity": "medium",
+      "approach": {
+        "metadata": "Spotify Web API (official, requires client ID/secret)",
+        "download": "yt-dlp directly",
+        "benefits": [
+          "Official API support",
+          "Better error messages",
+          "No intermediate temp files",
+          "More reliable"
+        ],
+        "drawbacks": [
+          "Two separate integrations",
+          "OAuth flow complexity",
+          "Need to maintain Spotify credentials"
+        ]
+      },
+      "recommendation": "Worth considering for v2.0, significant reliability improvement"
+    },
+    "clientSideAnalysis": {
+      "feasible": "partial",
+      "complexity": "medium-high",
+      "approach": {
+        "basic": "Web Audio API (waveform, FFT, basic tempo)",
+        "advanced": "Keep Python server-side (key detection, stems, MIDI)",
+        "benefits": [
+          "Instant feedback for waveform/spectrum",
+          "Zero server load for basic features",
+          "Better UX"
+        ],
+        "limitations": [
+          "Cannot do ML-based analysis client-side",
+          "Browser memory limits for large files",
+          "Complex WebAssembly port needed for librosa equivalent"
+        ]
+      },
+      "recommendation": "Hybrid approach - basic analysis client-side, advanced server-side"
+    },
+    "demucsOptimization": {
+      "feasible": true,
+      "complexity": "low-medium",
+      "approaches": [
+        {
+          "title": "Model pre-loading in Docker",
+          "impact": "Eliminates first-run delay",
+          "effort": "low"
+        },
+        {
+          "title": "GPU memory optimization",
+          "impact": "Allow larger batches or higher quality",
+          "effort": "medium"
+        },
+        {
+          "title": "Progressive streaming output",
+          "impact": "User sees stems as they complete",
+          "effort": "medium-high"
+        }
+      ],
+      "alternativeModels": {
+        "spleeter": "Faster but lower quality",
+        "openUnmix": "Similar quality, less maintained",
+        "recommendation": "Keep Demucs for quality, optimize around it"
+      }
+    },
+    "pythonNodeBridge": {
+      "current": "spawn() with stdout/file/Redis",
+      "alternatives": [
+        {
+          "name": "gRPC service",
+          "pros": ["Type-safe", "Bidirectional streaming", "Better errors"],
+          "cons": ["Infrastructure overhead", "Proto maintenance"]
+        },
+        {
+          "name": "Python worker pool",
+          "pros": ["Reuse interpreters", "2-3x faster", "Better resource control"],
+          "cons": ["State management", "More complex orchestration"]
+        },
+        {
+          "name": "MessageQueue (RabbitMQ/NATS)",
+          "pros": ["Decoupled", "Scalable", "Reliable"],
+          "cons": ["Additional infrastructure", "Complexity"]
+        }
+      ],
+      "recommendation": "Worker pool for immediate gains, gRPC for future microservices architecture"
+    }
+  }
+}

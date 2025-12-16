@@ -1,0 +1,342 @@
+{
+  "timestamp": "2025-12-16T06:30:00.000Z",
+  "agentId": "frontend-analysis",
+  "status": "completed",
+  "projectPath": "/Users/jeremiah/Developer/sound-forge-alchemy",
+
+  "inventory": {
+    "totalTsxJsxFiles": 116,
+    "componentFiles": {
+      "total": 74,
+      "ui": 54,
+      "pages": 4,
+      "modules": 4,
+      "business": 12
+    },
+    "testFiles": 42,
+    "componentCategories": {
+      "uiComponents": [
+        "accordion", "alert-dialog", "alert", "aspect-ratio", "avatar", "badge",
+        "breadcrumb", "button", "calendar", "card", "carousel", "chart", "checkbox",
+        "collapsible", "command", "context-menu", "dialog", "drawer", "dropdown-menu",
+        "form", "hover-card", "input-otp", "input", "label", "menubar", "navigation-menu",
+        "pagination", "popover", "progress", "radio-group", "resizable", "scroll-area",
+        "select", "separator", "sheet", "sidebar", "skeleton", "slider", "sonner",
+        "switch", "table", "tabs", "textarea", "toast", "toggle-group", "toggle",
+        "tooltip", "toaster"
+      ],
+      "customComponents": [
+        "VolumeVisualizer", "StickyPlayer", "DebugConsoleOverlay", "SettingsDropdown",
+        "NotificationLog", "OverlayGrid"
+      ],
+      "businessComponents": [
+        "StepDisplay", "TrackWaveform", "SpotifyInput", "Dashboard", "Layout",
+        "TrackLibrary", "SearchPage", "ErrorPage", "TrackList", "TrackStudio",
+        "StemViewer", "StemVisualizer", "ExportStemsPanel", "AudioProcessor",
+        "PlaylistPanel", "InputPanel", "ArrangementDetector", "ModuleContainer",
+        "AppLayout", "ModuleSelector"
+      ]
+    }
+  },
+
+  "componentUsage": {
+    "used": [
+      {"name": "button", "imports": 5},
+      {"name": "dialog", "imports": 1},
+      {"name": "input", "imports": 1},
+      {"name": "label", "imports": 1},
+      {"name": "sonner", "imports": 1},
+      {"name": "toast", "imports": 1},
+      {"name": "toggle", "imports": 1}
+    ],
+    "unused": [
+      "DebugConsoleOverlay", "NotificationLog", "OverlayGrid", "SettingsDropdown",
+      "StickyPlayer", "VolumeVisualizer", "accordion", "alert-dialog", "alert",
+      "aspect-ratio", "avatar", "badge", "breadcrumb", "calendar", "card",
+      "carousel", "chart", "checkbox", "collapsible", "command", "context-menu",
+      "drawer", "dropdown-menu", "form", "hover-card", "input-otp", "menubar",
+      "navigation-menu", "pagination", "popover", "progress", "radio-group",
+      "resizable", "scroll-area", "select", "separator", "sheet", "sidebar",
+      "skeleton", "slider", "switch", "table", "tabs", "textarea", "toaster",
+      "toggle-group", "tooltip"
+    ],
+    "usageRate": "12.96%",
+    "totalUsed": 7,
+    "totalUnused": 47
+  },
+
+  "radixAnalysis": {
+    "installed": {
+      "count": 27,
+      "packages": [
+        "@radix-ui/react-accordion",
+        "@radix-ui/react-alert-dialog",
+        "@radix-ui/react-aspect-ratio",
+        "@radix-ui/react-avatar",
+        "@radix-ui/react-checkbox",
+        "@radix-ui/react-collapsible",
+        "@radix-ui/react-context-menu",
+        "@radix-ui/react-dialog",
+        "@radix-ui/react-dropdown-menu",
+        "@radix-ui/react-hover-card",
+        "@radix-ui/react-label",
+        "@radix-ui/react-menubar",
+        "@radix-ui/react-navigation-menu",
+        "@radix-ui/react-popover",
+        "@radix-ui/react-progress",
+        "@radix-ui/react-radio-group",
+        "@radix-ui/react-scroll-area",
+        "@radix-ui/react-select",
+        "@radix-ui/react-separator",
+        "@radix-ui/react-slider",
+        "@radix-ui/react-slot",
+        "@radix-ui/react-switch",
+        "@radix-ui/react-tabs",
+        "@radix-ui/react-toast",
+        "@radix-ui/react-toggle",
+        "@radix-ui/react-toggle-group",
+        "@radix-ui/react-tooltip"
+      ],
+      "diskSize": "7.3 MB"
+    },
+    "actuallyUsed": {
+      "count": 5,
+      "packages": [
+        "@radix-ui/react-dialog",
+        "@radix-ui/react-label",
+        "@radix-ui/react-slot",
+        "@radix-ui/react-toast",
+        "@radix-ui/react-toggle"
+      ]
+    },
+    "removable": {
+      "count": 22,
+      "packages": [
+        "@radix-ui/react-accordion",
+        "@radix-ui/react-alert-dialog",
+        "@radix-ui/react-aspect-ratio",
+        "@radix-ui/react-avatar",
+        "@radix-ui/react-checkbox",
+        "@radix-ui/react-collapsible",
+        "@radix-ui/react-context-menu",
+        "@radix-ui/react-dropdown-menu",
+        "@radix-ui/react-hover-card",
+        "@radix-ui/react-menubar",
+        "@radix-ui/react-navigation-menu",
+        "@radix-ui/react-popover",
+        "@radix-ui/react-progress",
+        "@radix-ui/react-radio-group",
+        "@radix-ui/react-scroll-area",
+        "@radix-ui/react-select",
+        "@radix-ui/react-separator",
+        "@radix-ui/react-slider",
+        "@radix-ui/react-switch",
+        "@radix-ui/react-tabs",
+        "@radix-ui/react-toggle-group",
+        "@radix-ui/react-tooltip"
+      ],
+      "estimatedSavings": "~5.5 MB"
+    },
+    "usageRate": "18.52%"
+  },
+
+  "bundleAnalysis": {
+    "production": {
+      "total": "1.0 MB",
+      "js": {
+        "raw": "969.96 KB",
+        "gzip": "279.79 KB"
+      },
+      "css": {
+        "raw": "70.29 KB",
+        "gzip": "12.29 KB"
+      }
+    },
+    "warnings": [
+      "Main JS chunk exceeds 500 KB threshold (969.96 KB)",
+      "Consider code-splitting with dynamic imports",
+      "Consider manual chunking via rollupOptions"
+    ]
+  },
+
+  "typeScriptQuality": {
+    "anyTypeUsage": {
+      "count": 6,
+      "locations": [
+        "/Users/jeremiah/Developer/sound-forge-alchemy/src/lib/api.ts:downloadTrack (trackInfo?: any)",
+        "/Users/jeremiah/Developer/sound-forge-alchemy/src/lib/api.ts:separateTrack (options: any)",
+        "/Users/jeremiah/Developer/sound-forge-alchemy/src/lib/logger.ts:[key: string]: any",
+        "/Users/jeremiah/Developer/sound-forge-alchemy/src/lib/modules/ModuleTypes.ts:data: any",
+        "/Users/jeremiah/Developer/sound-forge-alchemy/src/lib/modules/ModuleMessaging.ts:setupWebSocketBridge (socketRef: any, messaging: any)",
+        "/Users/jeremiah/Developer/sound-forge-alchemy/src/lib/modules/ModuleMessaging.ts:handleMessage (event: any)"
+      ]
+    },
+    "strictMode": "enabled",
+    "typeErrors": 0
+  },
+
+  "dependencyAnalysis": {
+    "totalDependencies": 73,
+    "productionDependencies": 40,
+    "devDependencies": 33,
+    "heavyDependencies": [
+      {"name": "recharts", "reason": "Charting library - unused chart component"},
+      {"name": "react-day-picker", "reason": "Calendar widget - unused calendar component"},
+      {"name": "cmdk", "reason": "Command menu - unused command component"},
+      {"name": "embla-carousel-react", "reason": "Carousel - unused carousel component"},
+      {"name": "vaul", "reason": "Drawer component - unused drawer"},
+      {"name": "input-otp", "reason": "OTP input - unused input-otp component"}
+    ],
+    "potentiallyRemovable": [
+      "@hookform/resolvers",
+      "react-hook-form",
+      "react-day-picker",
+      "date-fns",
+      "recharts",
+      "cmdk",
+      "embla-carousel-react",
+      "vaul",
+      "input-otp"
+    ]
+  },
+
+  "drtwOpportunities": {
+    "componentConsolidation": {
+      "description": "47 unused UI components can be removed",
+      "action": "Delete unused component files and wrapper components",
+      "estimatedSavings": "~50-100 KB in bundle",
+      "riskLevel": "low"
+    },
+    "radixOptimization": {
+      "description": "22 unused Radix UI packages can be removed",
+      "action": "Uninstall unused @radix-ui/* packages",
+      "estimatedSavings": "~5.5 MB disk space, ~30-50 KB bundle reduction",
+      "riskLevel": "low",
+      "commands": [
+        "npm uninstall @radix-ui/react-accordion @radix-ui/react-alert-dialog @radix-ui/react-aspect-ratio @radix-ui/react-avatar @radix-ui/react-checkbox @radix-ui/react-collapsible @radix-ui/react-context-menu @radix-ui/react-dropdown-menu @radix-ui/react-hover-card @radix-ui/react-menubar @radix-ui/react-navigation-menu @radix-ui/react-popover @radix-ui/react-progress @radix-ui/react-radio-group @radix-ui/react-scroll-area @radix-ui/react-select @radix-ui/react-separator @radix-ui/react-slider @radix-ui/react-switch @radix-ui/react-tabs @radix-ui/react-toggle-group @radix-ui/react-tooltip"
+      ]
+    },
+    "dependencyPruning": {
+      "description": "Remove dependencies for unused components",
+      "packages": [
+        "recharts (charting - not used)",
+        "react-day-picker (calendar - not used)",
+        "date-fns (date utilities - not used)",
+        "cmdk (command menu - not used)",
+        "embla-carousel-react (carousel - not used)",
+        "vaul (drawer - not used)",
+        "input-otp (OTP input - not used)"
+      ],
+      "estimatedSavings": "~200-300 KB bundle reduction",
+      "riskLevel": "medium",
+      "verification": "Need to verify these aren't imported anywhere"
+    },
+    "typeScriptImprovement": {
+      "description": "Replace 6 any types with proper types",
+      "files": [
+        "src/lib/api.ts",
+        "src/lib/logger.ts",
+        "src/lib/modules/ModuleTypes.ts",
+        "src/lib/modules/ModuleMessaging.ts"
+      ],
+      "estimatedEffort": "1-2 hours",
+      "riskLevel": "low"
+    },
+    "codeSplitting": {
+      "description": "Main bundle is 970 KB - implement code splitting",
+      "strategy": "Dynamic imports for route-based components",
+      "estimatedSavings": "~30-40% initial bundle reduction",
+      "riskLevel": "medium",
+      "implementation": [
+        "Lazy load route components (Dashboard, TrackLibrary, SearchPage, TrackStudio)",
+        "Lazy load heavy modules (wavesurfer.js, socket.io-client)",
+        "Configure Vite manual chunks for vendor splitting"
+      ]
+    }
+  },
+
+  "recommendations": {
+    "immediate": [
+      {
+        "priority": "high",
+        "action": "Remove unused Radix UI packages",
+        "effort": "5 minutes",
+        "impact": "5.5 MB disk savings, cleaner dependencies"
+      },
+      {
+        "priority": "high",
+        "action": "Delete 47 unused UI component files",
+        "effort": "10 minutes",
+        "impact": "Cleaner codebase, reduced mental overhead"
+      },
+      {
+        "priority": "medium",
+        "action": "Verify and remove unused heavy dependencies",
+        "effort": "30 minutes",
+        "impact": "200-300 KB bundle reduction"
+      }
+    ],
+    "shortTerm": [
+      {
+        "priority": "medium",
+        "action": "Fix TypeScript any usage",
+        "effort": "1-2 hours",
+        "impact": "Better type safety, fewer runtime errors"
+      },
+      {
+        "priority": "medium",
+        "action": "Implement route-based code splitting",
+        "effort": "2-3 hours",
+        "impact": "30-40% initial bundle reduction"
+      }
+    ],
+    "longTerm": [
+      {
+        "priority": "low",
+        "action": "Evaluate custom component alternatives",
+        "effort": "1 week",
+        "impact": "Potential further simplification"
+      },
+      {
+        "priority": "low",
+        "action": "Configure advanced Vite chunking strategies",
+        "effort": "4-6 hours",
+        "impact": "Optimized vendor bundle splitting"
+      }
+    ]
+  },
+
+  "estimatedSavings": {
+    "diskSpace": "~6-8 MB",
+    "bundleSize": "~250-400 KB",
+    "componentCount": "-47 files",
+    "dependencyCount": "-30+ packages",
+    "maintenanceEffort": "-20% cognitive overhead"
+  },
+
+  "riskAssessment": {
+    "low": [
+      "Removing unused Radix packages",
+      "Deleting unused component files",
+      "Fixing TypeScript any types"
+    ],
+    "medium": [
+      "Removing heavy dependencies",
+      "Implementing code splitting"
+    ],
+    "high": []
+  },
+
+  "nextSteps": [
+    "1. Backup current state (git commit)",
+    "2. Remove unused Radix packages (npm uninstall)",
+    "3. Delete unused component files",
+    "4. Run build to verify no breakage",
+    "5. Verify unused heavy dependencies with grep",
+    "6. Remove verified unused dependencies",
+    "7. Fix TypeScript any usage",
+    "8. Implement route-based code splitting",
+    "9. Run tests and build",
+    "10. Commit changes"
+  ]
+}

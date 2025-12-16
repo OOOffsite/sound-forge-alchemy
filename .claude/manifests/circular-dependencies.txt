@@ -1,0 +1,29 @@
+
+  warn no-circular: src/components/StemViewer/midiHandlers.ts → 
+      src/components/StemViewer/StemViewer.tsx →
+      src/components/StemViewer/midiHandlers.ts
+    This dependency is part of a circular relationship. You might want to
+    revise your solution (i.e. use dependency inversion, make sure the modules
+    have a single responsibility)
+
+  error not-to-dev-dep: src/vite-env.d.ts → node_modules/vite/client.d.ts
+    This module depends on an npm package from the 'devDependencies' section of
+    your package.json. It looks like something that ships to production,
+    though. To prevent problems with npm packages that aren't there on
+    production declare it (only!) in the 'dependencies'section of your
+    package.json. If this module is development only - add it to the
+    from.pathNot re of the not-to-dev-dep rule in the dependency-cruiser
+    configuration
+
+  error not-to-dev-dep: src/setupTests.ts → node_modules/@testing-library/jest-dom/types/index.d.ts
+    This module depends on an npm package from the 'devDependencies' section of
+    your package.json. It looks like something that ships to production,
+    though. To prevent problems with npm packages that aren't there on
+    production declare it (only!) in the 'dependencies'section of your
+    package.json. If this module is development only - add it to the
+    from.pathNot re of the not-to-dev-dep rule in the dependency-cruiser
+    configuration
+
+
+x 3 dependency violations (2 errors, 1 warnings). 196 modules, 528 dependencies cruised.
+

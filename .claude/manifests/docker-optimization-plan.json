@@ -1,0 +1,555 @@
+{
+  "currentState": {
+    "totalDockerfiles": 65,
+    "actualServices": [
+      "frontend (React/Vite)",
+      "api-gateway (Node.js)",
+      "spotify-service (Node.js)",
+      "download-service (Node.js)",
+      "processing-service (Node.js + Python/Demucs)",
+      "analysis-service (Node.js)",
+      "websocket-service (Node.js)"
+    ],
+    "customBaseImages": [
+      "sound-forge-base",
+      "node-base",
+      "python-node-base",
+      "gpu-base",
+      "sound-forge-alchemy-node-base",
+      "sound-forge-alchemy-gpu-base",
+      "sound-forge-python-node-base"
+    ],
+    "variants": [
+      "-optimized",
+      "-cpu",
+      "-gpu",
+      "-simple",
+      "-fixed",
+      "-complete",
+      "-ts",
+      "-service"
+    ],
+    "duplicateLocations": [
+      "backend/*/Dockerfile (6 files - canonical)",
+      "docker/Dockerfile.* (14 files - duplicates)",
+      "docker/base/ (6 files - custom bases)",
+      "docker/base-images/ (4 files - duplicate bases)",
+      "docker/services/ (18 files - templates/variants)",
+      "docker/service-images/ (8 files - duplicate services)",
+      "docker/.old/ (6 files - backups)",
+      "Dockerfile.frontend (1 file - root level duplicate)"
+    ],
+    "complexity": "EXTREME - 65 Dockerfiles for 7 services (9.3x redundancy)",
+    "dockerComposeFiles": 5,
+    "totalLines": 1215
+  },
+
+  "problemAnalysis": {
+    "criticalIssues": [
+      "65 Dockerfiles for only 7 services = 9.3x redundancy",
+      "Custom base images that just wrap official images",
+      "Same Dockerfile duplicated across 3-4 locations",
+      "Variants (-optimized, -cpu, -gpu) creating exponential complexity",
+      "Template files that are never used",
+      "Multiple docker-compose files (yml, optimized, gpu, platform)",
+      "Base images building from other custom base images (2-3 layer nesting)",
+      "No clear canonical location - backend/*/Dockerfile vs docker/Dockerfile.*"
+    ],
+    "redundancyBreakdown": {
+      "frontend": "3 Dockerfiles (root, docker/, docker/services/)",
+      "api-gateway": "5 Dockerfiles (backend, docker/, docker/services/, docker/service-images/, + optimized)",
+      "spotify": "4 Dockerfiles (backend, docker/, docker/services/, docker/service-images/)",
+      "download": "4 Dockerfiles (backend, docker/, docker/services/, docker/service-images/)",
+      "processing": "7 Dockerfiles (backend + cpu variant, docker/, docker/services/ + 3 variants, docker/service-images/ + cpu)",
+      "analysis": "4 Dockerfiles (backend, docker/, docker/services/, docker/service-images/)",
+      "websocket": "5 Dockerfiles (backend, docker/, docker/services/ + ts variant, docker/service-images/)",
+      "base-images": "10+ custom base Dockerfiles that just wrap node:20-alpine"
+    }
+  },
+
+  "dockerfilesToRemove": {
+    "total": 58,
+    "categories": {
+      "customBaseImages": {
+        "count": 10,
+        "reason": "Replace with official Docker Hub images",
+        "files": [
+          "docker/base/Dockerfile.gpu-base",
+          "docker/base/Dockerfile.node-base",
+          "docker/base/Dockerfile.node-base-optimized",
+          "docker/base/Dockerfile.python-node-base",
+          "docker/base/Dockerfile.python-node-base-optimized",
+          "docker/base/Dockerfile.sound-forge-base",
+          "docker/base-images/Dockerfile.gpu-base",
+          "docker/base-images/Dockerfile.node-base",
+          "docker/base-images/Dockerfile.python-node-base",
+          "docker/base-images/Dockerfile.sound-forge-base"
+        ]
+      },
+      "dockerDirectoryDuplicates": {
+        "count": 14,
+        "reason": "Duplicates of backend/*/Dockerfile",
+        "files": [
+          "docker/Dockerfile.analysis",
+          "docker/Dockerfile.analysis-service",
+          "docker/Dockerfile.api-gateway",
+          "docker/Dockerfile.download",
+          "docker/Dockerfile.download-service",
+          "docker/Dockerfile.frontend",
+          "docker/Dockerfile.processing",
+          "docker/Dockerfile.processing-service",
+          "docker/Dockerfile.spotify",
+          "docker/Dockerfile.spotify-service",
+          "docker/Dockerfile.websocket",
+          "docker/Dockerfile.websocket-service",
+          "docker/Dockerfile.node-base",
+          "docker/Dockerfile.base"
+        ]
+      },
+      "serviceTemplatesAndVariants": {
+        "count": 18,
+        "reason": "Templates, variants, and experimental files",
+        "files": [
+          "docker/services/Dockerfile.analysis-service",
+          "docker/services/Dockerfile.api-gateway",
+          "docker/services/Dockerfile.api-gateway-optimized",
+          "docker/services/Dockerfile.download-service",
+          "docker/services/Dockerfile.frontend",
+          "docker/services/Dockerfile.frontend-optimized",
+          "docker/services/Dockerfile.node-complete",
+          "docker/services/Dockerfile.node-service",
+          "docker/services/Dockerfile.processing-optimized",
+          "docker/services/Dockerfile.processing-service",
+          "docker/services/Dockerfile.processing-service.cpu",
+          "docker/services/Dockerfile.processing-simple",
+          "docker/services/Dockerfile.service-fixed",
+          "docker/services/Dockerfile.service-template",
+          "docker/services/Dockerfile.simple-node",
+          "docker/services/Dockerfile.spotify-service",
+          "docker/services/Dockerfile.websocket-service",
+          "docker/services/Dockerfile.websocket-ts"
+        ]
+      },
+      "serviceImagesDuplicates": {
+        "count": 8,
+        "reason": "Duplicates of backend/*/Dockerfile",
+        "files": [
+          "docker/service-images/Dockerfile.analysis-service",
+          "docker/service-images/Dockerfile.api-gateway",
+          "docker/service-images/Dockerfile.download-service",
+          "docker/service-images/Dockerfile.frontend",
+          "docker/service-images/Dockerfile.processing-service",
+          "docker/service-images/Dockerfile.processing-service.cpu",
+          "docker/service-images/Dockerfile.spotify-service",
+          "docker/service-images/Dockerfile.websocket-service"
+        ]
+      },
+      "oldBackups": {
+        "count": 6,
+        "reason": "Backup files no longer needed",
+        "files": [
+          "docker/.old/Dockerfile.gpu-base",
+          "docker/.old/Dockerfile.gpu-base.bak",
+          "docker/.old/Dockerfile.node-base",
+          "docker/.old/Dockerfile.node-base.bak",
+          "docker/.old/Dockerfile.python-node-base",
+          "docker/.old/Dockerfile.python-node-base.bak"
+        ]
+      },
+      "rootLevelDuplicates": {
+        "count": 1,
+        "reason": "Duplicate of backend dockerfile",
+        "files": [
+          "Dockerfile.frontend"
+        ]
+      },
+      "simpleExperimentalFiles": {
+        "count": 1,
+        "reason": "Test/experimental files",
+        "files": [
+          "docker/Dockerfile.simple"
+        ]
+      }
+    }
+  },
+
+  "dockerfilesToKeep": {
+    "total": 7,
+    "canonical": "backend/*/Dockerfile (one per service)",
+    "files": [
+      "backend/analysis/Dockerfile",
+      "backend/api-gateway/Dockerfile",
+      "backend/download/Dockerfile",
+      "backend/processing/Dockerfile",
+      "backend/spotify/Dockerfile",
+      "backend/websocket/Dockerfile",
+      "Dockerfile (new, for frontend at root)"
+    ],
+    "reasoning": "Each service owns its Dockerfile in its directory. Frontend Dockerfile at root follows convention."
+  },
+
+  "newDockerfiles": [
+    {
+      "name": "Dockerfile",
+      "location": "/Users/jeremiah/Developer/sound-forge-alchemy/Dockerfile",
+      "baseImage": "node:20-alpine",
+      "purpose": "React/Vite frontend",
+      "multiStage": true,
+      "stages": ["development", "builder", "production (nginx:alpine)"],
+      "size": "~50 lines",
+      "features": [
+        "Multi-stage build (dev/build/prod)",
+        "Development with hot reload",
+        "Production with nginx",
+        "Non-root user",
+        "Health checks"
+      ]
+    },
+    {
+      "name": "Dockerfile",
+      "location": "/Users/jeremiah/Developer/sound-forge-alchemy/backend/api-gateway/Dockerfile",
+      "baseImage": "node:20-alpine",
+      "purpose": "API Gateway service",
+      "multiStage": true,
+      "stages": ["dependencies", "development", "production"],
+      "size": "~40 lines",
+      "features": [
+        "Shared dependency caching",
+        "Dev with nodemon",
+        "Production optimized",
+        "Non-root user"
+      ]
+    },
+    {
+      "name": "Dockerfile",
+      "location": "/Users/jeremiah/Developer/sound-forge-alchemy/backend/spotify/Dockerfile",
+      "baseImage": "node:20-alpine",
+      "purpose": "Spotify metadata service",
+      "multiStage": true,
+      "stages": ["dependencies", "development", "production"],
+      "size": "~40 lines"
+    },
+    {
+      "name": "Dockerfile",
+      "location": "/Users/jeremiah/Developer/sound-forge-alchemy/backend/download/Dockerfile",
+      "baseImage": "node:20-alpine",
+      "purpose": "Audio download service (yt-dlp)",
+      "multiStage": true,
+      "stages": ["dependencies", "development", "production"],
+      "size": "~45 lines",
+      "additionalDeps": ["python3", "ffmpeg", "yt-dlp"]
+    },
+    {
+      "name": "Dockerfile",
+      "location": "/Users/jeremiah/Developer/sound-forge-alchemy/backend/processing/Dockerfile",
+      "baseImage": "python:3.10-slim",
+      "purpose": "Audio processing with Demucs (ML/Python)",
+      "multiStage": true,
+      "stages": ["dependencies", "development", "production", "gpu (optional)"],
+      "size": "~60 lines",
+      "features": [
+        "Python + Node.js hybrid",
+        "Demucs ML models",
+        "Optional GPU support via build args",
+        "CPU-optimized by default"
+      ],
+      "buildArgs": ["USE_GPU=false"]
+    },
+    {
+      "name": "Dockerfile",
+      "location": "/Users/jeremiah/Developer/sound-forge-alchemy/backend/analysis/Dockerfile",
+      "baseImage": "node:20-alpine",
+      "purpose": "Audio analysis service",
+      "multiStage": true,
+      "stages": ["dependencies", "development", "production"],
+      "size": "~40 lines"
+    },
+    {
+      "name": "Dockerfile",
+      "location": "/Users/jeremiah/Developer/sound-forge-alchemy/backend/websocket/Dockerfile",
+      "baseImage": "node:20-alpine",
+      "purpose": "Real-time WebSocket service",
+      "multiStage": true,
+      "stages": ["dependencies", "development", "production"],
+      "size": "~40 lines"
+    }
+  ],
+
+  "officialImagesToUse": [
+    {
+      "for": "Frontend (React/Vite)",
+      "use": "node:20-alpine (build) → nginx:alpine (serve)",
+      "reason": "Standard Node.js build, nginx for production serving",
+      "replaces": ["sound-forge-base", "node-base", "custom frontend images"]
+    },
+    {
+      "for": "Node.js services (api-gateway, spotify, analysis, websocket)",
+      "use": "node:20-alpine",
+      "reason": "Official, well-maintained, small footprint (Alpine)",
+      "replaces": ["sound-forge-node-base", "sound-forge-alchemy-node-base", "node-base"]
+    },
+    {
+      "for": "Download service (Node.js + yt-dlp)",
+      "use": "node:20-alpine + apk add python3 ffmpeg yt-dlp",
+      "reason": "Alpine package manager makes it easy to add Python tools",
+      "replaces": ["python-node-base"]
+    },
+    {
+      "for": "Processing service (Python/Demucs + Node.js)",
+      "use": "python:3.10-slim + nvm/node",
+      "reason": "Python is primary (Demucs), add Node.js for orchestration",
+      "replaces": ["python-node-base", "gpu-base", "sound-forge-alchemy-gpu-base"],
+      "notes": "Use build args for GPU variant, not separate Dockerfiles"
+    },
+    {
+      "for": "GPU variant (processing-service)",
+      "use": "pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime (if GPU needed)",
+      "reason": "Official PyTorch image with CUDA support",
+      "buildStrategy": "Use --build-arg USE_GPU=true, not separate Dockerfile",
+      "replaces": ["Dockerfile.processing.cpu", "Dockerfile.processing-service.cpu"]
+    },
+    {
+      "for": "Redis cache",
+      "use": "redis:7.2-alpine",
+      "reason": "Already using official image - keep it",
+      "status": "KEEP AS-IS"
+    },
+    {
+      "for": "Development tools (redis-commander, adminer)",
+      "use": "rediscommander/redis-commander:latest, adminer:latest",
+      "reason": "Already using official images - keep them",
+      "status": "KEEP AS-IS"
+    }
+  ],
+
+  "dockerComposeSimplification": {
+    "currentComplexity": {
+      "files": 5,
+      "totalLines": 1215,
+      "services": 9,
+      "networks": 2,
+      "volumes": 5,
+      "profiles": ["build", "dev", "prod"],
+      "issues": [
+        "5 different docker-compose files (yml, optimized, gpu, gpu-optimized, platform)",
+        "Profiles add complexity (build, dev, prod)",
+        "Over-engineered network segmentation (external/internal)",
+        "node-base as a service in 'build' profile",
+        "Redundant volume mounts in dev mode",
+        "Complex conditional commands in service definitions"
+      ]
+    },
+    "proposedSimplification": {
+      "files": 1,
+      "filename": "docker-compose.yml",
+      "estimatedLines": 350,
+      "services": 9,
+      "networks": 1,
+      "volumes": 5,
+      "changes": [
+        "Single docker-compose.yml file (delete 4 others)",
+        "Remove 'build' profile and node-base service",
+        "Simplify to single 'app' network (remove external/internal split)",
+        "Use standard target: development/production instead of profiles",
+        "Simplify volume mounts - bind mounts only in development target",
+        "Remove complex conditional commands - handle in Dockerfile CMD",
+        "Use .env file for all environment configuration",
+        "Keep dev-only services (redis-commander, adminer) with profiles"
+      ],
+      "benefits": [
+        "Single source of truth",
+        "Easier to understand and maintain",
+        "Standard Docker practices",
+        "Faster startup (no profile selection needed)",
+        "Works with standard docker-compose up"
+      ]
+    }
+  },
+
+  "directoryStructureSimplification": {
+    "current": {
+      "directories": [
+        "docker/base/",
+        "docker/base-images/",
+        "docker/services/",
+        "docker/service-images/",
+        "docker/compose/",
+        "docker/config/",
+        "docker/config-files/",
+        "docker/.old/"
+      ]
+    },
+    "proposed": {
+      "directories": [
+        "docker/config/ (nginx.conf, redis.conf)",
+        "backend/*/Dockerfile (7 service Dockerfiles)",
+        "Dockerfile (frontend at root)"
+      ],
+      "removedDirectories": [
+        "docker/base/",
+        "docker/base-images/",
+        "docker/services/",
+        "docker/service-images/",
+        "docker/.old/"
+      ],
+      "removedFiles": [
+        "All 14 Dockerfiles in docker/ root",
+        "docker-compose.optimized.yml",
+        "docker-compose.gpu.yml",
+        "docker-compose.gpu-optimized.yml",
+        "docker-compose-platform.yml"
+      ]
+    }
+  },
+
+  "migrationStrategy": {
+    "phase1": {
+      "name": "Backup and prepare",
+      "steps": [
+        "Create backup branch: git checkout -b backup/docker-cleanup-$(date +%Y%m%d)",
+        "Create docker-archive/ directory for removed files",
+        "Document current working docker-compose command"
+      ]
+    },
+    "phase2": {
+      "name": "Consolidate to canonical Dockerfiles",
+      "steps": [
+        "Update backend/*/Dockerfile to use official base images",
+        "Create new frontend Dockerfile at root",
+        "Test each service builds independently",
+        "Remove custom base image references"
+      ]
+    },
+    "phase3": {
+      "name": "Simplify docker-compose.yml",
+      "steps": [
+        "Update docker-compose.yml to reference canonical Dockerfiles",
+        "Remove profiles (use target: development/production)",
+        "Simplify network to single 'app' network",
+        "Test full stack with docker-compose up"
+      ]
+    },
+    "phase4": {
+      "name": "Remove redundant files",
+      "steps": [
+        "Move docker/base*, docker/services/, docker/service-images/ to docker-archive/",
+        "Move docker/.old/ to docker-archive/",
+        "Delete 4 extra docker-compose files",
+        "Remove 14 duplicate Dockerfiles from docker/ root",
+        "Clean up empty directories"
+      ]
+    },
+    "phase5": {
+      "name": "Documentation and validation",
+      "steps": [
+        "Update README.md with new Docker structure",
+        "Document build commands for each service",
+        "Test full deployment (dev and prod)",
+        "Update CI/CD if applicable"
+      ]
+    }
+  },
+
+  "estimatedReduction": {
+    "dockerfiles": "65 → 7 Dockerfiles (-89%)",
+    "dockerComposeFiles": "5 → 1 file (-80%)",
+    "directories": "8 → 2 directories (-75%)",
+    "customBaseImages": "7 → 0 custom bases (-100%)",
+    "totalLines": "~4,500 → ~600 lines (-87%)",
+    "buildTime": "Estimated 40% faster (no base image builds)",
+    "diskSpace": "Estimated 60% reduction (no custom base image layers)",
+    "maintainability": "Massive improvement - single source of truth per service"
+  },
+
+  "recommendedDockerfileTemplate": {
+    "description": "Standard multi-stage Dockerfile for Node.js services",
+    "template": "# Dockerfile for <SERVICE_NAME>\n# <SERVICE_DESCRIPTION>\n\n# Stage 1: Dependencies\nFROM node:20-alpine AS dependencies\nWORKDIR /app\nRUN apk add --no-cache curl\nCOPY package*.json ./\nRUN npm ci --only=production && npm cache clean --force\n\n# Stage 2: Development\nFROM dependencies AS development\nRUN npm install && npm install -g nodemon\nCOPY . .\nRUN addgroup -g 1001 -S soundforge && adduser -S soundforge -u 1001 -G soundforge\nRUN chown -R soundforge:soundforge /app\nUSER soundforge\nEXPOSE ${PORT}\nHEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 CMD curl -f http://localhost:${PORT}/health || exit 1\nCMD [\"nodemon\", \"--watch\", \"src\", \"src/index.js\"]\n\n# Stage 3: Production\nFROM dependencies AS production\nCOPY --chown=1001:1001 . .\nRUN addgroup -g 1001 -S soundforge && adduser -S soundforge -u 1001 -G soundforge\nRUN chown -R soundforge:soundforge /app\nUSER soundforge\nEXPOSE ${PORT}\nHEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 CMD curl -f http://localhost:${PORT}/health || exit 1\nCMD [\"node\", \"src/index.js\"]",
+    "size": "~35 lines",
+    "features": [
+      "Multi-stage build",
+      "Dependency caching",
+      "Non-root user",
+      "Health checks",
+      "Development with nodemon",
+      "Production optimized"
+    ]
+  },
+
+  "quickWins": {
+    "immediate": [
+      "Delete docker/.old/ (6 files, zero risk)",
+      "Delete docker/services/ templates (18 files, not used)",
+      "Delete docker/service-images/ (8 files, duplicates)",
+      "Delete 4 extra docker-compose files (keep only docker-compose.yml)"
+    ],
+    "easyLift": [
+      "Move docker/Dockerfile.* duplicates to docker-archive/",
+      "Delete custom base image directories (docker/base/, docker/base-images/)",
+      "Update docker-compose.yml to use backend/*/Dockerfile paths"
+    ],
+    "mediumEffort": [
+      "Refactor backend/*/Dockerfile to use official images",
+      "Create new frontend Dockerfile at root",
+      "Simplify docker-compose.yml (remove profiles, simplify networks)"
+    ]
+  },
+
+  "riskAssessment": {
+    "low": [
+      "Deleting .old/ directory",
+      "Deleting service-images/ and services/ duplicates",
+      "Deleting extra docker-compose files (if not currently used)"
+    ],
+    "medium": [
+      "Refactoring to official base images",
+      "Simplifying docker-compose.yml",
+      "Removing custom base image builds"
+    ],
+    "high": [
+      "Removing GPU-specific Dockerfiles (need to verify GPU workflow)",
+      "Changing network architecture (external/internal → single network)"
+    ],
+    "mitigation": [
+      "Create backup branch before any changes",
+      "Archive removed files, don't delete permanently",
+      "Test each service individually before full stack test",
+      "Keep current docker-compose.yml until new one validated"
+    ]
+  },
+
+  "successCriteria": {
+    "functional": [
+      "All 7 services build successfully",
+      "docker-compose up starts full stack",
+      "Frontend accessible at localhost:8001",
+      "API Gateway accessible at localhost:3000",
+      "WebSocket connections work",
+      "Audio processing pipeline functional"
+    ],
+    "performance": [
+      "Build time ≤60% of current time",
+      "Image sizes ≤70% of current sizes",
+      "No regression in runtime performance"
+    ],
+    "maintainability": [
+      "Single Dockerfile per service",
+      "Single docker-compose.yml",
+      "All Dockerfiles use official base images",
+      "No more than 7 Dockerfiles total",
+      "Clear documentation of structure"
+    ]
+  },
+
+  "nextSteps": [
+    "1. Review and approve this optimization plan",
+    "2. Create backup branch",
+    "3. Execute phase 1: Quick wins (delete .old/, services/, service-images/)",
+    "4. Execute phase 2: Refactor backend/*/Dockerfile to official images",
+    "5. Execute phase 3: Create new frontend Dockerfile",
+    "6. Execute phase 4: Simplify docker-compose.yml",
+    "7. Execute phase 5: Remove remaining duplicates and custom bases",
+    "8. Test full stack deployment",
+    "9. Update documentation",
+    "10. Create PR with before/after comparison"
+  ]
+}

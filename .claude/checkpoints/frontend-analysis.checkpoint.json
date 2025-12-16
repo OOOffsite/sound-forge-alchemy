@@ -1,0 +1,44 @@
+{
+  "timestamp": "2025-12-16T06:35:00.000Z",
+  "agentId": "frontend-analysis",
+  "status": "completed",
+  "progress": 100,
+  "completedTasks": [
+    "inventory",
+    "radix-audit",
+    "bundle-analysis",
+    "typescript-quality",
+    "drtw-opportunities"
+  ],
+  "findings": {
+    "totalFiles": 116,
+    "totalComponents": 74,
+    "uiComponents": 54,
+    "usedComponents": 7,
+    "unusedComponents": 47,
+    "componentUsageRate": "12.96%",
+    "radixPackages": {
+      "installed": 27,
+      "actuallyUsed": 5,
+      "removable": 22,
+      "diskSize": "7.3 MB",
+      "usageRate": "18.52%"
+    },
+    "bundleSize": {
+      "total": "1.0 MB",
+      "jsBundle": "969.96 KB",
+      "cssBundle": "70.29 KB",
+      "gzipJs": "279.79 KB"
+    },
+    "typeScriptQuality": {
+      "anyUsage": 6,
+      "strictMode": true
+    },
+    "drtwOpportunities": {
+      "estimatedBundleSavings": "250-400 KB",
+      "estimatedDiskSavings": "6-8 MB",
+      "removableComponents": 47,
+      "removablePackages": 30
+    }
+  }
+}

@@ -1,0 +1,580 @@
+{
+  "analysisDate": "2025-12-16T00:00:00Z",
+  "agentId": "infrastructure-analysis-agent",
+  "projectPath": "/Users/jeremiah/Developer/sound-forge-alchemy",
+
+  "currentState": {
+    "dockerInfrastructure": {
+      "totalDockerFiles": 81,
+      "breakdown": {
+        "dockerComposeFiles": 9,
+        "serviceDockerfiles": 7,
+        "baseImageDockerfiles": 12,
+        "oldBackupFiles": 8,
+        "serviceLevelDockerfiles": 7,
+        "duplicateVariants": 38
+      },
+      "locations": {
+        "docker/": 57,
+        "docker/services/": 18,
+        "docker/base/": 6,
+        "docker/base-images/": 4,
+        "docker/service-images/": 7,
+        "docker/.old/": 8,
+        "backend/": 7,
+        "root/": 5
+      }
+    },
+
+    "redisUsage": {
+      "purpose": "multi-function",
+      "useCases": [
+        {
+          "type": "pub-sub",
+          "services": ["websocket", "analysis", "processing", "download"],
+          "channels": [
+            "download:job:created",
+            "download:job:completed",
+            "processing:job:created",
+            "processing:job:completed",
+            "broadcast:all",
+            "websocket:messages"
+          ],
+          "description": "Inter-service event messaging and real-time updates"
+        },
+        {
+          "type": "cache",
+          "services": ["analysis", "processing", "download", "spotify"],
+          "keys": [
+            "download:job:{jobId}",
+            "processing:job:{jobId}",
+            "analysis:job:{jobId}",
+            "track:{trackId}:jobs",
+            "track:{trackId}:autoProcess",
+            "track:{trackId}:autoAnalyze",
+            "track:{trackId}:separationOptions"
+          ],
+          "description": "Job state management and track configuration"
+        },
+        {
+          "type": "session-store",
+          "services": ["api-gateway"],
+          "description": "Potential session data storage (minimal usage)"
+        }
+      ],
+      "connections": {
+        "analysis-service": 3,
+        "processing-service": 3,
+        "download-service": 2,
+        "websocket-service": 2,
+        "spotify-service": 1,
+        "api-gateway": 0
+      },
+      "containerConfig": {
+        "image": "redis:7.2-alpine",
+        "port": 6379,
+        "persistence": "redis_data volume",
+        "config": "docker/config/redis.conf"
+      }
+    },
+
+    "supabaseIntegration": {
+      "currentUsage": "minimal",
+      "configuredServices": ["api-gateway", "frontend"],
+      "features": {
+        "auth": "not-used",
+        "database": "not-used",
+        "storage": "not-used",
+        "realtime": "not-used"
+      },
+      "configuration": {
+        "url": "SUPABASE_URL env var",
+        "key": "SUPABASE_KEY env var",
+        "client": "@supabase/supabase-js"
+      },
+      "unusedPotential": [
+        "Realtime (replace Redis pub/sub)",
+        "Postgres (replace custom job storage)",
+        "Storage (audio file management)",
+        "Edge Functions (serverless processing)",
+        "Auth (user management)"
+      ]
+    },
+
+    "networkArchitecture": {
+      "networks": [
+        {
+          "name": "sound-forge-external",
+          "driver": "bridge",
+          "services": ["frontend", "api-gateway"],
+          "purpose": "Public-facing services"
+        },
+        {
+          "name": "sound-forge-internal",
+          "driver": "bridge",
+          "services": [
+            "api-gateway",
+            "spotify-service",
+            "download-service",
+            "processing-service",
+            "analysis-service",
+            "websocket-service",
+            "redis"
+          ],
+          "purpose": "Backend service communication"
+        }
+      ],
+      "volumes": [
+        "shared_audio (audio_data)",
+        "shared_cache",
+        "shared_tmp",
+        "shared_logs",
+        "redis_data"
+      ],
+      "portMappings": {
+        "frontend": "8001:8001",
+        "api-gateway": "3000:3000",
+        "spotify-service": "3001:3001",
+        "download-service": "3002:3002",
+        "processing-service": "3003:3003",
+        "analysis-service": "3004:3004",
+        "websocket-service": "3006:3006",
+        "redis": "6379:6379",
+        "redis-commander": "8081:8081",
+        "adminer": "8080:8080"
+      }
+    }
+  },
+
+  "consolidationPlan": {
+    "phase1": {
+      "name": "Docker Simplification",
+      "targetReduction": "81 → 15 files (81% reduction)",
+      "actions": [
+        {
+          "action": "Remove old/backup files",
+          "files": [
+            "docker/.old/*",
+            "docker/Dockerfile.*.bak"
+          ],
+          "savings": "8 files"
+        },
+        {
+          "action": "Consolidate base images",
+          "current": "12 base image Dockerfiles",
+          "target": "3 base images (node-base, python-node-base, gpu-base)",
+          "locations": [
+            "docker/base/Dockerfile.node-base",
+            "docker/base/Dockerfile.python-node-base",
+            "docker/base/Dockerfile.gpu-base"
+          ],
+          "savings": "9 files"
+        },
+        {
+          "action": "Standardize service Dockerfiles",
+          "current": "Multiple variants per service",
+          "target": "1 multi-stage Dockerfile per service (7 total)",
+          "pattern": "docker/services/Dockerfile.{service-name}",
+          "savings": "30+ files"
+        },
+        {
+          "action": "Consolidate docker-compose files",
+          "current": "9 compose files",
+          "target": "2 files (docker-compose.yml + docker-compose.override.yml)",
+          "strategy": "Use profiles (dev/prod) and overrides",
+          "savings": "7 files"
+        }
+      ],
+      "expectedOutcome": {
+        "baseImages": 3,
+        "serviceDockerfiles": 7,
+        "composeFiles": 2,
+        "total": 12,
+        "reduction": "85%"
+      }
+    },
+
+    "phase2": {
+      "name": "Redis → Supabase Realtime Migration",
+      "feasibility": "HIGH",
+      "reasoning": "Supabase Realtime provides same pub/sub functionality with additional benefits",
+      "actions": [
+        {
+          "step": "Enable Supabase Realtime",
+          "tasks": [
+            "Configure Supabase project for Realtime",
+            "Create broadcast channels matching Redis channels",
+            "Set up presence tracking for WebSocket clients"
+          ]
+        },
+        {
+          "step": "Migrate pub/sub channels",
+          "mappings": [
+            {
+              "redis": "download:job:created",
+              "supabase": "realtime:download-jobs (broadcast)",
+              "services": ["processing-service"]
+            },
+            {
+              "redis": "download:job:completed",
+              "supabase": "realtime:download-jobs (broadcast)",
+              "services": ["processing-service", "analysis-service"]
+            },
+            {
+              "redis": "processing:job:completed",
+              "supabase": "realtime:processing-jobs (broadcast)",
+              "services": ["analysis-service", "websocket-service"]
+            },
+            {
+              "redis": "broadcast:all",
+              "supabase": "realtime:broadcast (broadcast)",
+              "services": ["websocket-service"]
+            },
+            {
+              "redis": "websocket:messages",
+              "supabase": "realtime:messages (broadcast)",
+              "services": ["all"]
+            }
+          ]
+        },
+        {
+          "step": "Replace Redis clients",
+          "changes": [
+            {
+              "file": "backend/shared/redis.js",
+              "action": "Create backend/shared/supabase-realtime.js",
+              "implementation": "Supabase client with broadcast/presence helpers"
+            },
+            {
+              "file": "backend/*/src/index.js",
+              "action": "Replace Redis pub/sub with Supabase Realtime",
+              "pattern": "Replace ioredis imports with @supabase/supabase-js"
+            }
+          ]
+        },
+        {
+          "step": "Update WebSocket service",
+          "implementation": "Use Supabase Realtime channels instead of custom WebSocket + Redis",
+          "benefits": [
+            "Automatic scaling",
+            "Built-in presence tracking",
+            "Message history",
+            "No separate WebSocket server needed"
+          ]
+        }
+      ],
+      "benefits": {
+        "infrastructure": "Remove Redis container",
+        "complexity": "Eliminate Redis connection management",
+        "scaling": "Automatic horizontal scaling",
+        "features": "Presence, broadcast, postgres changes",
+        "monitoring": "Built-in Supabase dashboard",
+        "cost": "Potentially lower (managed service)"
+      },
+      "risks": {
+        "latency": "LOW - Supabase Realtime is highly optimized",
+        "vendor-lock": "MEDIUM - Tied to Supabase ecosystem",
+        "migration": "LOW - Straightforward API replacement"
+      }
+    },
+
+    "phase3": {
+      "name": "Job Storage → Supabase Postgres Migration",
+      "feasibility": "HIGH",
+      "reasoning": "Redis used for simple key-value job storage - better suited for Postgres with Supabase SDK",
+      "actions": [
+        {
+          "step": "Design Supabase schema",
+          "tables": [
+            {
+              "name": "download_jobs",
+              "columns": [
+                "id UUID PRIMARY KEY",
+                "track_id TEXT NOT NULL",
+                "status TEXT NOT NULL",
+                "progress INTEGER DEFAULT 0",
+                "output_path TEXT",
+                "error TEXT",
+                "created_at TIMESTAMP DEFAULT NOW()",
+                "updated_at TIMESTAMP DEFAULT NOW()"
+              ],
+              "indexes": ["track_id", "status"],
+              "rls": true
+            },
+            {
+              "name": "processing_jobs",
+              "columns": [
+                "id UUID PRIMARY KEY",
+                "track_id TEXT NOT NULL",
+                "download_job_id UUID REFERENCES download_jobs(id)",
+                "status TEXT NOT NULL",
+                "progress INTEGER DEFAULT 0",
+                "model TEXT",
+                "options JSONB",
+                "output_paths TEXT[]",
+                "error TEXT",
+                "created_at TIMESTAMP DEFAULT NOW()",
+                "updated_at TIMESTAMP DEFAULT NOW()"
+              ],
+              "indexes": ["track_id", "status", "download_job_id"],
+              "rls": true
+            },
+            {
+              "name": "analysis_jobs",
+              "columns": [
+                "id UUID PRIMARY KEY",
+                "track_id TEXT NOT NULL",
+                "processing_job_id UUID REFERENCES processing_jobs(id)",
+                "status TEXT NOT NULL",
+                "results JSONB",
+                "error TEXT",
+                "created_at TIMESTAMP DEFAULT NOW()",
+                "updated_at TIMESTAMP DEFAULT NOW()"
+              ],
+              "indexes": ["track_id", "status", "processing_job_id"],
+              "rls": true
+            },
+            {
+              "name": "track_settings",
+              "columns": [
+                "track_id TEXT PRIMARY KEY",
+                "auto_process BOOLEAN DEFAULT false",
+                "auto_analyze BOOLEAN DEFAULT false",
+                "separation_options JSONB",
+                "created_at TIMESTAMP DEFAULT NOW()",
+                "updated_at TIMESTAMP DEFAULT NOW()"
+              ],
+              "rls": true
+            }
+          ]
+        },
+        {
+          "step": "Replace Redis key-value operations",
+          "mappings": [
+            {
+              "redis": "redis.set(`download:job:${jobId}`, JSON.stringify(jobData))",
+              "supabase": "supabase.from('download_jobs').upsert(jobData)"
+            },
+            {
+              "redis": "redis.get(`download:job:${jobId}`)",
+              "supabase": "supabase.from('download_jobs').select('*').eq('id', jobId).single()"
+            },
+            {
+              "redis": "redis.sadd(`track:${trackId}:jobs`, jobId)",
+              "supabase": "Automatic via foreign key relationship"
+            },
+            {
+              "redis": "redis.get(`track:${trackId}:autoProcess`)",
+              "supabase": "supabase.from('track_settings').select('auto_process').eq('track_id', trackId).single()"
+            }
+          ]
+        },
+        {
+          "step": "Enable Realtime for job updates",
+          "implementation": "Use Supabase Postgres Changes to broadcast job status updates",
+          "channels": [
+            "download_jobs:status",
+            "processing_jobs:status",
+            "analysis_jobs:status"
+          ],
+          "benefit": "Automatic pub/sub when job status changes (no manual publish needed)"
+        }
+      ],
+      "benefits": {
+        "queryability": "SQL queries instead of key patterns",
+        "relationships": "Foreign keys and joins",
+        "transactions": "ACID compliance",
+        "history": "Automatic audit trails",
+        "realtime": "Built-in change notifications",
+        "backup": "Automated Supabase backups"
+      }
+    },
+
+    "phase4": {
+      "name": "Simplified Docker Architecture",
+      "structure": {
+        "baseImages": [
+          {
+            "name": "sound-forge-node-base",
+            "file": "docker/base/Dockerfile.node-base",
+            "from": "node:20-alpine",
+            "includes": ["node", "npm", "common tools"],
+            "stages": ["dependencies", "development", "production"]
+          },
+          {
+            "name": "sound-forge-python-node-base",
+            "file": "docker/base/Dockerfile.python-node-base",
+            "from": "sound-forge-node-base",
+            "includes": ["python3", "pip", "audio libs"],
+            "stages": ["dependencies", "development", "production"]
+          },
+          {
+            "name": "sound-forge-gpu-base",
+            "file": "docker/base/Dockerfile.gpu-base",
+            "from": "nvidia/cuda:12.1.0-runtime-ubuntu22.04",
+            "includes": ["cuda", "cudnn", "python", "node"],
+            "stages": ["dependencies", "development", "production"]
+          }
+        ],
+        "serviceImages": [
+          {
+            "service": "api-gateway",
+            "base": "sound-forge-node-base",
+            "file": "docker/services/Dockerfile.api-gateway"
+          },
+          {
+            "service": "spotify-service",
+            "base": "sound-forge-node-base",
+            "file": "docker/services/Dockerfile.spotify"
+          },
+          {
+            "service": "download-service",
+            "base": "sound-forge-node-base",
+            "file": "docker/services/Dockerfile.download"
+          },
+          {
+            "service": "processing-service",
+            "base": "sound-forge-python-node-base (or gpu-base)",
+            "file": "docker/services/Dockerfile.processing"
+          },
+          {
+            "service": "analysis-service",
+            "base": "sound-forge-node-base",
+            "file": "docker/services/Dockerfile.analysis"
+          },
+          {
+            "service": "websocket-service",
+            "base": "sound-forge-node-base",
+            "file": "docker/services/Dockerfile.websocket",
+            "note": "May be eliminated if using Supabase Realtime exclusively"
+          },
+          {
+            "service": "frontend",
+            "base": "node:20-alpine → nginx:alpine",
+            "file": "docker/services/Dockerfile.frontend"
+          }
+        ],
+        "compose": [
+          {
+            "file": "docker-compose.yml",
+            "purpose": "Base configuration for all services",
+            "profiles": ["dev", "prod"],
+            "includes": ["all services", "networks", "volumes"]
+          },
+          {
+            "file": "docker-compose.override.yml",
+            "purpose": "Local development overrides (auto-loaded)",
+            "includes": ["volume mounts", "hot reload", "debug ports"]
+          }
+        ]
+      }
+    },
+
+    "phase5": {
+      "name": "Network Optimization",
+      "simplifications": [
+        {
+          "current": "Redis container with pub/sub channels",
+          "future": "Supabase Realtime (external managed service)"
+        },
+        {
+          "current": "Custom WebSocket service for real-time updates",
+          "future": "Supabase Realtime channels (may eliminate service)"
+        },
+        {
+          "current": "Redis Commander (dev tool)",
+          "future": "Supabase Dashboard (built-in)"
+        }
+      ],
+      "proposedNetworks": {
+        "sound-forge-external": {
+          "services": ["frontend", "api-gateway"],
+          "purpose": "Public-facing services only"
+        },
+        "sound-forge-internal": {
+          "services": [
+            "api-gateway",
+            "spotify-service",
+            "download-service",
+            "processing-service",
+            "analysis-service"
+          ],
+          "purpose": "Backend microservices (no redis, no websocket if using Supabase)"
+        }
+      },
+      "volumeOptimization": {
+        "keep": ["shared_audio", "shared_cache", "shared_tmp", "shared_logs"],
+        "remove": ["redis_data"],
+        "consider": "Supabase Storage for shared_audio (long-term)"
+      }
+    }
+  },
+
+  "migrationRoadmap": {
+    "immediate": [
+      "Clean up old/backup Docker files (8 files)",
+      "Consolidate base image Dockerfiles to 3 canonical versions",
+      "Remove duplicate service Dockerfile variants"
+    ],
+    "shortTerm": [
+      "Set up Supabase project with Realtime enabled",
+      "Create Supabase schema for job storage (download_jobs, processing_jobs, analysis_jobs, track_settings)",
+      "Implement backend/shared/supabase-realtime.js wrapper module",
+      "Migrate one service (e.g., download-service) to test Supabase integration"
+    ],
+    "mediumTerm": [
+      "Migrate all pub/sub channels from Redis to Supabase Realtime",
+      "Migrate all job storage from Redis to Supabase Postgres",
+      "Update WebSocket service to proxy Supabase Realtime (or eliminate entirely)",
+      "Remove Redis container from docker-compose.yml"
+    ],
+    "longTerm": [
+      "Consider Supabase Storage for audio file management",
+      "Implement Supabase Auth for user management",
+      "Explore Supabase Edge Functions for serverless audio processing tasks",
+      "Evaluate GPU processing via Supabase Edge Functions + external GPU services"
+    ]
+  },
+
+  "expectedOutcomes": {
+    "dockerReduction": {
+      "before": "81 Docker files",
+      "after": "12 Docker files (3 base + 7 services + 2 compose)",
+      "reduction": "85%"
+    },
+    "infrastructureSimplification": {
+      "containersRemoved": ["redis", "redis-commander", "websocket-service (optional)"],
+      "servicesConsolidated": "Pub/sub + job storage + WebSocket → Supabase",
+      "managedServices": "Supabase (Realtime, Postgres, Storage, Auth)"
+    },
+    "operationalBenefits": {
+      "deployment": "Simpler docker-compose with fewer containers",
+      "scaling": "Supabase handles DB and Realtime scaling automatically",
+      "monitoring": "Unified Supabase dashboard for all data operations",
+      "maintenance": "No Redis tuning, backup, or version management",
+      "development": "Supabase local development via CLI"
+    },
+    "performanceConsiderations": {
+      "latency": "Comparable or better (Supabase is globally distributed)",
+      "reliability": "Higher (managed service with SLA)",
+      "scalability": "Superior (automatic horizontal scaling)",
+      "cost": "Potentially lower (no self-hosted Redis infrastructure)"
+    }
+  },
+
+  "riskMitigation": {
+    "phased-migration": "Migrate one service at a time, run parallel Redis + Supabase during transition",
+    "rollback-plan": "Keep Redis configuration in git, easy to revert",
+    "testing": "Comprehensive integration tests for pub/sub and job storage",
+    "monitoring": "Set up Supabase monitoring and alerts before full migration",
+    "documentation": "Document Supabase schema, channels, and migration steps"
+  },
+
+  "recommendations": {
+    "priority1": "Clean up Docker file sprawl immediately (low risk, high impact)",
+    "priority2": "Set up Supabase and migrate job storage (medium risk, high value)",
+    "priority3": "Migrate Redis pub/sub to Supabase Realtime (medium risk, high value)",
+    "priority4": "Consolidate/eliminate WebSocket service (low risk, medium value)",
+    "priority5": "Explore Supabase Storage for audio files (low priority, future optimization)"
+  }
+}

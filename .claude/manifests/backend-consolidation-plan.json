@@ -1,0 +1,367 @@
+{
+  "currentArchitecture": {
+    "services": 6,
+    "servicesList": [
+      "api-gateway (Express proxy)",
+      "spotify (Spotify API + spotdl wrapper)",
+      "download (spotdl wrapper for downloading)",
+      "processing (Demucs audio separation)",
+      "analysis (librosa/essentia analysis)",
+      "websocket (Socket.IO realtime updates)"
+    ],
+    "infrastructure": [
+      "Redis (pub/sub + caching)",
+      "PostgreSQL (referenced but not actively used)",
+      "Supabase (configured but minimally used)"
+    ],
+    "complexity": "high",
+    "totalDockerServices": 6,
+    "interServiceCommunication": "HTTP REST + Redis pub/sub",
+    "currentIssues": [
+      "Excessive service fragmentation",
+      "Redis used for state management instead of Supabase",
+      "Custom WebSocket implementation instead of Supabase Realtime",
+      "API Gateway is just a simple proxy",
+      "Spotify service duplicates metadata fetching that could be client-side"
+    ]
+  },
+
+  "servicesToRemove": [
+    {
+      "name": "api-gateway",
+      "reason": "Simple HTTP proxy with no business logic",
+      "replacement": "Supabase Edge Functions + direct client-side calls",
+      "impact": "Low - just routing, no state",
+      "dependencies": ["All services currently proxy through this"]
+    },
+    {
+      "name": "websocket",
+      "reason": "Custom Socket.IO implementation for realtime updates",
+      "replacement": "Supabase Realtime (Channels + Presence)",
+      "impact": "Medium - need to migrate Redis pub/sub to Supabase",
+      "dependencies": ["processing, download services publish updates here"]
+    },
+    {
+      "name": "spotify",
+      "reason": "Metadata fetching can be done client-side",
+      "replacement": "Spotify Web API (client-side) + Supabase Edge Function for sensitive operations",
+      "impact": "Medium - requires frontend changes",
+      "dependencies": ["None - just metadata fetching"],
+      "note": "Keep spotdl functionality but move to worker service"
+    }
+  ],
+
+  "servicesToConsolidate": [
+    {
+      "services": ["download", "processing", "analysis"],
+      "newService": "audio-worker",
+      "reason": "Sequential pipeline: download → process → analyze. All CPU/Python-heavy operations.",
+      "benefits": [
+        "Single queue-based worker service",
+        "Shared Python environment (Demucs + librosa + essentia)",
+        "Natural pipeline: download MP3 → separate stems → analyze audio features",
+        "Reduced container overhead",
+        "Simpler orchestration"
+      ],
+      "implementation": {
+        "language": "Python + Node.js wrapper",
+        "queue": "Supabase Queue (pg_cron) or BullMQ with Redis",
+        "architecture": "Job queue with state stored in Supabase",
+        "endpoints": [
+          "POST /jobs/audio - Create audio processing job",
+          "GET /jobs/:id - Get job status",
+          "GET /jobs/:id/results - Get analysis results + stems"
+        ]
+      }
+    }
+  ],
+
+  "newArchitecture": {
+    "services": ["audio-worker"],
+    "servicesDescription": {
+      "audio-worker": {
+        "purpose": "Unified audio processing pipeline",
+        "responsibilities": [
+          "Download tracks via spotdl",
+          "Separate stems via Demucs",
+          "Analyze audio features via librosa/essentia",
+          "Store results in Supabase"
+        ],
+        "technology": "Python (FastAPI) with Node.js for spotdl",
+        "scaling": "Horizontal (multiple workers consume from same queue)",
+        "state": "Supabase PostgreSQL + Storage"
+      }
+    },
+    "infrastructure": [
+      "Supabase (PostgreSQL + Storage + Realtime + Edge Functions + Auth)",
+      "Redis (optional - only for BullMQ if needed for advanced queue features)"
+    ],
+    "clientSideServices": [
+      "Spotify Web API (metadata fetching)",
+      "Supabase Realtime (progress updates)",
+      "Supabase Storage (audio file access)"
+    ],
+    "description": "Single audio-worker service + Supabase managed services + client-side Spotify API"
+  },
+
+  "replacements": [
+    {
+      "current": "Redis pub/sub",
+      "replaceWith": "Supabase Realtime Channels",
+      "reason": "Managed service, integrates with PostgreSQL, supports presence",
+      "migration": "Convert Redis PUBLISH to Supabase channel.send()"
+    },
+    {
+      "current": "Redis caching (Spotify metadata)",
+      "replaceWith": "Client-side caching + Supabase PostgreSQL",
+      "reason": "Spotify metadata should be fetched client-side; persistent data in PostgreSQL",
+      "migration": "Remove Redis cache, use React Query for client cache"
+    },
+    {
+      "current": "Custom API Gateway proxy",
+      "replaceWith": "Supabase Edge Functions + direct service calls",
+      "reason": "No business logic, just routing",
+      "migration": "Frontend calls services directly or via Edge Functions"
+    },
+    {
+      "current": "Custom WebSocket service",
+      "replaceWith": "Supabase Realtime",
+      "reason": "Managed realtime subscriptions with Postgres integration",
+      "migration": "Use supabase.channel() API instead of Socket.IO"
+    },
+    {
+      "current": "Spotify service (metadata only)",
+      "replaceWith": "Spotify Web API (client-side)",
+      "reason": "Public API, no server needed for metadata",
+      "migration": "Use spotify-web-api-js in frontend with OAuth PKCE flow"
+    },
+    {
+      "current": "File storage in Docker volumes",
+      "replaceWith": "Supabase Storage",
+      "reason": "Managed, accessible via CDN, integrates with auth",
+      "migration": "Upload stems and results to Supabase Storage buckets"
+    }
+  ],
+
+  "detailedMigrationPlan": {
+    "phase1": {
+      "name": "Setup Supabase Infrastructure",
+      "duration": "1-2 days",
+      "tasks": [
+        "Create Supabase project",
+        "Design PostgreSQL schema for jobs, tracks, stems, analysis_results",
+        "Create Storage buckets: audio-files, stems, analysis-data",
+        "Setup Row Level Security policies",
+        "Configure Realtime on jobs table",
+        "Create database functions for job state transitions"
+      ]
+    },
+    "phase2": {
+      "name": "Build Audio Worker Service",
+      "duration": "3-5 days",
+      "tasks": [
+        "Create FastAPI service structure",
+        "Integrate spotdl for downloads",
+        "Integrate Demucs for stem separation",
+        "Integrate librosa/essentia for analysis",
+        "Implement job queue consumer (Supabase or BullMQ)",
+        "Store results in Supabase (database + storage)",
+        "Publish progress updates to Supabase Realtime",
+        "Add health checks and monitoring"
+      ]
+    },
+    "phase3": {
+      "name": "Frontend Migration",
+      "duration": "2-3 days",
+      "tasks": [
+        "Install @supabase/supabase-js",
+        "Replace WebSocket with Supabase Realtime subscriptions",
+        "Implement client-side Spotify API integration",
+        "Update API calls to hit audio-worker directly",
+        "Add Supabase Storage integration for file access",
+        "Implement React Query for caching",
+        "Remove dependencies on old services"
+      ]
+    },
+    "phase4": {
+      "name": "Supabase Edge Functions (Optional)",
+      "duration": "1-2 days",
+      "tasks": [
+        "Create Edge Function for Spotify OAuth if needed",
+        "Create Edge Function for job creation with validation",
+        "Create Edge Function for webhook processing",
+        "Deploy and test Edge Functions"
+      ]
+    },
+    "phase5": {
+      "name": "Deprecate Old Services",
+      "duration": "1 day",
+      "tasks": [
+        "Remove api-gateway service",
+        "Remove websocket service",
+        "Remove spotify service",
+        "Remove download service",
+        "Remove processing service",
+        "Remove analysis service",
+        "Update docker-compose.yml",
+        "Remove Redis if not needed for queue",
+        "Remove PostgreSQL container (using Supabase)"
+      ]
+    },
+    "phase6": {
+      "name": "Testing & Optimization",
+      "duration": "2-3 days",
+      "tasks": [
+        "End-to-end testing of audio pipeline",
+        "Load testing with multiple concurrent jobs",
+        "Optimize Supabase queries and indexes",
+        "Setup monitoring and alerting",
+        "Document new architecture",
+        "Update deployment scripts"
+      ]
+    }
+  },
+
+  "migrationPath": [
+    "1. Setup Supabase project and schema",
+    "2. Build unified audio-worker service (download + processing + analysis)",
+    "3. Migrate frontend to Supabase Realtime and client-side Spotify API",
+    "4. Deprecate and remove 6 microservices",
+    "5. Remove Redis (if using Supabase for queue) and PostgreSQL containers",
+    "6. Test and optimize"
+  ],
+
+  "estimatedReduction": "6 services → 1 service (-83%)",
+
+  "metricsComparison": {
+    "before": {
+      "dockerServices": 6,
+      "infrastructure": 2,
+      "totalContainers": 8,
+      "codebasesServices": 6,
+      "communicationPatterns": 3,
+      "stateManagement": "Redis + filesystem",
+      "realtime": "Custom Socket.IO",
+      "deployment": "8 containers to orchestrate"
+    },
+    "after": {
+      "dockerServices": 1,
+      "infrastructure": 1,
+      "totalContainers": 2,
+      "codebasesServices": 1,
+      "communicationPatterns": 1,
+      "stateManagement": "Supabase PostgreSQL + Storage",
+      "realtime": "Supabase Realtime",
+      "deployment": "1 worker + Supabase (managed)"
+    },
+    "improvements": {
+      "containerReduction": "75% (8 → 2)",
+      "serviceReduction": "83% (6 → 1)",
+      "managedServices": "+Supabase (database, storage, realtime, auth, edge functions)",
+      "complexity": "Significantly reduced",
+      "maintenance": "Much lower",
+      "scalability": "Improved (Supabase scales automatically, workers scale horizontally)"
+    }
+  },
+
+  "architectureDiagram": {
+    "current": "Client → API Gateway → [Spotify, Download, Processing, Analysis, WebSocket] → Redis ← → All Services",
+    "proposed": "Client → [Supabase Realtime, Spotify Web API, Audio Worker] → Supabase (PostgreSQL + Storage + Realtime)"
+  },
+
+  "costsConsiderations": {
+    "current": {
+      "infrastructure": "Self-hosted (Docker + Redis + PostgreSQL)",
+      "compute": "6 containers running continuously",
+      "scaling": "Manual, complex orchestration"
+    },
+    "proposed": {
+      "infrastructure": "Supabase (free tier: 500MB database, 1GB storage, generous realtime)",
+      "compute": "1 worker container (can be spot/preemptible)",
+      "scaling": "Automatic (Supabase) + horizontal workers",
+      "savings": "Reduced operational overhead, pay-as-you-grow"
+    }
+  },
+
+  "riskAssessment": {
+    "low": [
+      "Removing API Gateway (just a proxy)",
+      "Replacing Redis cache with client-side cache",
+      "Moving Spotify to client-side"
+    ],
+    "medium": [
+      "Replacing WebSocket with Supabase Realtime (well-documented migration)",
+      "Consolidating services (requires refactoring but clear boundaries)"
+    ],
+    "high": [
+      "None - all replacements are proven technologies"
+    ]
+  },
+
+  "recommendations": [
+    "Start with Phase 1 & 2 in parallel - setup Supabase while building audio-worker",
+    "Keep Redis temporarily if using BullMQ for job queue (can migrate to Supabase Queue later)",
+    "Use Supabase Storage for all audio files (stems, downloads, analysis results)",
+    "Implement proper job state machine in PostgreSQL with triggers",
+    "Use Supabase Realtime for live progress updates instead of polling",
+    "Consider Supabase Edge Functions for rate limiting and validation",
+    "Setup proper monitoring from day 1 (Supabase has built-in monitoring)",
+    "Use feature flags to gradually migrate users to new architecture",
+    "Keep old services running during migration for rollback capability"
+  ],
+
+  "technicalDebt": {
+    "eliminated": [
+      "Custom API routing logic",
+      "Custom WebSocket implementation",
+      "Inter-service HTTP communication overhead",
+      "Redis state synchronization complexity",
+      "Docker volume management for audio files",
+      "Service discovery and health check overhead"
+    ],
+    "introduced": [
+      "Supabase vendor lock-in (mitigated: open-source, can self-host)",
+      "Need to learn Supabase APIs (well-documented)"
+    ]
+  },
+
+  "supabaseFeaturesToLeverage": {
+    "database": "PostgreSQL with real-time subscriptions, RLS, triggers, functions",
+    "storage": "S3-compatible object storage with CDN, image transformations",
+    "realtime": "WebSocket subscriptions to database changes, custom channels, presence",
+    "auth": "User authentication if needed for multi-user features",
+    "edgeFunctions": "Deno-based serverless functions for custom logic",
+    "queue": "pg_cron or pg_net for job scheduling (or use external BullMQ)",
+    "vector": "pgvector extension for audio similarity search (future feature)"
+  },
+
+  "alternativeConsiderations": {
+    "keepRedis": {
+      "if": "Advanced queue features needed (delayed jobs, priorities, retries)",
+      "use": "BullMQ with Redis",
+      "impact": "Keep Redis container, but still remove 5 services"
+    },
+    "edgeFunctionsVsWorker": {
+      "edgeFunctions": "Not suitable for long-running CPU tasks (10s timeout)",
+      "worker": "Required for Demucs/analysis (can take minutes)",
+      "hybrid": "Edge Functions for API, Worker for processing"
+    },
+    "spotifyServerSide": {
+      "if": "Need to hide client credentials or server-to-server API",
+      "use": "Supabase Edge Function for OAuth",
+      "otherwise": "Client-side is simpler and reduces server load"
+    }
+  },
+
+  "successCriteria": [
+    "Reduce Docker containers from 8 to 2 (audio-worker + Redis optional)",
+    "All realtime updates working via Supabase Realtime",
+    "Audio files stored in Supabase Storage",
+    "Job state tracked in Supabase PostgreSQL",
+    "No custom API Gateway or WebSocket code",
+    "Spotify metadata fetched client-side",
+    "Same or better user experience",
+    "Faster development iteration (less services to manage)",
+    "Easier deployment and scaling"
+  ]
+}

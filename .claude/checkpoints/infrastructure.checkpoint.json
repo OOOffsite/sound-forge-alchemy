@@ -1,0 +1,28 @@
+{
+  "timestamp": "2025-12-16T00:30:00Z",
+  "agentId": "infrastructure-analysis",
+  "status": "completed",
+  "progress": 100,
+  "findings": {
+    "dockerFileCount": 81,
+    "dockerFilesInDockerDir": 57,
+    "serviceDockerfiles": 7,
+    "baseImageDockerfiles": 12,
+    "oldBackupDockerfiles": 8,
+    "dockerComposeFiles": 9,
+    "redisUsageFiles": 6,
+    "redisUsageType": "pub-sub-and-cache-and-job-storage",
+    "redisChannels": 6,
+    "supabaseIntegration": "partial-minimal",
+    "redisReplacement": "supabase-realtime-and-postgres",
+    "postgresReplacement": "supabase-postgres",
+    "simplificationRatio": "85%",
+    "targetDockerFiles": 12,
+    "containerReduction": 3
+  },
+  "outputFiles": [
+    ".claude/manifests/infrastructure-detailed.json",
+    ".claude/manifests/all-dockerfiles.txt",
+    ".claude/manifests/redis-usage.txt"
+  ]
+}

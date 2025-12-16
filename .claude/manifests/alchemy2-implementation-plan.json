@@ -1,0 +1,1018 @@
+{
+  "metadata": {
+    "generated": "2025-12-16T00:00:00Z",
+    "projectPath": "/Users/jeremiah/Developer/sound-forge-alchemy",
+    "targetDirectory": "alchemy2/",
+    "estimatedDuration": "5 weeks",
+    "totalTasks": 87,
+    "parallelCapable": 45
+  },
+
+  "phases": [
+    {
+      "phase": 1,
+      "name": "Preparation & Setup",
+      "duration": "1 week",
+      "startWeek": 1,
+      "objectives": [
+        "Set up alchemy2/ directory structure",
+        "Configure Supabase project",
+        "Create Docker base images",
+        "Establish development environment"
+      ],
+      "tasks": [
+        {
+          "id": "P1-T1",
+          "name": "Create alchemy2 directory structure",
+          "agent": "structure-agent",
+          "priority": "critical",
+          "effort": "2 hours",
+          "parallelizable": false,
+          "dependencies": [],
+          "commands": [
+            "mkdir -p alchemy2/{frontend,backend,supabase,docker}",
+            "mkdir -p alchemy2/frontend/{src,public}",
+            "mkdir -p alchemy2/frontend/src/{components,pages,lib,layouts,types}",
+            "mkdir -p alchemy2/backend/{src,python}",
+            "mkdir -p alchemy2/backend/src/{routes,services,workers,middleware,lib,types}",
+            "mkdir -p alchemy2/supabase/{migrations,seed}",
+            "mkdir -p alchemy2/docker/{base,services,config}"
+          ],
+          "successCriteria": [
+            "All directories created",
+            "Structure matches specification"
+          ]
+        },
+        {
+          "id": "P1-T2",
+          "name": "Set up Supabase project",
+          "agent": "supabase-agent",
+          "priority": "critical",
+          "effort": "3 hours",
+          "parallelizable": false,
+          "dependencies": ["P1-T1"],
+          "commands": [
+            "supabase init",
+            "supabase start",
+            "supabase db reset"
+          ],
+          "files": [
+            "alchemy2/supabase/config.toml",
+            "alchemy2/supabase/.env.local"
+          ],
+          "successCriteria": [
+            "Supabase running locally",
+            "Database accessible",
+            "Realtime enabled"
+          ]
+        },
+        {
+          "id": "P1-T3",
+          "name": "Create database schema migration",
+          "agent": "database-agent",
+          "priority": "high",
+          "effort": "4 hours",
+          "parallelizable": false,
+          "dependencies": ["P1-T2"],
+          "files": [
+            "alchemy2/supabase/migrations/001_initial_schema.sql",
+            "alchemy2/supabase/migrations/002_realtime_config.sql",
+            "alchemy2/supabase/migrations/003_storage_buckets.sql"
+          ],
+          "tables": [
+            "tracks",
+            "download_jobs",
+            "processing_jobs",
+            "analysis_jobs",
+            "track_settings"
+          ],
+          "successCriteria": [
+            "Migrations run successfully",
+            "Tables created with indexes",
+            "Realtime enabled for job tables"
+          ]
+        },
+        {
+          "id": "P1-T4",
+          "name": "Create Docker base images",
+          "agent": "docker-agent",
+          "priority": "high",
+          "effort": "4 hours",
+          "parallelizable": true,
+          "dependencies": ["P1-T1"],
+          "files": [
+            "alchemy2/docker/base/Dockerfile.node-base",
+            "alchemy2/docker/base/Dockerfile.python-node-base",
+            "alchemy2/docker/base/Dockerfile.gpu-base"
+          ],
+          "commands": [
+            "docker build -t sound-forge-node-base:latest -f alchemy2/docker/base/Dockerfile.node-base .",
+            "docker build -t sound-forge-python-node-base:latest -f alchemy2/docker/base/Dockerfile.python-node-base .",
+            "docker build -t sound-forge-gpu-base:latest -f alchemy2/docker/base/Dockerfile.gpu-base ."
+          ],
+          "successCriteria": [
+            "All 3 base images build successfully",
+            "Images tagged and available locally",
+            "Build time <10 minutes each"
+          ]
+        },
+        {
+          "id": "P1-T5",
+          "name": "Set up environment configuration",
+          "agent": "config-agent",
+          "priority": "medium",
+          "effort": "1 hour",
+          "parallelizable": true,
+          "dependencies": ["P1-T1", "P1-T2"],
+          "files": [
+            "alchemy2/.env.example",
+            "alchemy2/frontend/.env.example",
+            "alchemy2/backend/.env.example"
+          ],
+          "successCriteria": [
+            "All env templates created",
+            "Documented all required variables",
+            "Supabase credentials configured"
+          ]
+        }
+      ],
+      "successCriteria": [
+        "Directory structure complete",
+        "Supabase operational",
+        "Docker base images built",
+        "Environment configured"
+      ],
+      "risks": [
+        {
+          "risk": "Supabase setup fails",
+          "mitigation": "Use Supabase cloud if local fails",
+          "probability": "low"
+        }
+      ]
+    },
+
+    {
+      "phase": 2,
+      "name": "Backend Consolidation",
+      "duration": "2 weeks",
+      "startWeek": 2,
+      "objectives": [
+        "Create unified backend API",
+        "Migrate 4 services into 1",
+        "Implement Python worker pool",
+        "Replace Redis with Supabase"
+      ],
+      "tasks": [
+        {
+          "id": "P2-T1",
+          "name": "Create Express app skeleton",
+          "agent": "backend-agent",
+          "priority": "critical",
+          "effort": "4 hours",
+          "parallelizable": false,
+          "dependencies": ["P1-T3"],
+          "files": [
+            "alchemy2/backend/src/index.ts",
+            "alchemy2/backend/package.json",
+            "alchemy2/backend/tsconfig.json"
+          ],
+          "successCriteria": [
+            "Express app running",
+            "Health check endpoint functional",
+            "TypeScript configured"
+          ]
+        },
+        {
+          "id": "P2-T2",
+          "name": "Implement shared middleware",
+          "agent": "middleware-agent",
+          "priority": "high",
+          "effort": "6 hours",
+          "parallelizable": true,
+          "dependencies": ["P2-T1"],
+          "files": [
+            "alchemy2/backend/src/middleware/auth.ts",
+            "alchemy2/backend/src/middleware/error-handler.ts",
+            "alchemy2/backend/src/middleware/logger.ts",
+            "alchemy2/backend/src/middleware/validation.ts",
+            "alchemy2/backend/src/middleware/cors.ts"
+          ],
+          "successCriteria": [
+            "All middleware implemented",
+            "Unit tests passing",
+            "Integrated into Express app"
+          ]
+        },
+        {
+          "id": "P2-T3",
+          "name": "Create Supabase client library",
+          "agent": "supabase-agent",
+          "priority": "high",
+          "effort": "3 hours",
+          "parallelizable": true,
+          "dependencies": ["P1-T3"],
+          "files": [
+            "alchemy2/backend/src/lib/supabase.ts"
+          ],
+          "successCriteria": [
+            "Supabase client initialized",
+            "Connection tested",
+            "Helper methods created"
+          ]
+        },
+        {
+          "id": "P2-T4",
+          "name": "Migrate spotify-service routes",
+          "agent": "spotify-agent",
+          "priority": "high",
+          "effort": "8 hours",
+          "parallelizable": true,
+          "dependencies": ["P2-T1", "P2-T2", "P2-T3"],
+          "files": [
+            "alchemy2/backend/src/routes/spotify.ts",
+            "alchemy2/backend/src/services/spotify.service.ts"
+          ],
+          "endpoints": [
+            "POST /api/spotify/fetch",
+            "GET /api/spotify/fetch/stream"
+          ],
+          "successCriteria": [
+            "Endpoints functional",
+            "Integration tests passing",
+            "No Redis dependencies"
+          ]
+        },
+        {
+          "id": "P2-T5",
+          "name": "Migrate download-service routes",
+          "agent": "download-agent",
+          "priority": "high",
+          "effort": "8 hours",
+          "parallelizable": true,
+          "dependencies": ["P2-T1", "P2-T2", "P2-T3"],
+          "files": [
+            "alchemy2/backend/src/routes/download.ts",
+            "alchemy2/backend/src/services/download.service.ts"
+          ],
+          "endpoints": [
+            "POST /api/download/track",
+            "GET /api/download/job/:jobId",
+            "GET /api/download/track/:trackId"
+          ],
+          "successCriteria": [
+            "Endpoints functional",
+            "Job status in Supabase",
+            "Integration tests passing"
+          ]
+        },
+        {
+          "id": "P2-T6",
+          "name": "Migrate processing-service routes",
+          "agent": "processing-agent",
+          "priority": "high",
+          "effort": "10 hours",
+          "parallelizable": true,
+          "dependencies": ["P2-T1", "P2-T2", "P2-T3"],
+          "files": [
+            "alchemy2/backend/src/routes/processing.ts",
+            "alchemy2/backend/src/services/processing.service.ts"
+          ],
+          "endpoints": [
+            "GET /api/processing/models",
+            "POST /api/processing/models/download",
+            "POST /api/processing/separate",
+            "GET /api/processing/job/:jobId",
+            "GET /api/processing/track/:trackId"
+          ],
+          "successCriteria": [
+            "Endpoints functional",
+            "Demucs integration working",
+            "Integration tests passing"
+          ]
+        },
+        {
+          "id": "P2-T7",
+          "name": "Migrate analysis-service routes",
+          "agent": "analysis-agent",
+          "priority": "high",
+          "effort": "8 hours",
+          "parallelizable": true,
+          "dependencies": ["P2-T1", "P2-T2", "P2-T3"],
+          "files": [
+            "alchemy2/backend/src/routes/analysis.ts",
+            "alchemy2/backend/src/services/analysis.service.ts"
+          ],
+          "endpoints": [
+            "POST /api/analysis/analyze",
+            "GET /api/analysis/job/:jobId",
+            "GET /api/analysis/track/:trackId"
+          ],
+          "successCriteria": [
+            "Endpoints functional",
+            "librosa integration working",
+            "Integration tests passing"
+          ]
+        },
+        {
+          "id": "P2-T8",
+          "name": "Implement Python worker pool",
+          "agent": "worker-pool-agent",
+          "priority": "critical",
+          "effort": "12 hours",
+          "parallelizable": false,
+          "dependencies": ["P2-T1"],
+          "files": [
+            "alchemy2/backend/src/workers/worker-pool.ts",
+            "alchemy2/backend/src/workers/job-queue.ts",
+            "alchemy2/backend/python/demucs_worker.py",
+            "alchemy2/backend/python/analyzer.py"
+          ],
+          "successCriteria": [
+            "Worker pool operational",
+            "Job queue functional",
+            "Concurrent job processing working",
+            "2-3x performance improvement verified"
+          ]
+        },
+        {
+          "id": "P2-T9",
+          "name": "Implement Supabase Realtime pub/sub",
+          "agent": "realtime-agent",
+          "priority": "high",
+          "effort": "6 hours",
+          "parallelizable": true,
+          "dependencies": ["P2-T3"],
+          "files": [
+            "alchemy2/backend/src/lib/realtime.ts"
+          ],
+          "channels": [
+            "download-jobs",
+            "processing-jobs",
+            "analysis-jobs",
+            "broadcast"
+          ],
+          "successCriteria": [
+            "Realtime channels configured",
+            "Broadcast functional",
+            "Frontend can subscribe"
+          ]
+        },
+        {
+          "id": "P2-T10",
+          "name": "Replace spotdl with yt-dlp + Spotify Web API",
+          "agent": "download-agent",
+          "priority": "medium",
+          "effort": "10 hours",
+          "parallelizable": true,
+          "dependencies": ["P2-T5"],
+          "files": [
+            "alchemy2/backend/src/lib/spotify-api.ts",
+            "alchemy2/backend/src/lib/ytdlp.ts"
+          ],
+          "successCriteria": [
+            "Spotify Web API integrated",
+            "yt-dlp functional",
+            "Better error messages",
+            "Same or better reliability"
+          ]
+        },
+        {
+          "id": "P2-T11",
+          "name": "Write backend integration tests",
+          "agent": "test-agent",
+          "priority": "high",
+          "effort": "12 hours",
+          "parallelizable": true,
+          "dependencies": ["P2-T4", "P2-T5", "P2-T6", "P2-T7"],
+          "files": [
+            "alchemy2/backend/src/__tests__/spotify.test.ts",
+            "alchemy2/backend/src/__tests__/download.test.ts",
+            "alchemy2/backend/src/__tests__/processing.test.ts",
+            "alchemy2/backend/src/__tests__/analysis.test.ts"
+          ],
+          "successCriteria": [
+            "All endpoint tests passing",
+            "Coverage >80%",
+            "Integration tests successful"
+          ]
+        }
+      ],
+      "successCriteria": [
+        "All API endpoints functional",
+        "No Redis dependencies",
+        "Python worker pool operational",
+        "Integration tests passing"
+      ],
+      "risks": [
+        {
+          "risk": "Python worker pool instability",
+          "mitigation": "Fallback to spawn, extensive error handling",
+          "probability": "medium"
+        },
+        {
+          "risk": "Supabase Realtime latency",
+          "mitigation": "Fallback to Socket.IO if needed",
+          "probability": "low"
+        }
+      ]
+    },
+
+    {
+      "phase": 3,
+      "name": "Frontend Optimization",
+      "duration": "1.5 weeks",
+      "startWeek": 3,
+      "objectives": [
+        "Remove unused components and dependencies",
+        "Implement code splitting",
+        "Fix circular dependencies and TypeScript issues",
+        "Update API client"
+      ],
+      "tasks": [
+        {
+          "id": "P3-T1",
+          "name": "Copy frontend to alchemy2",
+          "agent": "frontend-agent",
+          "priority": "critical",
+          "effort": "2 hours",
+          "parallelizable": false,
+          "dependencies": ["P1-T1"],
+          "commands": [
+            "cp -r src/ alchemy2/frontend/src/",
+            "cp -r public/ alchemy2/frontend/public/",
+            "cp package.json alchemy2/frontend/",
+            "cp vite.config.ts alchemy2/frontend/",
+            "cp tsconfig.json alchemy2/frontend/"
+          ],
+          "successCriteria": [
+            "All frontend files copied",
+            "Build succeeds"
+          ]
+        },
+        {
+          "id": "P3-T2",
+          "name": "Remove 47 unused UI components",
+          "agent": "cleanup-agent",
+          "priority": "high",
+          "effort": "3 hours",
+          "parallelizable": false,
+          "dependencies": ["P3-T1"],
+          "filesToRemove": [
+            "accordion.tsx", "alert-dialog.tsx", "alert.tsx", "aspect-ratio.tsx", 
+            "avatar.tsx", "badge.tsx", "breadcrumb.tsx", "calendar.tsx", "card.tsx",
+            "carousel.tsx", "chart.tsx", "checkbox.tsx", "collapsible.tsx", "command.tsx",
+            "context-menu.tsx", "drawer.tsx", "dropdown-menu.tsx", "form.tsx", 
+            "hover-card.tsx", "input-otp.tsx", "menubar.tsx", "navigation-menu.tsx",
+            "pagination.tsx", "popover.tsx", "progress.tsx", "radio-group.tsx",
+            "resizable.tsx", "scroll-area.tsx", "select.tsx", "separator.tsx",
+            "sheet.tsx", "sidebar.tsx", "skeleton.tsx", "slider.tsx", "switch.tsx",
+            "table.tsx", "tabs.tsx", "textarea.tsx", "toggle-group.tsx", "tooltip.tsx",
+            "DebugConsoleOverlay.tsx", "NotificationLog.tsx", "OverlayGrid.tsx",
+            "SettingsDropdown.tsx", "StickyPlayer.tsx", "VolumeVisualizer.tsx",
+            "routes.tsx"
+          ],
+          "successCriteria": [
+            "All unused files removed",
+            "Build still succeeds",
+            "No import errors"
+          ]
+        },
+        {
+          "id": "P3-T3",
+          "name": "Uninstall 22 unused Radix packages",
+          "agent": "dependency-agent",
+          "priority": "high",
+          "effort": "1 hour",
+          "parallelizable": false,
+          "dependencies": ["P3-T2"],
+          "commands": [
+            "cd alchemy2/frontend && npm uninstall @radix-ui/react-accordion @radix-ui/react-alert-dialog @radix-ui/react-aspect-ratio @radix-ui/react-avatar @radix-ui/react-checkbox @radix-ui/react-collapsible @radix-ui/react-context-menu @radix-ui/react-dropdown-menu @radix-ui/react-hover-card @radix-ui/react-menubar @radix-ui/react-navigation-menu @radix-ui/react-popover @radix-ui/react-progress @radix-ui/react-radio-group @radix-ui/react-scroll-area @radix-ui/react-select @radix-ui/react-separator @radix-ui/react-slider @radix-ui/react-switch @radix-ui/react-tabs @radix-ui/react-toggle-group @radix-ui/react-tooltip"
+          ],
+          "successCriteria": [
+            "Packages removed from package.json",
+            "node_modules cleaned",
+            "Build succeeds"
+          ]
+        },
+        {
+          "id": "P3-T4",
+          "name": "Remove unused heavy dependencies",
+          "agent": "dependency-agent",
+          "priority": "medium",
+          "effort": "2 hours",
+          "parallelizable": false,
+          "dependencies": ["P3-T3"],
+          "packagesToVerifyAndRemove": [
+            "recharts",
+            "react-day-picker",
+            "date-fns",
+            "cmdk",
+            "embla-carousel-react",
+            "vaul",
+            "input-otp"
+          ],
+          "successCriteria": [
+            "Verified packages not used",
+            "Packages removed",
+            "Build succeeds"
+          ]
+        },
+        {
+          "id": "P3-T5",
+          "name": "Fix circular dependency (StemViewer)",
+          "agent": "refactor-agent",
+          "priority": "high",
+          "effort": "3 hours",
+          "parallelizable": false,
+          "dependencies": ["P3-T1"],
+          "files": [
+            "alchemy2/frontend/src/components/StemViewer/types.ts",
+            "alchemy2/frontend/src/components/StemViewer/StemViewer.tsx",
+            "alchemy2/frontend/src/components/StemViewer/midiHandlers.ts"
+          ],
+          "successCriteria": [
+            "Circular dependency resolved",
+            "dependency-cruiser reports 0 cycles",
+            "Component still functional"
+          ]
+        },
+        {
+          "id": "P3-T6",
+          "name": "Replace 6 any types with proper types",
+          "agent": "typescript-agent",
+          "priority": "medium",
+          "effort": "4 hours",
+          "parallelizable": true,
+          "dependencies": ["P3-T1"],
+          "files": [
+            "alchemy2/frontend/src/lib/api.ts",
+            "alchemy2/frontend/src/lib/logger.ts",
+            "alchemy2/frontend/src/lib/modules/ModuleTypes.ts",
+            "alchemy2/frontend/src/lib/modules/ModuleMessaging.ts"
+          ],
+          "successCriteria": [
+            "All any types replaced",
+            "tsc --noEmit passes",
+            "No type errors"
+          ]
+        },
+        {
+          "id": "P3-T7",
+          "name": "Implement route-based code splitting",
+          "agent": "optimization-agent",
+          "priority": "high",
+          "effort": "4 hours",
+          "parallelizable": false,
+          "dependencies": ["P3-T2"],
+          "files": [
+            "alchemy2/frontend/src/App.tsx",
+            "alchemy2/frontend/vite.config.ts"
+          ],
+          "successCriteria": [
+            "Routes lazy loaded",
+            "Initial bundle <500 KB",
+            "Lighthouse score improved"
+          ]
+        },
+        {
+          "id": "P3-T8",
+          "name": "Configure Vite manual chunking",
+          "agent": "optimization-agent",
+          "priority": "medium",
+          "effort": "3 hours",
+          "parallelizable": false,
+          "dependencies": ["P3-T7"],
+          "files": [
+            "alchemy2/frontend/vite.config.ts"
+          ],
+          "successCriteria": [
+            "Vendor chunks optimized",
+            "Bundle analysis improved",
+            "Build time <30s"
+          ]
+        },
+        {
+          "id": "P3-T9",
+          "name": "Update API client for unified backend",
+          "agent": "api-agent",
+          "priority": "critical",
+          "effort": "6 hours",
+          "parallelizable": false,
+          "dependencies": ["P2-T11", "P3-T1"],
+          "files": [
+            "alchemy2/frontend/src/lib/api.ts"
+          ],
+          "successCriteria": [
+            "All API calls updated",
+            "Base URL points to unified backend",
+            "Error handling consistent"
+          ]
+        },
+        {
+          "id": "P3-T10",
+          "name": "Implement Supabase Realtime subscriptions",
+          "agent": "realtime-agent",
+          "priority": "high",
+          "effort": "5 hours",
+          "parallelizable": true,
+          "dependencies": ["P3-T1", "P2-T9"],
+          "files": [
+            "alchemy2/frontend/src/lib/supabase.ts"
+          ],
+          "successCriteria": [
+            "Realtime client configured",
+            "Job subscriptions working",
+            "Live updates functional"
+          ]
+        },
+        {
+          "id": "P3-T11",
+          "name": "Write frontend tests",
+          "agent": "test-agent",
+          "priority": "medium",
+          "effort": "8 hours",
+          "parallelizable": true,
+          "dependencies": ["P3-T9", "P3-T10"],
+          "files": [
+            "alchemy2/frontend/src/components/__tests__/",
+            "alchemy2/frontend/src/lib/__tests__/"
+          ],
+          "successCriteria": [
+            "Component tests passing",
+            "Coverage >70%",
+            "Integration tests successful"
+          ]
+        }
+      ],
+      "successCriteria": [
+        "Bundle size <720 KB",
+        "No circular dependencies",
+        "No TypeScript errors",
+        "Build succeeds with no warnings"
+      ],
+      "risks": [
+        {
+          "risk": "Code splitting breaks functionality",
+          "mitigation": "Thorough testing, lazy loading guards",
+          "probability": "low"
+        }
+      ]
+    },
+
+    {
+      "phase": 4,
+      "name": "Infrastructure Migration",
+      "duration": "1 week",
+      "startWeek": 4,
+      "objectives": [
+        "Deploy alchemy2 with new Docker setup",
+        "Migrate data from v1.0 to v2.0",
+        "Decommission old services"
+      ],
+      "tasks": [
+        {
+          "id": "P4-T1",
+          "name": "Build backend Docker image",
+          "agent": "docker-agent",
+          "priority": "critical",
+          "effort": "3 hours",
+          "parallelizable": false,
+          "dependencies": ["P2-T11"],
+          "files": [
+            "alchemy2/docker/services/Dockerfile.backend"
+          ],
+          "commands": [
+            "docker build -t sound-forge-backend:latest -f alchemy2/docker/services/Dockerfile.backend alchemy2/backend"
+          ],
+          "successCriteria": [
+            "Image builds successfully",
+            "Size <500 MB",
+            "Health check passes"
+          ]
+        },
+        {
+          "id": "P4-T2",
+          "name": "Build frontend Docker image",
+          "agent": "docker-agent",
+          "priority": "critical",
+          "effort": "2 hours",
+          "parallelizable": true,
+          "dependencies": ["P3-T11"],
+          "files": [
+            "alchemy2/docker/services/Dockerfile.frontend"
+          ],
+          "commands": [
+            "docker build -t sound-forge-frontend:latest -f alchemy2/docker/services/Dockerfile.frontend alchemy2/frontend"
+          ],
+          "successCriteria": [
+            "Image builds successfully",
+            "Size <50 MB",
+            "Nginx serving correctly"
+          ]
+        },
+        {
+          "id": "P4-T3",
+          "name": "Create docker-compose configuration",
+          "agent": "docker-agent",
+          "priority": "high",
+          "effort": "4 hours",
+          "parallelizable": false,
+          "dependencies": ["P4-T1", "P4-T2"],
+          "files": [
+            "alchemy2/docker-compose.yml",
+            "alchemy2/docker-compose.override.yml"
+          ],
+          "successCriteria": [
+            "Compose files valid",
+            "Services start successfully",
+            "Health checks pass"
+          ]
+        },
+        {
+          "id": "P4-T4",
+          "name": "Test docker-compose setup",
+          "agent": "test-agent",
+          "priority": "critical",
+          "effort": "4 hours",
+          "parallelizable": false,
+          "dependencies": ["P4-T3"],
+          "commands": [
+            "docker-compose -f alchemy2/docker-compose.yml up -d",
+            "docker-compose -f alchemy2/docker-compose.yml ps",
+            "curl http://localhost:3000/health",
+            "curl http://localhost:8001"
+          ],
+          "successCriteria": [
+            "All containers running",
+            "Health checks passing",
+            "End-to-end workflow functional"
+          ]
+        },
+        {
+          "id": "P4-T5",
+          "name": "Migrate audio data to Supabase Storage (optional)",
+          "agent": "migration-agent",
+          "priority": "low",
+          "effort": "6 hours",
+          "parallelizable": true,
+          "dependencies": ["P1-T3", "P4-T4"],
+          "successCriteria": [
+            "Audio files uploaded to Supabase Storage",
+            "Bucket policies configured",
+            "File access verified"
+          ]
+        },
+        {
+          "id": "P4-T6",
+          "name": "Run smoke tests",
+          "agent": "test-agent",
+          "priority": "high",
+          "effort": "4 hours",
+          "parallelizable": false,
+          "dependencies": ["P4-T4"],
+          "tests": [
+            "Spotify metadata fetch",
+            "Track download",
+            "Stem separation",
+            "Audio analysis",
+            "Realtime updates"
+          ],
+          "successCriteria": [
+            "All smoke tests passing",
+            "No critical errors",
+            "Performance acceptable"
+          ]
+        },
+        {
+          "id": "P4-T7",
+          "name": "Decommission old services",
+          "agent": "cleanup-agent",
+          "priority": "medium",
+          "effort": "2 hours",
+          "parallelizable": false,
+          "dependencies": ["P4-T6"],
+          "commands": [
+            "docker-compose down",
+            "docker volume prune -f",
+            "docker network prune -f"
+          ],
+          "successCriteria": [
+            "Old containers stopped",
+            "Redis container removed",
+            "Old volumes cleaned"
+          ]
+        },
+        {
+          "id": "P4-T8",
+          "name": "Update documentation",
+          "agent": "docs-agent",
+          "priority": "medium",
+          "effort": "6 hours",
+          "parallelizable": true,
+          "dependencies": ["P4-T6"],
+          "files": [
+            "alchemy2/README.md",
+            "alchemy2/docs/API.md",
+            "alchemy2/docs/DEPLOYMENT.md",
+            "alchemy2/docs/DEVELOPMENT.md"
+          ],
+          "successCriteria": [
+            "Documentation complete",
+            "Setup instructions clear",
+            "API documented"
+          ]
+        }
+      ],
+      "successCriteria": [
+        "Docker containers running",
+        "Health checks passing",
+        "End-to-end workflow functional",
+        "Old services decommissioned"
+      ],
+      "risks": [
+        {
+          "risk": "Docker networking issues",
+          "mitigation": "Thorough testing, fallback to host networking",
+          "probability": "low"
+        }
+      ]
+    },
+
+    {
+      "phase": 5,
+      "name": "Testing & Validation",
+      "duration": "1 week",
+      "startWeek": 5,
+      "objectives": [
+        "Comprehensive testing",
+        "Performance validation",
+        "User acceptance testing"
+      ],
+      "tasks": [
+        {
+          "id": "P5-T1",
+          "name": "Run full test suite",
+          "agent": "test-agent",
+          "priority": "critical",
+          "effort": "4 hours",
+          "parallelizable": false,
+          "dependencies": ["P4-T6"],
+          "commands": [
+            "npm run test --prefix alchemy2/backend",
+            "npm run test --prefix alchemy2/frontend"
+          ],
+          "successCriteria": [
+            "All tests passing",
+            "Coverage >80%",
+            "No flaky tests"
+          ]
+        },
+        {
+          "id": "P5-T2",
+          "name": "Run end-to-end tests",
+          "agent": "e2e-agent",
+          "priority": "high",
+          "effort": "8 hours",
+          "parallelizable": false,
+          "dependencies": ["P4-T6"],
+          "files": [
+            "alchemy2/e2e/spotify-flow.spec.ts",
+            "alchemy2/e2e/download-flow.spec.ts",
+            "alchemy2/e2e/processing-flow.spec.ts",
+            "alchemy2/e2e/analysis-flow.spec.ts"
+          ],
+          "successCriteria": [
+            "All E2E tests passing",
+            "Critical workflows validated",
+            "No regressions"
+          ]
+        },
+        {
+          "id": "P5-T3",
+          "name": "Performance benchmarking",
+          "agent": "perf-agent",
+          "priority": "high",
+          "effort": "6 hours",
+          "parallelizable": true,
+          "dependencies": ["P4-T6"],
+          "benchmarks": [
+            "API response time",
+            "Bundle size",
+            "Initial load time",
+            "Memory usage",
+            "Job processing speed"
+          ],
+          "successCriteria": [
+            "All metrics meet or exceed v1.0",
+            "Bundle size <720 KB",
+            "API latency <50ms",
+            "Memory usage <250 MB"
+          ]
+        },
+        {
+          "id": "P5-T4",
+          "name": "Load testing",
+          "agent": "perf-agent",
+          "priority": "medium",
+          "effort": "6 hours",
+          "parallelizable": true,
+          "dependencies": ["P4-T6"],
+          "scenarios": [
+            "100 concurrent users",
+            "10 concurrent jobs",
+            "Large file processing"
+          ],
+          "successCriteria": [
+            "System stable under load",
+            "No memory leaks",
+            "Graceful degradation"
+          ]
+        },
+        {
+          "id": "P5-T5",
+          "name": "User acceptance testing",
+          "agent": "uat-agent",
+          "priority": "high",
+          "effort": "8 hours",
+          "parallelizable": false,
+          "dependencies": ["P5-T1", "P5-T2"],
+          "workflows": [
+            "Search and download track",
+            "Separate stems",
+            "Analyze audio",
+            "Export stems"
+          ],
+          "successCriteria": [
+            "All workflows functional",
+            "User feedback positive",
+            "No critical bugs"
+          ]
+        },
+        {
+          "id": "P5-T6",
+          "name": "Bug fixes and polish",
+          "agent": "fix-agent",
+          "priority": "high",
+          "effort": "12 hours",
+          "parallelizable": false,
+          "dependencies": ["P5-T5"],
+          "successCriteria": [
+            "All critical bugs fixed",
+            "UI polished",
+            "Error messages improved"
+          ]
+        },
+        {
+          "id": "P5-T7",
+          "name": "Final deployment preparation",
+          "agent": "deploy-agent",
+          "priority": "medium",
+          "effort": "4 hours",
+          "parallelizable": true,
+          "dependencies": ["P5-T6"],
+          "tasks": [
+            "Create deployment checklist",
+            "Prepare rollback plan",
+            "Document known issues",
+            "Create monitoring dashboard"
+          ],
+          "successCriteria": [
+            "Deployment plan complete",
+            "Rollback tested",
+            "Monitoring configured"
+          ]
+        }
+      ],
+      "successCriteria": [
+        "Test coverage >80%",
+        "All critical workflows tested",
+        "Performance meets or exceeds v1.0",
+        "No critical bugs",
+        "User acceptance sign-off"
+      ],
+      "risks": [
+        {
+          "risk": "Performance regression discovered late",
+          "mitigation": "Early benchmarking, rollback plan",
+          "probability": "low"
+        }
+      ]
+    }
+  ],
+
+  "parallelExecution": {
+    "phase1": ["P1-T4", "P1-T5"],
+    "phase2": ["P2-T2", "P2-T3", "P2-T4", "P2-T5", "P2-T6", "P2-T7", "P2-T9", "P2-T10", "P2-T11"],
+    "phase3": ["P3-T6", "P3-T10", "P3-T11"],
+    "phase4": ["P4-T2", "P4-T5", "P4-T8"],
+    "phase5": ["P3-T3", "P5-T4", "P5-T7"]
+  },
+
+  "totalEstimate": {
+    "sequentialHours": 282,
+    "parallelHours": 175,
+    "estimatedWeeks": 5,
+    "teamSize": 3,
+    "fullTimeEquivalent": "1.5 FTE"
+  }
+}

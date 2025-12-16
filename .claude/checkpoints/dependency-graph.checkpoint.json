@@ -1,0 +1,33 @@
+{
+  "timestamp": "2025-12-16T00:00:00.000Z",
+  "agentId": "dependency-graph-analysis",
+  "status": "completed",
+  "progress": 100,
+  "completedTasks": [
+    "Generate Frontend Dependency Graph JSON",
+    "Detect Circular Dependencies",
+    "Find Orphan Modules",
+    "Generate Visual DOT Graph",
+    "Analyze Module Coupling"
+  ],
+  "findings": {
+    "circularDependencies": [
+      {
+        "from": "src/components/StemViewer/midiHandlers.ts",
+        "to": "src/components/StemViewer/StemViewer.tsx"
+      }
+    ],
+    "orphanModules": [
+      "src/components/ui/sidebar.tsx",
+      "src/routes.tsx",
+      "src/components/ui/command.tsx",
+      "src/components/ui/form.tsx"
+    ],
+    "highCoupling": [
+      "src/App.tsx (19 deps)",
+      "src/components/AudioProcessor.tsx (19 deps)",
+      "src/layouts/MainLayout.tsx (12 deps)"
+    ],
+    "totalModules": 196
+  }
+}

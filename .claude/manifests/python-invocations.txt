@@ -1,0 +1,27 @@
+backend/analysis/src/index.js:4:const { exec, spawn } = require("child_process");
+backend/analysis/src/index.js:304:    const analyzer = spawn("python3", [
+backend/processing/src/index.js:3:const { exec, spawn } = require("child_process");
+backend/processing/src/index.js:436:    const demucs = spawn("python", args);
+backend/processing/src/models.js:3:const { exec, spawn } = require("child_process");
+backend/processing/src/models.js:8:// Promisify exec
+backend/processing/src/models.js:9:const execPromise = util.promisify(exec);
+backend/processing/src/models.js:60:    const { stdout } = await execPromise("python -m demucs.separate -h");
+backend/processing/src/models.js:108:    const pythonProcess = spawn("python", [
+backend/spotify/src/index.js:6:const { exec, spawn } = require("child_process");
+backend/spotify/src/index.js:14:// Promisify exec
+backend/spotify/src/index.js:15:const execPromise = util.promisify(exec);
+backend/spotify/src/index.js:240:    const spotdlProcess = exec(
+backend/spotify/src/index.js:643:    const spotdlProcess = spawn('python3', ['-m', 'spotdl', ...spotdlArgs]);
+backend/download/src/index.js:4:const { exec, spawn } = require("child_process");
+backend/download/src/index.js:176:    const spotdl = spawn("python3", spotdlArgs);
+backend/analysis/src/index.js:304:    const analyzer = spawn("python3", [
+backend/processing/src/index.js:436:    const demucs = spawn("python", args);
+backend/processing/src/models.js:60:    const { stdout } = await execPromise("python -m demucs.separate -h");
+backend/processing/src/models.js:107:    // Use python to download the model through demucs
+backend/processing/src/models.js:108:    const pythonProcess = spawn("python", [
+backend/processing/src/models.js:116:    pythonProcess.stdout.on("data", (data) => {
+backend/processing/src/models.js:121:    pythonProcess.stderr.on("data", (data) => {
+backend/processing/src/models.js:127:      pythonProcess.on("close", (code) => {
+backend/spotify/src/index.js:241:      `python3 -m spotdl save "${url}" --save-file ${outputFile} --log-level DEBUG`
+backend/spotify/src/index.js:643:    const spotdlProcess = spawn('python3', ['-m', 'spotdl', ...spotdlArgs]);
+backend/download/src/index.js:176:    const spotdl = spawn("python3", spotdlArgs);

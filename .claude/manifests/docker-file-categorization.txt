@@ -1,0 +1,178 @@
+DOCKER FILE CATEGORIZATION - Sound Forge Alchemy
+===============================================
+
+TOTAL: 81 Docker files
+
+CATEGORY 1: DOCKER COMPOSE FILES (9 files)
+-------------------------------------------
+./docker-compose-platform.yml
+./docker-compose.gpu.yml
+./docker-compose.gpu-optimized.yml
+./docker-compose.optimized.yml
+./docker-compose.yml                        [KEEP - Main compose]
+./docker/.old/docker-compose-platform.yml   [DELETE - Old backup]
+./docker/.old/docker-compose.mac.yml        [DELETE - Old backup]
+./docker/.old/docker-compose-redis.yml      [DELETE - Old backup]
+./docker/.old/docker-compose.dev.yml        [DELETE - Old backup]
+./docker/.old/docker-compose.prod.yml       [DELETE - Old backup]
+./docker/.old/docker-compose.yml            [DELETE - Old backup]
+./docker/.old/docker-compose.yml.bak        [DELETE - Old backup]
+./docker/compose/docker-compose.mac.yml     [DELETE - Duplicate]
+./docker/compose/docker-compose.dev.yml     [DELETE - Duplicate]
+./docker/compose/docker-compose-redis.yml   [DELETE - Duplicate]
+./docker/compose/docker-compose.prod.yml    [DELETE - Duplicate]
+
+ACTION: Consolidate to 2 files
+- docker-compose.yml (base with profiles)
+- docker-compose.override.yml (dev overrides)
+
+
+CATEGORY 2: BASE IMAGE DOCKERFILES (12 files)
+----------------------------------------------
+./docker/Dockerfile.node-base               [DELETE - Duplicate]
+./docker/Dockerfile.base                    [DELETE - Duplicate]
+./docker/base-images/Dockerfile.gpu-base    [DELETE - Duplicate]
+./docker/base-images/Dockerfile.python-node-base [DELETE - Duplicate]
+./docker/base-images/Dockerfile.sound-forge-base [DELETE - Not used]
+./docker/base-images/Dockerfile.node-base   [DELETE - Duplicate]
+./docker/base/Dockerfile.node-base-optimized     [KEEP - Consolidate here]
+./docker/base/Dockerfile.gpu-base           [KEEP - Consolidate here]
+./docker/base/Dockerfile.python-node-base   [DELETE - Duplicate]
+./docker/base/Dockerfile.sound-forge-base   [DELETE - Not used]
+./docker/base/Dockerfile.node-base          [DELETE - Duplicate]
+./docker/base/Dockerfile.python-node-base-optimized [KEEP - Consolidate here]
+./docker/.old/Dockerfile.python-node-base.bak [DELETE - Old backup]
+./docker/.old/Dockerfile.gpu-base           [DELETE - Old backup]
+./docker/.old/Dockerfile.gpu-base.bak       [DELETE - Old backup]
+./docker/.old/Dockerfile.python-node-base   [DELETE - Old backup]
+./docker/.old/Dockerfile.node-base          [DELETE - Old backup]
+./docker/.old/Dockerfile.node-base.bak      [DELETE - Old backup]
+
+ACTION: Consolidate to 3 canonical base images
+- docker/base/Dockerfile.node-base (node:20-alpine + common tools)
+- docker/base/Dockerfile.python-node-base (node-base + python + audio libs)
+- docker/base/Dockerfile.gpu-base (nvidia/cuda + python + node)
+
+
+CATEGORY 3: SERVICE DOCKERFILES - API GATEWAY (8 files)
+--------------------------------------------------------
+./docker/Dockerfile.api-gateway             [DELETE - Duplicate]
+./docker/service-images/Dockerfile.api-gateway [DELETE - Duplicate]
+./docker/services/Dockerfile.api-gateway    [DELETE - Duplicate]
+./docker/services/Dockerfile.api-gateway-optimized [KEEP - Consolidate to this]
+./backend/api-gateway/Dockerfile            [DELETE - Duplicate]
+
+ACTION: Consolidate to 1 file
+- docker/services/Dockerfile.api-gateway
+
+
+CATEGORY 4: SERVICE DOCKERFILES - SPOTIFY (4 files)
+----------------------------------------------------
+./docker/Dockerfile.spotify                 [DELETE - Duplicate]
+./docker/Dockerfile.spotify-service         [DELETE - Duplicate]
+./docker/service-images/Dockerfile.spotify-service [DELETE - Duplicate]
+./docker/services/Dockerfile.spotify-service [KEEP - Consolidate to this]
+./backend/spotify/Dockerfile                [DELETE - Duplicate]
+
+ACTION: Consolidate to 1 file
+- docker/services/Dockerfile.spotify
+
+
+CATEGORY 5: SERVICE DOCKERFILES - DOWNLOAD (3 files)
+-----------------------------------------------------
+./docker/Dockerfile.download                [DELETE - Duplicate]
+./docker/service-images/Dockerfile.download-service [DELETE - Duplicate]
+./docker/services/Dockerfile.download-service [KEEP - Consolidate to this]
+./backend/download/Dockerfile               [DELETE - Duplicate]
+
+ACTION: Consolidate to 1 file
+- docker/services/Dockerfile.download
+
+
+CATEGORY 6: SERVICE DOCKERFILES - PROCESSING (10 files)
+--------------------------------------------------------
+./docker/Dockerfile.processing              [DELETE - Duplicate]
+./docker/Dockerfile.processing-service      [DELETE - Duplicate]
+./docker/service-images/Dockerfile.processing-service.cpu [DELETE - Variant]
+./docker/service-images/Dockerfile.processing-service [DELETE - Duplicate]
+./docker/services/Dockerfile.processing-service.cpu [DELETE - Variant]
+./docker/services/Dockerfile.processing-service [DELETE - Duplicate]
+./docker/services/Dockerfile.processing-optimized [KEEP - Consolidate to this]
+./docker/services/Dockerfile.processing-simple [DELETE - Variant]
+./backend/processing/Dockerfile.cpu         [DELETE - Variant]
+./backend/processing/Dockerfile             [DELETE - Duplicate]
+
+ACTION: Consolidate to 1 multi-stage file with CPU/GPU targets
+- docker/services/Dockerfile.processing
+
+
+CATEGORY 7: SERVICE DOCKERFILES - ANALYSIS (3 files)
+-----------------------------------------------------
+./docker/Dockerfile.analysis                [DELETE - Duplicate]
+./docker/service-images/Dockerfile.analysis-service [DELETE - Duplicate]
+./docker/services/Dockerfile.analysis-service [KEEP - Consolidate to this]
+./backend/analysis/Dockerfile               [DELETE - Duplicate]
+
+ACTION: Consolidate to 1 file
+- docker/services/Dockerfile.analysis
+
+
+CATEGORY 8: SERVICE DOCKERFILES - WEBSOCKET (5 files)
+------------------------------------------------------
+./docker/Dockerfile.websocket-service       [DELETE - Duplicate]
+./docker/Dockerfile.websocket               [DELETE - Duplicate]
+./docker/service-images/Dockerfile.websocket-service [DELETE - Duplicate]
+./docker/services/Dockerfile.websocket-service [KEEP - Consolidate to this]
+./docker/services/Dockerfile.websocket-ts   [DELETE - Variant]
+./backend/websocket/Dockerfile              [DELETE - Duplicate]
+
+ACTION: Consolidate to 1 file (or eliminate if using Supabase Realtime)
+- docker/services/Dockerfile.websocket
+
+
+CATEGORY 9: SERVICE DOCKERFILES - FRONTEND (4 files)
+-----------------------------------------------------
+./docker/Dockerfile.frontend                [DELETE - Duplicate]
+./docker/service-images/Dockerfile.frontend [DELETE - Duplicate]
+./docker/services/Dockerfile.frontend-optimized [KEEP - Consolidate to this]
+./docker/services/Dockerfile.frontend       [DELETE - Duplicate]
+./Dockerfile.frontend                       [DELETE - Duplicate]
+
+ACTION: Consolidate to 1 file
+- docker/services/Dockerfile.frontend
+
+
+CATEGORY 10: UTILITY/TEMPLATE DOCKERFILES (7 files)
+----------------------------------------------------
+./docker/Dockerfile.simple                  [DELETE - Not used]
+./docker/services/Dockerfile.service-template [KEEP - Optional template]
+./docker/services/Dockerfile.simple-node    [DELETE - Not used]
+./docker/services/Dockerfile.node-complete  [DELETE - Duplicate]
+./docker/services/Dockerfile.node-service   [DELETE - Duplicate]
+./docker/services/Dockerfile.service-fixed  [DELETE - Not used]
+
+
+CONSOLIDATION SUMMARY
+=====================
+DELETE: 69 files
+KEEP:   12 files (85% reduction)
+
+FINAL STRUCTURE:
+----------------
+docker/
+├── base/
+│   ├── Dockerfile.node-base              [Base 1: Node.js + tools]
+│   ├── Dockerfile.python-node-base       [Base 2: Python + Node + audio libs]
+│   └── Dockerfile.gpu-base               [Base 3: CUDA + Python + Node]
+├── services/
+│   ├── Dockerfile.api-gateway            [Service 1]
+│   ├── Dockerfile.spotify                [Service 2]
+│   ├── Dockerfile.download               [Service 3]
+│   ├── Dockerfile.processing             [Service 4]
+│   ├── Dockerfile.analysis               [Service 5]
+│   ├── Dockerfile.websocket              [Service 6 - optional]
+│   └── Dockerfile.frontend               [Service 7]
+docker-compose.yml                         [Compose 1: Base config]
+docker-compose.override.yml                [Compose 2: Dev overrides]
+
+TOTAL: 12 files

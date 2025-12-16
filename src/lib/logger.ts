@@ -3,31 +3,69 @@
  * Version: 1.0.0
  * License: MIT
  *
- * Highly referential and understandable logger utility for Sound Forge Alchemy frontend.
- * Based on backend/config/logging.js, adapted for TypeScript and browser/Node compatibility.
+ * Browser-safe logger utility for Sound Forge Alchemy frontend.
+ * Provides Winston-like API for browser environments.
  */
 
-import winston from 'winston';
-import { format } from 'winston';
+type LogLevel = 'error' | 'warn' | 'info' | 'debug';
 
-// Create a logger instance with maximum verbosity for all levels
-const logger = winston.createLogger({
-  level: 'debug',
-  format: format.combine(
-    format.timestamp({ format: 'YYYY-MM-DDTHH:mm:ss.SSSZ' }),
-    format.printf(({ timestamp, level, message, ...meta }) => {
-      const metaStr = Object.keys(meta).length ? JSON.stringify(meta) : '';
-      // Syslog format: <LEVEL> TIMESTAMP MESSAGE [meta]
-      return `<${level.toUpperCase()}> ${timestamp} ${message} ${metaStr}`;
-    })
-  ),
-  transports: [
-    new winston.transports.Console({
-      level: 'debug',
-      stderrLevels: ['error'],
-      consoleWarnLevels: ['warn'],
-    }),
-  ],
-});
+interface LogMeta {
+  [key: string]: any;
+}
+
+class BrowserLogger {
+  private level: LogLevel = 'debug';
+  private levels: Record<LogLevel, number> = {
+    error: 0,
+    warn: 1,
+    info: 2,
+    debug: 3
+  };
+
+  private shouldLog(level: LogLevel): boolean {
+    return this.levels[level] <= this.levels[this.level];
+  }
+
+  private formatMessage(level: LogLevel, message: string, meta?: LogMeta): string {
+    const timestamp = new Date().toISOString();
+    const metaStr = meta && Object.keys(meta).length ? JSON.stringify(meta) : '';
+    return `<${level.toUpperCase()}> ${timestamp} ${message} ${metaStr}`.trim();
+  }
+
+  error(message: string, meta?: LogMeta): void {
+    if (this.shouldLog('error')) {
+      console.error(this.formatMessage('error', message, meta));
+    }
+  }
+
+  warn(message: string, meta?: LogMeta): void {
+    if (this.shouldLog('warn')) {
+      console.warn(this.formatMessage('warn', message, meta));
+    }
+  }
+
+  info(message: string, meta?: LogMeta): void {
+    if (this.shouldLog('info')) {
+      console.info(this.formatMessage('info', message, meta));
+    }
+  }
+
+  debug(message: string, meta?: LogMeta): void {
+    if (this.shouldLog('debug')) {
+      console.log(this.formatMessage('debug', message, meta));
+    }
+  }
+
+  verbose(message: string, meta?: LogMeta): void {
+    // Verbose is treated same as debug in browser
+    this.debug(message, meta);
+  }
+
+  setLevel(level: LogLevel): void {
+    this.level = level;
+  }
+}
+
+const logger = new BrowserLogger();
 
 export default logger;

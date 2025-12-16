@@ -1,75 +1,64 @@
-# Dockerfile.processing-service
-# Service for audio separation with Demucs
+# Dockerfile for Processing Service
+# Service for audio separation with Demucs (CPU/GPU support via build args)
 
-FROM sound-forge-alchemy-gpu-base:latest AS builder
+# Use Python 3.10 slim as base (can be overridden for GPU)
+ARG BASE_IMAGE=python:3.10-slim
+FROM ${BASE_IMAGE}
 
-# Set working directory
-WORKDIR /build
-
-# Copy package files
-COPY package*.json ./
-USER root
-RUN npm install 
-RUN npm ci
-USER soundforge
-
-# Copy Python requirements
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy TypeScript configuration files
-COPY tsconfig.app.json ./
-COPY tsconfig.node.json ./
-
-# Copy source code
-COPY . .
-
-# Production stage
-FROM sound-forge-alchemy-gpu-base:latest
+# Install Node.js, ffmpeg, and system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl \
+    ffmpeg \
+    ca-certificates \
+    gnupg \
+    git \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
 
-# Copy built dependencies and application code
-COPY --from=builder --chown=soundforge:soundforge /build/node_modules /app/node_modules
-COPY --chown=soundforge:soundforge . .
+# Copy and install Node.js dependencies
+COPY package*.json ./
+RUN npm ci && npm cache clean --force
+
+# Copy and install Python dependencies (including Demucs)
+COPY requirements.txt ./
+RUN pip3 install --upgrade pip && \
+    pip3 install --no-cache-dir -r requirements.txt && \
+    pip3 install --no-cache-dir demucs
+
+# Copy application code
+COPY . .
+
+# Create non-root user
+RUN groupadd -g 1001 soundforge && useradd -r -u 1001 -g soundforge soundforge
 
 # Create directories with proper permissions
-RUN mkdir -p /app/tmp /app/cache /app/audio_data /app/models && \
-    chown -R soundforge:soundforge /app/audio_data /app/models
+ENV TMP_PATH=/app/tmp \
+    CACHE_PATH=/app/cache \
+    AUDIO_DATA_PATH=/app/audio_data \
+    PYTORCH_MODEL_PATH=/app/models
+RUN mkdir -p $TMP_PATH $CACHE_PATH $AUDIO_DATA_PATH $PYTORCH_MODEL_PATH && \
+    chown -R soundforge:soundforge /app
+
+# Switch to non-root user
+USER soundforge
 
 # Environment variables
+ARG USE_GPU=false
 ENV PORT=3003 \
     SERVICE_NAME=processing-service \
-    AUDIO_DATA_PATH=/app/audio_data \
-    USE_GPU=true \
-    PYTORCH_MODEL_PATH=/app/models \
-    TMP_PATH=/app/tmp \
-    CACHE_PATH=/app/cache
-
-# Resource tuning (uncomment and adjust as needed)
-ENV NODE_OPTIONS="--max-old-space-size=4096"  
-# Node.js memory limit in MB
-# ENV OMP_NUM_THREADS=4                         # Number of OpenMP threads (for numpy, pytorch, demucs)
-# ENV MKL_NUM_THREADS=4                         # Number of MKL threads
-# ENV NUMEXPR_NUM_THREADS=4                     # Number of threads for numexpr
-ENV PYTHONUNBUFFERED=1                        
-# Ensures real-time Python logging
-# ENV PYTHONWARNINGS="ignore"                   # Suppress Python warnings
-ENV DEMUCS_THREADS=4                          
-# Demucs-specific thread count (if supported)
-ENV DEMUCS_MEMORY=4096                        
-# Demucs-specific memory limit in MB (if supported)
-# ENV CUDA_VISIBLE_DEVICES=0                    # GPU selection (if using CUDA)
-# ENV TF_CPP_MIN_LOG_LEVEL=2                    # TensorFlow log level (if relevant)
-
-RUN pip install demucs
-
-# Add Python to PATH and set Python environment variables   
-ENV PYTHONPATH="/usr/local/lib/python3.10/site-packages"
-ENV PYTHONPATH="${PYTHONPATH}:${PYTHONPATH:-}" \
+    USE_GPU=${USE_GPU} \
+    NODE_OPTIONS="--max-old-space-size=4096" \
+    PYTHONPATH="/usr/local/lib/python3.10/site-packages" \
     PYTHONUNBUFFERED=1 \
-    PATH="/usr/local/bin:${PATH}"
+    PATH="/usr/local/bin:${PATH}" \
+    DEMUCS_THREADS=4 \
+    DEMUCS_MEMORY=4096 \
+    NODE_ENV=production
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \

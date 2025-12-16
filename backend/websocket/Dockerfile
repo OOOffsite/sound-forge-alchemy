@@ -1,59 +1,49 @@
-# Dockerfile.websocket-service
+# Dockerfile for WebSocket Service
 # Service for real-time communication
 
-FROM sound-forge-alchemy-node-base:latest AS builder
-# Set working directory
-WORKDIR /build
-
-# Copy package files
-COPY package*.json ./
-USER root
-RUN npm install 
-RUN npm ci
-
-# Install TypeScript globally to ensure `tsc` is available
-RUN npm install -g typescript
-
-USER soundforge
-
-# Copy source code
-COPY . .
-
-# Copy the tsconfig.json file to the build context
-COPY tsconfig.json ./
-
-# Copy TypeScript configuration files
-COPY tsconfig.app.json ./
-COPY tsconfig.node.json ./
-
-# Build the application if needed
-RUN npm run build
-
-# Production stage
-FROM sound-forge-alchemy-node-base:latest
-
-# Set working directory
+# Stage 1: Dependencies
+FROM node:20-alpine AS dependencies
 WORKDIR /app
+RUN apk add --no-cache curl
+COPY package*.json ./
+RUN npm ci --only=production && npm cache clean --force
 
-# Add TMP_PATH and CACHE_PATH environment variables and directory creation
-ENV TMP_PATH=/app/tmp \
-    CACHE_PATH=/app/cache
-
-RUN mkdir -p $TMP_PATH $CACHE_PATH
-
-# Copy application code
-COPY --chown=soundforge:soundforge . .
-
-# Environment variables
+# Stage 2: Development
+FROM node:20-alpine AS development
+WORKDIR /app
+RUN apk add --no-cache curl
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN addgroup -g 1001 -S soundforge && adduser -S soundforge -u 1001 -G soundforge
+RUN chown -R soundforge:soundforge /app
+RUN mkdir -p /app/tmp /app/cache && chown -R soundforge:soundforge /app/tmp /app/cache
+USER soundforge
 ENV PORT=3006 \
-    SERVICE_NAME=websocket-service
-
-# Health check
+    SERVICE_NAME=websocket-service \
+    TMP_PATH=/app/tmp \
+    CACHE_PATH=/app/cache
+EXPOSE 3006
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:3006/health || exit 1
+CMD ["npm", "run", "dev"]
 
-# Expose port
+# Stage 3: Production
+FROM node:20-alpine AS production
+WORKDIR /app
+RUN apk add --no-cache curl
+COPY --from=dependencies /app/node_modules ./node_modules
+COPY --chown=1001:1001 . .
+RUN addgroup -g 1001 -S soundforge && adduser -S soundforge -u 1001 -G soundforge
+RUN chown -R soundforge:soundforge /app
+RUN mkdir -p /app/tmp /app/cache && chown -R soundforge:soundforge /app/tmp /app/cache
+USER soundforge
+ENV PORT=3006 \
+    SERVICE_NAME=websocket-service \
+    TMP_PATH=/app/tmp \
+    CACHE_PATH=/app/cache \
+    NODE_ENV=production
 EXPOSE 3006
-
-# Command to run the service
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3006/health || exit 1
 CMD ["node", "index.js"]

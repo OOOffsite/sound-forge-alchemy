@@ -1,0 +1,43 @@
+# TypeScript WebSocket service Dockerfile with compilation
+FROM node:20-alpine AS deps
+WORKDIR /deps
+COPY package*.json ./
+RUN npm install --only=production
+
+FROM node:20-alpine AS builder
+WORKDIR /build
+COPY package*.json ./
+RUN npm install
+COPY tsconfig*.json ./
+COPY src ./src
+RUN npm run build || npx tsc
+
+FROM node:20-alpine AS base
+RUN apk add --no-cache curl
+RUN addgroup -g 1001 -S soundforge && \
+    adduser -S soundforge -u 1001 -G soundforge
+WORKDIR /app
+RUN chown -R soundforge:soundforge /app
+
+# Production stage
+FROM base AS production
+COPY --from=deps --chown=soundforge:soundforge /deps/node_modules ./node_modules
+COPY --from=builder --chown=soundforge:soundforge /build/dist ./dist
+COPY --chown=soundforge:soundforge package*.json ./
+USER soundforge
+ENV NODE_ENV=production PORT=3006
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:3006/health || exit 1
+CMD ["node", "dist/index.js"]
+
+# Development stage
+FROM base AS development
+WORKDIR /app
+COPY --chown=soundforge:soundforge package*.json ./
+RUN npm install
+COPY --chown=soundforge:soundforge . .
+USER soundforge
+ENV NODE_ENV=development PORT=3006
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:3006/health || exit 1
+CMD ["npx", "nodemon", "--watch", "src", "--exec", "npx", "ts-node", "src/index.ts"]

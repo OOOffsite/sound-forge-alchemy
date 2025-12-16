@@ -7,7 +7,7 @@ const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 const Redis = require("ioredis");
 const axios = require("axios");
-const logger = require("./config/logging");
+const logger = require("../config/logging");
 
 // Initialize Redis client
 const redis = new Redis(process.env.REDIS_URL);

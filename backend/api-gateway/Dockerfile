@@ -1,48 +1,51 @@
-# Dockerfile.api-gateway
+# Dockerfile for API Gateway
 # API Gateway service for routing client requests to backend services
 
-FROM sound-forge-alchemy-node-base:latest AS builder
-
-# Set working directory for the build stage
-WORKDIR /build
-
-# Copy package files for dependency installation
-COPY package*.json ./
-RUN npm install --no-package-lock
-RUN npm ci
-
-# Copy source code
-COPY . .
-
-# Build the application if needed
-RUN npm run build
-
-# Production image
-FROM sound-forge-alchemy-node-base:latest
-
-# Set working directory
+# Stage 1: Dependencies
+FROM node:20-alpine AS dependencies
 WORKDIR /app
+RUN apk add --no-cache curl
+COPY package*.json ./
+RUN npm ci --only=production && npm cache clean --force
 
-# Copy application code
-COPY --chown=soundforge:soundforge . .
-
-# Environment variables
+# Stage 2: Development
+FROM node:20-alpine AS development
+WORKDIR /app
+RUN apk add --no-cache curl
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN addgroup -g 1001 -S soundforge && adduser -S soundforge -u 1001 -G soundforge
+RUN chown -R soundforge:soundforge /app
+RUN mkdir -p /app/tmp /app/cache /app/audio_data && chown -R soundforge:soundforge /app/tmp /app/cache /app/audio_data
+USER soundforge
 ENV PORT=3000 \
     SERVICE_NAME=api-gateway \
     TMP_PATH=/app/tmp \
     CACHE_PATH=/app/cache
-
-# Add TMP_PATH and CACHE_PATH directory creation
-RUN mkdir -p $TMP_PATH $CACHE_PATH
-
-# Health check specific to API Gateway
+EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:3000/health || exit 1
+VOLUME ["/app/audio_data"]
+CMD ["npm", "run", "dev"]
 
-
-VOLUME [ "/app/audio_data" ]    
-# Expose API Gateway port
+# Stage 3: Production
+FROM node:20-alpine AS production
+WORKDIR /app
+RUN apk add --no-cache curl
+COPY --from=dependencies /app/node_modules ./node_modules
+COPY --chown=1001:1001 . .
+RUN addgroup -g 1001 -S soundforge && adduser -S soundforge -u 1001 -G soundforge
+RUN chown -R soundforge:soundforge /app
+RUN mkdir -p /app/tmp /app/cache /app/audio_data && chown -R soundforge:soundforge /app/tmp /app/cache /app/audio_data
+USER soundforge
+ENV PORT=3000 \
+    SERVICE_NAME=api-gateway \
+    TMP_PATH=/app/tmp \
+    CACHE_PATH=/app/cache \
+    NODE_ENV=production
 EXPOSE 3000
-
-# Command to run the service
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3000/health || exit 1
+VOLUME ["/app/audio_data"]
 CMD ["node", "index.js"]

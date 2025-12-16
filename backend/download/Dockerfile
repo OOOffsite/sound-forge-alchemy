@@ -1,64 +1,55 @@
-# Dockerfile.download-service
-# Service for downloading audio tracks
+# Dockerfile for Download Service
+# Service for downloading audio tracks with Python and Node.js
 
-FROM sound-forge-alchemy-python-node-base AS builder
+FROM python:3.10-slim
 
-# Set working directory
-WORKDIR /build
+# Install Node.js, ffmpeg, and system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl \
+    ffmpeg \
+    ca-certificates \
+    gnupg \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copy package files
-COPY package*.json ./
-USER root
-RUN npm install 
-RUN npm install express
-RUN npm ci
-USER soundforge
-
-# Copy Python requirements
-COPY requirements.txt ./
-RUN pip install --no-cache-dir --user -r requirements.txt
-
-# Copy TypeScript configuration files
-COPY tsconfig.app.json ./
-COPY tsconfig.node.json ./
-
-# Copy source code
-COPY . .
-
-# Build step
-RUN npm run build
-
-# Production stage
-FROM sound-forge-alchemy-python-node-base
 # Set working directory
 WORKDIR /app
+
+# Copy and install Node.js dependencies
+COPY package*.json ./
+RUN npm ci && npm cache clean --force
+
+# Copy and install Python dependencies (including yt-dlp and spotdl)
 COPY requirements.txt ./
-
-RUN python3 --version && \
-    which python3 && \
-    pip3 --version && \
-    pip install --no-cache-dir --user -r ./requirements.txt
-
-# Install ffmpeg and upgrade spotdl/yt-dlp to latest as root
-USER root
-RUN apt-get update && apt-get install -y ffmpeg
-USER soundforge
-RUN pip install --no-cache-dir --user --upgrade spotdl yt-dlp
+RUN pip3 install --upgrade pip && \
+    pip3 install --no-cache-dir -r requirements.txt && \
+    pip3 install --no-cache-dir --upgrade spotdl yt-dlp
 
 # Copy application code
-COPY --chown=soundforge:soundforge . .
+COPY . .
 
-# Add TMP_PATH and CACHE_PATH environment variables and directory creation
+# Create non-root user
+RUN groupadd -g 1001 soundforge && useradd -r -u 1001 -g soundforge soundforge
+
+# Create directories with proper permissions
 ENV TMP_PATH=/app/tmp \
-    CACHE_PATH=/app/cache
+    CACHE_PATH=/app/cache \
+    AUDIO_DATA_PATH=/app/audio_data
+RUN mkdir -p $TMP_PATH $CACHE_PATH $AUDIO_DATA_PATH && \
+    chown -R soundforge:soundforge /app
 
-RUN mkdir -p $TMP_PATH $CACHE_PATH /app/audio_data && \
-    chown -R soundforge:soundforge /app/audio_data
+# Switch to non-root user
+USER soundforge
 
 # Environment variables
 ENV PORT=3002 \
     SERVICE_NAME=download-service \
-    AUDIO_DATA_PATH=/app/audio_data
+    PYTHONPATH="/usr/local/lib/python3.10/site-packages" \
+    PYTHONUNBUFFERED=1 \
+    PATH="/usr/local/bin:${PATH}" \
+    NODE_ENV=production
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
@@ -69,7 +60,6 @@ EXPOSE 3002
 
 # Define volumes
 VOLUME ["/app/audio_data"]
-RUN npm install express
 
 # Command to run the service
 CMD ["npm", "start"]

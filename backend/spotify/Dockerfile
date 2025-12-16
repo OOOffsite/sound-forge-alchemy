@@ -1,64 +1,51 @@
-# Dockerfile.spotify-service
-# Service for Spotify API integration
+# Dockerfile for Spotify Service
+# Service for Spotify API integration with Python and Node.js
 
-FROM sound-forge-alchemy-python-node-base:latest AS builder
+FROM python:3.10-slim
 
-# Set working directory
-WORKDIR /build
-
-# Copy package files
-COPY package*.json ./
-USER root
-RUN npm install && \
-    npm install express && \
-    npm ci
-
-# Verify Python installation as root (soundforge user does not exist in this image)
-RUN python3 --version && \
-    which python3 && \
-    pip3 --version
-
-# Copy Python requirements
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt 
-
-# Copy TypeScript configuration files
-COPY tsconfig.app.json ./
-COPY tsconfig.node.json ./
-
-# Copy source code
-COPY . .
-
-# # Build the application if needed
-# RUN npm run build
-
-# Production stage
-FROM sound-forge-alchemy-python-node-base:latest
+# Install Node.js and system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates \
+    gnupg \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
 
+# Copy and install Node.js dependencies
+COPY package*.json ./
+RUN npm ci && npm cache clean --force
+
+# Copy and install Python dependencies
+COPY requirements.txt ./
+RUN pip3 install --upgrade pip && pip3 install --no-cache-dir -r requirements.txt
+
 # Copy application code
-COPY --chown=soundforge:soundforge . .
-COPY --from=builder --chown=soundforge:soundforge /usr/local/lib/python3.10/site-packages "/usr/local/lib/python3.10/site-packages"
+COPY . .
+
+# Create non-root user
+RUN groupadd -g 1001 soundforge && useradd -r -u 1001 -g soundforge soundforge
+
+# Create directories with proper permissions
+ENV TMP_PATH=/app/tmp \
+    CACHE_PATH=/app/cache
+RUN mkdir -p $TMP_PATH $CACHE_PATH && \
+    chown -R soundforge:soundforge /app
+
+# Switch to non-root user
+USER soundforge
 
 # Environment variables
 ENV PORT=3001 \
     SERVICE_NAME=spotify-service \
-    TMP_PATH=/app/tmp \
-    CACHE_PATH=/app/cache
-
-# Add Python to PATH and set Python environment variables
-ENV PYTHONPATH="/usr/local/lib/python3.10/site-packages"
-ENV PYTHONPATH="${PYTHONPATH}:${PYTHONPATH:-}" \
+    PYTHONPATH="/usr/local/lib/python3.10/site-packages" \
     PYTHONUNBUFFERED=1 \
-    PATH="/usr/local/bin:${PATH}"
-
-# Create necessary directories
-RUN mkdir -p $TMP_PATH $CACHE_PATH
-
-# Switch to non-root user (soundforge exists in this image)
-USER soundforge
+    PATH="/usr/local/bin:${PATH}" \
+    NODE_ENV=production
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
@@ -66,7 +53,6 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
 
 # Expose port
 EXPOSE 3001
-RUN npm install express
 
 # Command to run the service
 CMD ["node", "index.js"]

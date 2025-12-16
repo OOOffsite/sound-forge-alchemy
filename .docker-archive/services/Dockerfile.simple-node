@@ -1,0 +1,23 @@
+# Simplified Node service that just works
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install dependencies first
+COPY package*.json ./
+RUN npm install
+
+# Copy everything
+COPY . .
+
+# Create non-root user
+RUN addgroup -g 1001 -S soundforge && \
+    adduser -S soundforge -u 1001 -G soundforge && \
+    chown -R soundforge:soundforge /app
+
+USER soundforge
+
+EXPOSE ${PORT:-3000}
+
+# Run directly with node
+CMD ["node", "src/index.js"]

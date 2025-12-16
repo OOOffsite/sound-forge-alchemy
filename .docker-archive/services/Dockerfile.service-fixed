@@ -1,0 +1,42 @@
+# Fixed service Dockerfile template
+# Handles CommonJS/ES module compatibility
+
+ARG BASE_IMAGE=sound-forge-node-base:latest
+ARG SERVICE_NAME=service
+ARG SERVICE_PORT=3000
+
+FROM ${BASE_IMAGE} AS base
+
+# Service configuration from build args
+ARG SERVICE_NAME
+ARG SERVICE_PORT
+ENV SERVICE_NAME=${SERVICE_NAME} \
+    PORT=${SERVICE_PORT}
+
+WORKDIR /app
+
+# Copy package.json first to ensure module type is correct
+COPY --chown=soundforge:soundforge package*.json ./
+
+# Install dependencies if not already in base
+RUN if [ ! -d "node_modules" ]; then npm ci --only=production; fi
+
+# Copy service files
+COPY --chown=soundforge:soundforge src ./src
+COPY --chown=soundforge:soundforge config ./config
+
+# Production stage
+FROM base AS production
+ARG SERVICE_PORT
+EXPOSE ${SERVICE_PORT}
+CMD ["node", "src/index.js"]
+
+# Development stage
+FROM base AS development
+ARG SERVICE_PORT
+EXPOSE ${SERVICE_PORT}
+# Install dev dependencies
+USER root
+RUN npm install
+USER soundforge
+CMD ["npx", "nodemon", "--watch", "src", "--watch", "config", "src/index.js"]

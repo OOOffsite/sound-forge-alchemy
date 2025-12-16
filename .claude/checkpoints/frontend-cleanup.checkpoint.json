@@ -1,0 +1,91 @@
+{
+  "checkpoint_id": "frontend-cleanup-2025-12-16",
+  "timestamp": "2025-12-16T12:14:00Z",
+  "agent": "Frontend Cleanup Agent",
+  "status": "PENDING_USER_ACTION",
+  "phase": "dependency_cleanup",
+
+  "tasks_completed": [
+    {
+      "task": "remove_unused_ui_components",
+      "status": "COMPLETE",
+      "files_removed": 47,
+      "details": "Removed 41 shadcn/ui components + 6 custom components + 6 test files"
+    },
+    {
+      "task": "update_package_json",
+      "status": "COMPLETE",
+      "dependencies_removed": 31,
+      "details": "Removed 22 @radix-ui packages + 9 heavy dependencies"
+    }
+  ],
+
+  "tasks_pending": [
+    {
+      "task": "reinstall_node_modules",
+      "status": "BLOCKED",
+      "blocker": "Permission denied - node_modules owned by root",
+      "solution": "Run /tmp/reinstall-deps.sh with sudo",
+      "command": "sudo /tmp/reinstall-deps.sh"
+    },
+    {
+      "task": "build_verification",
+      "status": "PENDING",
+      "depends_on": "reinstall_node_modules"
+    },
+    {
+      "task": "git_commit",
+      "status": "PENDING",
+      "depends_on": "build_verification"
+    }
+  ],
+
+  "metrics": {
+    "before": {
+      "ui_components": 60,
+      "radix_packages": 27,
+      "total_dependencies": 57,
+      "node_modules_size": "420MB",
+      "bundle_size": "947KB"
+    },
+    "after_partial": {
+      "ui_components": 7,
+      "radix_packages": 5,
+      "total_dependencies": 26,
+      "node_modules_size": "pending_reinstall",
+      "bundle_size": "pending_build"
+    },
+    "expected_final": {
+      "ui_components": 7,
+      "radix_packages": 5,
+      "total_dependencies": 26,
+      "node_modules_size": "~150-200MB",
+      "bundle_size": "~500-600KB"
+    },
+    "reductions": {
+      "ui_components_removed": 53,
+      "radix_packages_removed": 22,
+      "total_dependencies_removed": 31,
+      "expected_space_savings": "~220-270MB",
+      "expected_bundle_reduction": "~350-450KB"
+    }
+  },
+
+  "files_modified": [
+    "package.json",
+    "src/components/ui/* (47 files removed)"
+  ],
+
+  "next_steps": [
+    "1. Run: sudo /tmp/reinstall-deps.sh (requires password)",
+    "2. Wait for npm install to complete",
+    "3. Run: npm run build",
+    "4. Verify bundle size reduction",
+    "5. Git commit changes"
+  ],
+
+  "rollback_plan": {
+    "command": "git checkout package.json && git checkout src/components/ui/",
+    "note": "Restore package.json and deleted components from git"
+  }
+}

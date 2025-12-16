@@ -7,12 +7,20 @@ const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 const Redis = require("ioredis");
 const axios = require("axios");
-const logger = require("./config/logging");
+const logger = require("../config/logging");
 
-// Initialize Redis client
-const redis = new Redis(process.env.REDIS_URL);
-const pub = new Redis(process.env.REDIS_URL);
-const sub = new Redis(process.env.REDIS_URL);
+// Initialize Redis client with better error handling
+const redisConfig = {
+  host: 'redis',
+  port: 6379,
+  retryStrategy: (times) => Math.min(times * 50, 2000),
+  maxRetriesPerRequest: 3,
+  enableReadyCheck: false
+};
+
+const redis = new Redis(redisConfig);
+const pub = new Redis(redisConfig);
+const sub = new Redis(redisConfig);
 
 // Constants
 const AUDIO_DATA_PATH =

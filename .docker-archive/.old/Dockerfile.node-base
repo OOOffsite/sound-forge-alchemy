@@ -1,0 +1,14 @@
+# Dockerfile.node-base
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Set environment variables for cache and tmp directories
+ENV TMP_PATH=/app/tmp
+ENV CACHE_PATH=/app/cache
+
+# Create directories
+RUN mkdir -p $TMP_PATH $CACHE_PATH
+
+# Expose a default port
+EXPOSE 3000

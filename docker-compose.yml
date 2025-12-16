@@ -6,22 +6,12 @@
 
 services:
   # ===================
-  # BASE IMAGES
-  # ===================
-  node-base:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.node-base
-    image: sound-forge-node-base:latest
-    profiles: ["build"]
-
-  # ===================
   # FRONTEND SERVICE
   # ===================
   frontend:
     build:
       context: .
-      dockerfile: docker/Dockerfile.frontend
+      dockerfile: Dockerfile
       target: ${NODE_ENV:-development}
     ports:
       - "8001:8001"
@@ -75,7 +65,8 @@ services:
   api-gateway:
     build:
       context: ./backend/api-gateway
-      dockerfile: ../../docker/Dockerfile.api-gateway
+      dockerfile: Dockerfile
+      target: ${NODE_ENV:-development}
     ports:
       - "3000:3000"
     environment:
@@ -139,7 +130,7 @@ services:
   spotify-service:
     build:
       context: ./backend/spotify
-      dockerfile: ../../docker/Dockerfile.spotify
+      dockerfile: Dockerfile
     ports:
       - "3001:3001"
     environment:
@@ -185,7 +176,7 @@ services:
   download-service:
     build:
       context: ./backend/download
-      dockerfile: ../../docker/Dockerfile.download
+      dockerfile: Dockerfile
     ports:
       - "3002:3002"
     environment:
@@ -233,8 +224,10 @@ services:
   processing-service:
     build:
       context: ./backend/processing
-      dockerfile: ../../docker/Dockerfile.processing
-      target: base
+      dockerfile: Dockerfile
+      args:
+        - USE_GPU=${USE_GPU:-false}
+        - BASE_IMAGE=${PROCESSING_BASE_IMAGE:-python:3.10-slim}
     ports:
       - "3003:3003"
     environment:
@@ -289,7 +282,7 @@ services:
   analysis-service:
     build:
       context: ./backend/analysis
-      dockerfile: ../../docker/Dockerfile.analysis
+      dockerfile: Dockerfile
     ports:
       - "3004:3004"
     environment:
@@ -335,7 +328,8 @@ services:
   websocket-service:
     build:
       context: ./backend/websocket
-      dockerfile: ../../docker/Dockerfile.websocket
+      dockerfile: Dockerfile
+      target: ${NODE_ENV:-development}
     ports:
       - "3006:3006"
     environment:

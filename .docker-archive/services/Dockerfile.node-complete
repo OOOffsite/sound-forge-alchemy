@@ -1,0 +1,39 @@
+# Complete Node.js service Dockerfile with proper dependency installation
+FROM node:20-alpine AS deps
+WORKDIR /deps
+COPY package*.json ./
+RUN npm install --only=production
+
+FROM node:20-alpine AS dev-deps
+WORKDIR /deps
+COPY package*.json ./
+RUN npm install
+
+FROM node:20-alpine AS base
+RUN apk add --no-cache curl
+RUN addgroup -g 1001 -S soundforge && \
+    adduser -S soundforge -u 1001 -G soundforge
+WORKDIR /app
+RUN chown -R soundforge:soundforge /app
+
+# Production stage
+FROM base AS production
+COPY --from=deps --chown=soundforge:soundforge /deps/node_modules ./node_modules
+COPY --chown=soundforge:soundforge package*.json ./
+COPY --chown=soundforge:soundforge . .
+USER soundforge
+ENV NODE_ENV=production
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-3000}/health || exit 1
+CMD ["node", "src/index.js"]
+
+# Development stage
+FROM base AS development
+COPY --from=dev-deps --chown=soundforge:soundforge /deps/node_modules ./node_modules
+COPY --chown=soundforge:soundforge package*.json ./
+COPY --chown=soundforge:soundforge . .
+USER soundforge
+ENV NODE_ENV=development
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-3000}/health || exit 1
+CMD ["npx", "nodemon", "--watch", "src", "--watch", "config", "src/index.js"]

@@ -1,9 +1,9 @@
-import fs from "fs";
-import path from "path";
-import { exec, spawn } from "child_process";
-import util from "util";
-import axios from "axios";
-import logger from "./config/logging.js";
+const fs = require("fs");
+const path = require("path");
+const { exec, spawn } = require("child_process");
+const util = require("util");
+const axios = require("axios");
+const logger = require("../config/logging");
 
 // Promisify exec
 const execPromise = util.promisify(exec);
@@ -259,11 +259,13 @@ async function getDefaultModel() {
   }
 }
 
-export default {
-  getInstalledModels,
-  getAllModels,
-  downloadModel,
-  ensureModelDownloaded,
-  getDefaultModel,
-  PYTORCH_MODEL_PATH,
+module.exports = {
+  default: {
+    getInstalledModels,
+    getAllModels,
+    downloadModel,
+    ensureModelDownloaded,
+    getDefaultModel,
+    PYTORCH_MODEL_PATH,
+  }
 };

@@ -1,5 +1,5 @@
-# Dockerfile.analysis-service
-# Service for audio analysis using prebuilt Essentia image
+# Dockerfile for Analysis Service
+# Service for audio analysis using Essentia
 
 FROM mtgupf/essentia:latest
 
@@ -19,6 +19,10 @@ RUN apt-get update && \
 # Set working directory
 WORKDIR /app
 
+# Copy and install dependencies
+COPY package*.json ./
+RUN npm ci && npm cache clean --force
+
 # Copy Python requirements and install dependencies
 COPY requirements.txt ./
 RUN pip3 install --upgrade pip && pip3 install --no-cache-dir -r requirements.txt
@@ -26,15 +30,23 @@ RUN pip3 install --upgrade pip && pip3 install --no-cache-dir -r requirements.tx
 # Copy application code
 COPY . .
 
+# Create non-root user
+RUN groupadd -g 1001 soundforge && useradd -r -u 1001 -g soundforge soundforge
+
 # Create directories with proper permissions
 ENV TMP_PATH=/app/tmp \
-    CACHE_PATH=/app/cache
-RUN mkdir -p $TMP_PATH $CACHE_PATH /app/audio_data
+    CACHE_PATH=/app/cache \
+    AUDIO_DATA_PATH=/app/audio_data
+RUN mkdir -p $TMP_PATH $CACHE_PATH $AUDIO_DATA_PATH && \
+    chown -R soundforge:soundforge /app
+
+# Switch to non-root user
+USER soundforge
 
 # Environment variables
 ENV PORT=3004 \
     SERVICE_NAME=analysis-service \
-    AUDIO_DATA_PATH=/app/audio_data
+    NODE_ENV=production
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
@@ -45,8 +57,7 @@ EXPOSE 3004
 
 # Define volumes
 VOLUME ["/app/audio_data"]
-RUN npm install
-RUN npm install express
+
 # Use tini as entrypoint for proper signal handling
 ENTRYPOINT ["/usr/bin/tini", "--"]
 

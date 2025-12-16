@@ -1,0 +1,87 @@
+# Docker ignore file for Sound Forge Alchemy
+# Optimized to reduce build context size
+
+# Dependencies
+node_modules
+**/node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# Testing
+coverage/
+*.coverage
+.nyc_output
+.vitest
+.jest
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker
+.docker-archive/
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# Documentation
+*.md
+docs/
+.github/
+
+# Logs
+logs/
+*.log
+tmp/
+cache/
+
+# Audio data (handled via volumes)
+audio_data/
+models/
+
+# CI/CD
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+
+# Other
+*.bak
+*.tmp
+.cache/

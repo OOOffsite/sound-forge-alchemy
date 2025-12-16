@@ -1,0 +1,24 @@
+# Simplified Processing Service Dockerfile
+ARG BASE_IMAGE=sound-forge-python-node-base:latest
+FROM ${BASE_IMAGE} AS base
+
+ENV SERVICE_NAME=processing \
+    PORT=3003 \
+    USE_GPU=false
+
+WORKDIR /app
+
+# Copy service files
+COPY --chown=soundforge:soundforge src ./src
+COPY --chown=soundforge:soundforge config ./config
+
+# Create required directories
+RUN mkdir -p /app/models /app/scripts
+
+# Production stage
+FROM base AS production
+CMD ["node", "src/index.js"]
+
+# Development stage  
+FROM base AS development
+CMD ["nodemon", "--watch", "src", "--watch", "config", "src/index.js"]

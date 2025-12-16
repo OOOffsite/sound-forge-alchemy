@@ -1,0 +1,117 @@
+{
+  "checkpoint_name": "supabase-setup",
+  "version": "1.0.0",
+  "created_at": "2025-12-16T00:00:00Z",
+  "agent": "Supabase Setup Agent",
+  "status": "completed",
+  "project_path": "/Users/jeremiah/Developer/sound-forge-alchemy",
+  "tasks_completed": [
+    {
+      "task": "Create Supabase directory structure",
+      "path": "alchemy2/supabase/migrations/",
+      "status": "completed"
+    },
+    {
+      "task": "Create initial migration schema",
+      "file": "alchemy2/supabase/migrations/20251216000001_initial_schema.sql",
+      "status": "completed",
+      "details": {
+        "tables_created": [
+          "tracks",
+          "download_jobs",
+          "processing_jobs",
+          "analysis_jobs",
+          "stems",
+          "analysis_results"
+        ],
+        "indexes_created": 15,
+        "functions_created": 2,
+        "triggers_created": 4,
+        "rls_policies_created": 18,
+        "realtime_tables": 4
+      }
+    },
+    {
+      "task": "Create Supabase configuration",
+      "file": "alchemy2/supabase/config.toml",
+      "status": "completed",
+      "details": {
+        "storage_buckets": ["audio-files", "stems"],
+        "realtime_enabled": true,
+        "auth_enabled": false,
+        "file_size_limit": "50MiB"
+      }
+    },
+    {
+      "task": "Verify .env.example configuration",
+      "file": "alchemy2/.env.example",
+      "status": "completed",
+      "details": {
+        "supabase_config_present": true,
+        "keys_needed": ["SUPABASE_URL", "SUPABASE_ANON_KEY", "SUPABASE_SERVICE_ROLE_KEY"]
+      }
+    },
+    {
+      "task": "Create setup documentation",
+      "file": "alchemy2/supabase/README.md",
+      "status": "completed",
+      "details": {
+        "sections": [
+          "Quick Start (Local & Cloud)",
+          "Database Schema",
+          "Storage Buckets",
+          "Realtime Subscriptions",
+          "Migration from Redis",
+          "Testing",
+          "Troubleshooting",
+          "CLI Commands"
+        ]
+      }
+    }
+  ],
+  "schema_summary": {
+    "total_tables": 6,
+    "total_columns": 56,
+    "total_indexes": 15,
+    "total_functions": 2,
+    "total_triggers": 4,
+    "total_rls_policies": 18,
+    "realtime_enabled_tables": 4,
+    "storage_buckets": 2
+  },
+  "replaces": {
+    "redis_job_storage": "PostgreSQL tables (download_jobs, processing_jobs, analysis_jobs)",
+    "redis_pubsub": "Supabase Realtime (automatic on table changes)",
+    "docker_volumes": "Supabase Storage buckets (audio-files, stems)",
+    "separate_postgresql": "Supabase unified PostgreSQL"
+  },
+  "benefits": [
+    "Persistent storage (no Redis TTL)",
+    "SQL queries for filtering/sorting",
+    "CDN-backed file serving",
+    "Built-in auth + RLS ready",
+    "Managed service (no Redis container)",
+    "Real-time subscriptions included",
+    "Automatic backups",
+    "Point-in-time recovery"
+  ],
+  "next_steps": [
+    "Run `supabase start` locally",
+    "Apply migrations with `supabase db push`",
+    "Create storage buckets in Studio",
+    "Update .env with API keys from `supabase start` output",
+    "Update backend services to use Supabase client",
+    "Replace Redis calls with Supabase queries",
+    "Update frontend to use Realtime subscriptions",
+    "Test end-to-end workflow"
+  ],
+  "files_created": [
+    "alchemy2/supabase/migrations/20251216000001_initial_schema.sql",
+    "alchemy2/supabase/config.toml",
+    "alchemy2/supabase/README.md",
+    ".claude/checkpoints/supabase-setup.checkpoint.json"
+  ],
+  "git_commit_pending": true,
+  "estimated_setup_time": "30-60 minutes",
+  "success_criteria_met": true
+}

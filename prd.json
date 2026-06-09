@@ -1,0 +1,120 @@
+{
+  "project": "SoundForgeAlchemy-Prototype",
+  "scope": "alchemy2-refactor (prototype-only, not canonical SFA)",
+  "canonicalProject": "~/Developer/sfa (Phoenix/Elixir) — see CLAUDE.md Resume Parity section",
+  "branchName": "feature/alchemy2-refactor-2025-12-16",
+  "description": "Retroactive PRD synthesized from .claude/PHASE{1..5}_COMPLETE.md + .claude/ALCHEMY2_TDD_COMPLETE.md on 2026-06-09 during /upm sync strategic gate. Captures the 5-phase TDD refactor of the React prototype into the alchemy2/ directory: directory scaffolding, frontend cleanup, backend consolidation (6 services → 1 Express API), Docker simplification, Supabase configuration. RED-phase TDD complete with 706 tests written across phases. Local-only — does not propagate to Plane SFA project (which tracks sfa/, not this repo).",
+  "userStories": [
+    {
+      "id": "US-A2-001",
+      "title": "Phase 1 — Setup, cleanup, and scaffolding",
+      "description": "Establish alchemy2/ directory structure, clean up unused React components and dependencies, consolidate the 6-microservice backend into a unified Express API, simplify Docker, and configure Supabase as the data layer (replacing Redis + custom queue).",
+      "acceptanceCriteria": [
+        "alchemy2/ directory tree created with 21 directories and 28 config files (frontend, backend, docker, supabase migrations, e2e/integration/unit test scaffolds)",
+        "Frontend components reduced 60 → 7 (-88%): button, dialog, input, label, sonner, toast, toggle retained",
+        "Frontend Radix dependencies reduced 27 → 5 (-81%), total deps 57 → 26 (-54%)",
+        "Backend consolidated 6 services → 1 unified Express + Socket.IO API (-83%)",
+        "Docker files reduced 81 → 9 (-89%) using shared base images + multi-stage builds",
+        "Supabase schema with 6 tables, 16 indexes, 18 RLS policies, 2 storage buckets",
+        "Replaces Redis + PostgreSQL with Supabase (Realtime channels, Auth, Storage)"
+      ],
+      "passes": true,
+      "checkpointId": "ALCH2-CP-01",
+      "wave": 1,
+      "completionEvidence": ".claude/PHASE1_COMPLETE.md (2025-12-16)"
+    },
+    {
+      "id": "US-A2-002",
+      "title": "Phase 2 — Backend migration (TDD RED-GREEN-REFACTOR)",
+      "description": "Migrate all backend route handlers and Python workers to the new unified architecture using strict TDD. Each route gets a test file written first (RED), then implementation (GREEN), then refactor.",
+      "acceptanceCriteria": [
+        "Spotify routes: 7 tests, ≥95% coverage (achieved 96.8%)",
+        "Download routes: 32 tests, ≥95% coverage (achieved 95.0%)",
+        "Processing routes (Demucs worker): 51 tests, ≥95% coverage (achieved 95.0%)",
+        "Analysis routes (librosa worker): 45 tests, ≥95% coverage (achieved 96.5%)",
+        "All 4 route groups migrated end-to-end, 135 total tests, average 95.8% coverage",
+        "Python workers (Demucs, analyzer) integrated via subprocess + structured stderr capture",
+        "Service layer extracted from inline handlers"
+      ],
+      "passes": true,
+      "checkpointId": "ALCH2-CP-02",
+      "wave": 2,
+      "completionEvidence": ".claude/PHASE2_COMPLETE.md (2025-12-16)"
+    },
+    {
+      "id": "US-A2-003",
+      "title": "Phase 3 — Frontend migration (TDD)",
+      "description": "Migrate React components, hooks, and integration helpers to the new alchemy2 frontend using strict TDD. Components, hooks, and integration utilities each get their own test suites.",
+      "acceptanceCriteria": [
+        "Components: AudioPlayer (45 tests, 98.5% coverage), TrackLibrary (38 tests, 97.2%), JobProgress (32 tests, 96.8%) — 115 tests, 97.5% avg",
+        "Hooks: useJobProgress (10), useSupabase (10), useAudioPlayer (16), useTracks (11) — 47 tests, 96.95% avg",
+        "Integrations: API Client (24), Realtime Manager (16), Storage Helpers (18), Workflow Orchestrator (15) — 73 tests, 95.0% avg",
+        "Total: 235 tests, 96.5% average coverage (exceeds 95% target)",
+        "All components, hooks, and integrations implemented through GREEN phase",
+        "Real-time updates via Supabase Realtime channels (replaces Socket.IO direct from backend)"
+      ],
+      "passes": true,
+      "checkpointId": "ALCH2-CP-03",
+      "wave": 3,
+      "completionEvidence": ".claude/PHASE3_COMPLETE.md (2025-12-16)"
+    },
+    {
+      "id": "US-A2-004",
+      "title": "Phase 4 — Infrastructure & deployment (TDD RED phase)",
+      "description": "Write infrastructure-as-code tests and Supabase migration tests in TDD RED phase. Establishes deployment surface contracts before implementation.",
+      "acceptanceCriteria": [
+        "Docker compose multi-service tests defined",
+        "Supabase migration tests cover all 6 tables + RLS policies",
+        "Storage bucket policy tests written",
+        "CI/CD workflow tests defined",
+        "All tests intentionally in RED state — implementation tracked separately",
+        "Test files reference real schema, not mocks"
+      ],
+      "passes": true,
+      "checkpointId": "ALCH2-CP-04",
+      "wave": 4,
+      "completionEvidence": ".claude/PHASE4_COMPLETE.md (2025-12-16)"
+    },
+    {
+      "id": "US-A2-005",
+      "title": "Phase 5 — End-to-end integration tests (TDD RED phase)",
+      "description": "Define E2E scenarios spanning the full pipeline (Spotify URL → download → stem separation → analysis → library) as TDD RED tests, establishing acceptance contracts for the integrated alchemy2 system.",
+      "acceptanceCriteria": [
+        "End-to-end scenario: paste Spotify URL → metadata fetch → audio download → Demucs separation → librosa analysis → library entry",
+        "Real-time progress tracking across the full pipeline via Supabase Realtime",
+        "Error recovery scenarios covered (network failure, Demucs crash, analyzer timeout)",
+        "Multi-track concurrent processing scenarios defined",
+        "All E2E tests in RED state pending unified integration",
+        "Test suite total across all 5 phases: 706 tests, 85-97.5% coverage targets"
+      ],
+      "passes": true,
+      "checkpointId": "ALCH2-CP-05",
+      "wave": 5,
+      "completionEvidence": ".claude/PHASE5_COMPLETE.md (2025-12-16) + .claude/ALCHEMY2_TDD_COMPLETE.md"
+    }
+  ],
+  "checkpointHistory": [
+    {"id": "ALCH2-CP-01", "phase": 1, "completed": "2025-12-16", "evidence": ".claude/PHASE1_COMPLETE.md"},
+    {"id": "ALCH2-CP-02", "phase": 2, "completed": "2025-12-16", "evidence": ".claude/PHASE2_COMPLETE.md"},
+    {"id": "ALCH2-CP-03", "phase": 3, "completed": "2025-12-16", "evidence": ".claude/PHASE3_COMPLETE.md"},
+    {"id": "ALCH2-CP-04", "phase": 4, "completed": "2025-12-16", "evidence": ".claude/PHASE4_COMPLETE.md"},
+    {"id": "ALCH2-CP-05", "phase": 5, "completed": "2025-12-16", "evidence": ".claude/PHASE5_COMPLETE.md"},
+    {"id": "SYNC-2026-06-09", "phase": "retroactive-sync", "completed": "2026-06-09", "evidence": "Generated by /upm sync coalesce strategic gate — cross-repo orientation established, MEMORY.md initialized in both repos, retroactive prd.json created."}
+  ],
+  "metadata": {
+    "totalTests": 706,
+    "averageCoverage": "85-97.5%",
+    "totalFiles": "150+",
+    "complexityReduction": "80%+",
+    "generatedBy": "/upm sync coalesce (2026-06-09)",
+    "generatedFromSources": [
+      ".claude/PHASE1_COMPLETE.md",
+      ".claude/PHASE2_COMPLETE.md",
+      ".claude/PHASE3_COMPLETE.md",
+      ".claude/PHASE4_COMPLETE.md",
+      ".claude/PHASE5_COMPLETE.md",
+      ".claude/ALCHEMY2_TDD_COMPLETE.md"
+    ],
+    "planeSyncStatus": "local-only-do-not-push (Plane SFA project tracks ~/Developer/sfa, not this repo)"
+  }
+}

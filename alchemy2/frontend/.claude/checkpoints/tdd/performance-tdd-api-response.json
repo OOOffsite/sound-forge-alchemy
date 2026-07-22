@@ -1,0 +1,36 @@
+{
+  "suite": "api-response-times",
+  "phase": "red",
+  "timestamp": "2025-12-16T00:00:00.000Z",
+  "testsWritten": 10,
+  "targets": {
+    "spotifyFetch": "< 500ms",
+    "downloadCreate": "< 200ms",
+    "jobStatus": "< 100ms",
+    "processingCreate": "< 300ms",
+    "analysisCreate": "< 250ms",
+    "concurrentRequests": "< 1s total",
+    "errorResponse": "< 300ms",
+    "rateLimit": "< 100ms",
+    "loadTest": "< 120ms avg",
+    "websocketConnect": "< 1s"
+  },
+  "testFiles": [
+    "tests/performance/api-response-times.spec.ts"
+  ],
+  "status": "red",
+  "coverage": {
+    "expected": 85,
+    "actual": 0
+  },
+  "nextPhase": "green",
+  "nextActions": [
+    "Run tests to establish baseline",
+    "Add database indexing",
+    "Implement API response caching",
+    "Optimize database queries",
+    "Add connection pooling",
+    "Implement request batching",
+    "Add API rate limiting"
+  ]
+}

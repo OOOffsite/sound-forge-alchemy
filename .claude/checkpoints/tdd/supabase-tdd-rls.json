@@ -1,0 +1,50 @@
+{
+  "checkpoint_type": "tdd",
+  "test_suite": "rls-policies",
+  "phase": "red",
+  "timestamp": "2025-12-16T00:00:00Z",
+  "agent": "Supabase Migration Tests Agent",
+  "project": "Sound Forge Alchemy - Alchemy2 Phase 4",
+  "test_file": "/Users/jeremiah/Developer/sound-forge-alchemy/alchemy2/tests/infrastructure/supabase/rls.test.ts",
+  "migration_file": "/Users/jeremiah/Developer/sound-forge-alchemy/alchemy2/supabase/migrations/20251216000001_initial_schema.sql",
+  "status": "tests_written",
+  "tests_written": 9,
+  "tests_passing": 0,
+  "tests_failing": 0,
+  "tests_pending": 9,
+  "coverage_target": 90,
+  "tables_with_rls": [
+    "tracks",
+    "download_jobs",
+    "processing_jobs",
+    "analysis_jobs",
+    "stems",
+    "analysis_results"
+  ],
+  "validations": {
+    "rls_enabled_tables": 6,
+    "total_policies": 18,
+    "select_policies": 6,
+    "insert_policies": 6,
+    "update_policies": 6,
+    "public_access": true
+  },
+  "policy_structure": {
+    "per_table": 3,
+    "commands": ["SELECT", "INSERT", "UPDATE"],
+    "access_level": "public (true)"
+  },
+  "test_categories": [
+    "rls_enabled",
+    "policy_existence",
+    "read_access",
+    "write_access",
+    "policy_conditions",
+    "unauthenticated_access"
+  ],
+  "next_steps": [
+    "Run tests to verify RED phase",
+    "Fix any policy issues (GREEN phase)",
+    "Verify access control works"
+  ]
+}

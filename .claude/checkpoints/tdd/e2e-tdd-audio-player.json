@@ -1,0 +1,130 @@
+{
+  "workflow": "audio-player",
+  "priority": 4,
+  "phase": "red",
+  "timestamp": "2025-12-16T00:00:00Z",
+  "testsWritten": 10,
+  "testFiles": [
+    "tests/e2e/audio-player.spec.ts"
+  ],
+  "testCases": [
+    {
+      "name": "should play, pause, and seek audio",
+      "description": "Tests basic playback controls",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Player not yet implemented"
+    },
+    {
+      "name": "should adjust volume and mute",
+      "description": "Tests volume controls",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Volume controls not yet implemented"
+    },
+    {
+      "name": "should enable loop and shuffle modes",
+      "description": "Tests loop and shuffle",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Loop/shuffle not yet implemented"
+    },
+    {
+      "name": "should navigate between tracks",
+      "description": "Tests next/previous navigation",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Navigation not yet implemented"
+    },
+    {
+      "name": "should display waveform and allow seeking via waveform",
+      "description": "Tests waveform visualization",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Waveform not yet implemented"
+    },
+    {
+      "name": "should support keyboard shortcuts",
+      "description": "Tests keyboard shortcuts",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Keyboard shortcuts not yet implemented"
+    },
+    {
+      "name": "should adjust playback speed",
+      "description": "Tests speed control",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Speed control not yet implemented"
+    },
+    {
+      "name": "should manage playback queue",
+      "description": "Tests queue management",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Queue not yet implemented"
+    },
+    {
+      "name": "should allow selecting audio output device",
+      "description": "Tests device selection",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Device selection not yet implemented"
+    },
+    {
+      "name": "should auto-play next track when current track ends",
+      "description": "Tests auto-play",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Auto-play not yet implemented"
+    },
+    {
+      "name": "should display comprehensive track metadata",
+      "description": "Tests metadata display",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Metadata display not yet complete"
+    }
+  ],
+  "coverage": {
+    "target": 85,
+    "current": 0,
+    "workflows": [
+      "Track selection",
+      "Play/pause",
+      "Seek",
+      "Volume control",
+      "Loop/shuffle",
+      "Navigation",
+      "Waveform",
+      "Queue",
+      "Metadata"
+    ]
+  },
+  "dependencies": {
+    "components": [
+      "AudioPlayer",
+      "TrackWaveform",
+      "PlaylistPanel"
+    ],
+    "features": [
+      "playback",
+      "volume",
+      "seeking",
+      "waveform",
+      "keyboard-shortcuts",
+      "queue",
+      "metadata"
+    ]
+  },
+  "nextPhase": "green",
+  "nextSteps": [
+    "Implement audio player component",
+    "Implement waveform visualization",
+    "Implement playback controls",
+    "Implement volume controls",
+    "Implement keyboard shortcuts",
+    "Implement queue system",
+    "Implement metadata display"
+  ]
+}

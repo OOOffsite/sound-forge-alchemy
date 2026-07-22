@@ -1,0 +1,79 @@
+{
+  "workflow": "download",
+  "priority": 1,
+  "phase": "red",
+  "timestamp": "2025-12-16T00:00:00Z",
+  "testsWritten": 5,
+  "testFiles": [
+    "tests/e2e/download-workflow.spec.ts"
+  ],
+  "testCases": [
+    {
+      "name": "should complete full download flow",
+      "description": "Tests complete download from URL to library",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Implementation not yet complete"
+    },
+    {
+      "name": "should show error for invalid URL",
+      "description": "Tests URL validation error handling",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Validation not yet implemented"
+    },
+    {
+      "name": "should handle network errors gracefully",
+      "description": "Tests network error handling",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Error handling not yet complete"
+    },
+    {
+      "name": "should handle multiple concurrent downloads",
+      "description": "Tests download queue management",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Queue management not yet implemented"
+    },
+    {
+      "name": "should allow canceling download",
+      "description": "Tests download cancellation",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Cancellation not yet implemented"
+    }
+  ],
+  "coverage": {
+    "target": 85,
+    "current": 0,
+    "workflows": [
+      "Spotify URL input",
+      "Track metadata fetch",
+      "Download job creation",
+      "Realtime progress updates",
+      "Completion verification",
+      "Library integration"
+    ]
+  },
+  "dependencies": {
+    "components": [
+      "SpotifyInput",
+      "JobProgress",
+      "TrackLibrary"
+    ],
+    "services": [
+      "spotify-service",
+      "download-service",
+      "websocket-service"
+    ]
+  },
+  "nextPhase": "green",
+  "nextSteps": [
+    "Implement Spotify URL validation",
+    "Implement track metadata fetching",
+    "Implement download job system",
+    "Implement WebSocket progress updates",
+    "Implement library integration"
+  ]
+}

@@ -4,18 +4,20 @@
  * @module routes/spotify
  * @description Spotify metadata fetching and URL parsing
  * @migrated_from backend/spotify/src/index.js
+ * @refactored TDD Phase: Extracted service layer for better separation of concerns
  *
  * Endpoints:
  * - POST /api/spotify/fetch - Fetch track metadata from Spotify URL
- * - GET /api/spotify/fetch/stream - Stream track metadata
+ * - GET /api/spotify/health - Health check endpoint
  *
  * @author Sound Forge Alchemy Team
  * @version 2.0.0
+ * @license MIT
  */
 
-import { Router, Request, Response, NextFunction } from 'express';
-import SpotifyWebApi from 'spotify-web-api-node';
+import { Router, Request, Response } from 'express';
 import Joi from 'joi';
+import { createSpotifyService, SpotifyService } from '../services/spotifyService';
 
 const router = Router();
 
@@ -25,46 +27,28 @@ const fetchSchema = Joi.object({
   type: Joi.string().valid('track', 'playlist', 'album').optional()
 });
 
-// Initialize Spotify API client
-const spotifyApi = new SpotifyWebApi({
-  clientId: process.env.SPOTIFY_CLIENT_ID,
-  clientSecret: process.env.SPOTIFY_CLIENT_SECRET
-});
+// Initialize Spotify service (singleton per module)
+let spotifyService: SpotifyService | null = null;
 
-// Token refresh middleware
-let accessToken: string | null = null;
-let tokenExpirationTime: number = 0;
-
-async function ensureSpotifyToken(req: Request, res: Response, next: NextFunction) {
-  const logger = req.app.locals.logger;
-
-  try {
-    const now = Date.now();
-    if (!accessToken || now >= tokenExpirationTime) {
-      logger.info('Refreshing Spotify access token...');
-      const data = await spotifyApi.clientCredentialsGrant();
-      accessToken = data.body.access_token;
-      tokenExpirationTime = now + (data.body.expires_in * 1000) - 60000; // Refresh 1 min early
-      spotifyApi.setAccessToken(accessToken);
-      logger.info('Spotify access token refreshed');
-    }
-    next();
-  } catch (error) {
-    logger.error('Failed to refresh Spotify token:', error);
-    res.status(500).json({
-      error: 'Spotify authentication failed',
-      message: error instanceof Error ? error.message : 'Unknown error'
-    });
+/**
+ * Get or create Spotify service instance
+ */
+function getSpotifyService(req: Request): SpotifyService {
+  if (!spotifyService) {
+    const logger = req.app.locals.logger;
+    spotifyService = createSpotifyService(logger);
   }
+  return spotifyService;
 }
 
 /**
  * POST /api/spotify/fetch
  * Fetch track metadata from Spotify URL
  */
-router.post('/fetch', ensureSpotifyToken, async (req: Request, res: Response) => {
+router.post('/fetch', async (req: Request, res: Response) => {
   const logger = req.app.locals.logger;
   const supabase = req.app.locals.supabase;
+  const service = getSpotifyService(req);
 
   try {
     // Validate request
@@ -79,64 +63,17 @@ router.post('/fetch', ensureSpotifyToken, async (req: Request, res: Response) =>
     const { url } = value;
     logger.info(`Fetching metadata for Spotify URL: ${url}`);
 
-    // Extract Spotify ID and type from URL
-    const urlPattern = /spotify\.com\/(track|album|playlist)\/([a-zA-Z0-9]+)/;
-    const match = url.match(urlPattern);
-
-    if (!match) {
+    // Validate Spotify URL format
+    const spotifyInfo = service.extractSpotifyInfo(url);
+    if (!spotifyInfo) {
       return res.status(400).json({
         error: 'Invalid Spotify URL',
         message: 'URL must be a valid Spotify track, album, or playlist URL'
       });
     }
 
-    const [, type, id] = match;
-
-    // Fetch metadata based on type
-    let metadata: any;
-    switch (type) {
-      case 'track':
-        const trackData = await spotifyApi.getTrack(id);
-        metadata = {
-          id: trackData.body.id,
-          type: 'track',
-          name: trackData.body.name,
-          artists: trackData.body.artists.map(a => a.name),
-          album: trackData.body.album.name,
-          albumArt: trackData.body.album.images[0]?.url,
-          duration: trackData.body.duration_ms,
-          url: trackData.body.external_urls.spotify,
-          previewUrl: trackData.body.preview_url
-        };
-        break;
-
-      case 'album':
-        const albumData = await spotifyApi.getAlbum(id);
-        metadata = {
-          id: albumData.body.id,
-          type: 'album',
-          name: albumData.body.name,
-          artists: albumData.body.artists.map(a => a.name),
-          albumArt: albumData.body.images[0]?.url,
-          totalTracks: albumData.body.total_tracks,
-          releaseDate: albumData.body.release_date,
-          url: albumData.body.external_urls.spotify
-        };
-        break;
-
-      case 'playlist':
-        const playlistData = await spotifyApi.getPlaylist(id);
-        metadata = {
-          id: playlistData.body.id,
-          type: 'playlist',
-          name: playlistData.body.name,
-          description: playlistData.body.description,
-          owner: playlistData.body.owner.display_name,
-          totalTracks: playlistData.body.tracks.total,
-          url: playlistData.body.external_urls.spotify
-        };
-        break;
-    }
+    // Fetch metadata using service
+    const metadata = await service.fetchMetadataByURL(url);
 
     // Store in Supabase
     const { data: track, error: dbError } = await supabase
@@ -159,7 +96,7 @@ router.post('/fetch', ensureSpotifyToken, async (req: Request, res: Response) =>
       logger.error('Failed to store track metadata:', dbError);
     }
 
-    logger.info(`Successfully fetched metadata for ${type}: ${metadata.name}`);
+    logger.info(`Successfully fetched metadata for ${metadata.type}: ${metadata.name}`);
 
     res.json({
       success: true,
@@ -181,11 +118,13 @@ router.post('/fetch', ensureSpotifyToken, async (req: Request, res: Response) =>
  * Health check
  */
 router.get('/health', (req: Request, res: Response) => {
+  const service = getSpotifyService(req);
+  const tokenStatus = service.getTokenStatus();
+
   res.json({
     status: 'ok',
     service: 'spotify',
-    hasToken: !!accessToken,
-    tokenExpires: tokenExpirationTime ? new Date(tokenExpirationTime).toISOString() : null
+    ...tokenStatus
   });
 });
 

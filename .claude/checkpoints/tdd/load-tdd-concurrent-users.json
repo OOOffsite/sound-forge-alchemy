@@ -1,0 +1,57 @@
+{
+  "suite": "concurrent-users",
+  "phase": "red",
+  "timestamp": "2025-12-16T00:00:00.000Z",
+  "testsWritten": 5,
+  "testFiles": [
+    "tests/load/concurrent-users.spec.ts"
+  ],
+  "targets": {
+    "concurrentUsers": 10,
+    "concurrentDownloads": 50,
+    "concurrentProcessing": 20,
+    "mixedActions": 30,
+    "sustainedLoad": {
+      "duration": "30s",
+      "concurrentUsers": 5,
+      "requestInterval": 1000
+    }
+  },
+  "performanceTargets": {
+    "homepageLoad": "< 5s for 10 users",
+    "downloadRequests": "< 10s for 50 requests",
+    "processingQueue": "< 5s for 20 requests",
+    "mixedActions": "< 8s for 30 users",
+    "sustainedErrorRate": "< 1%"
+  },
+  "tests": [
+    {
+      "name": "should handle 10 concurrent users loading homepage",
+      "target": "< 5 seconds",
+      "status": "pending"
+    },
+    {
+      "name": "should handle 50 concurrent download requests",
+      "target": "< 10 seconds, > 90% success",
+      "status": "pending"
+    },
+    {
+      "name": "should handle 20 concurrent stem separation requests",
+      "target": "< 5 seconds queuing, > 95% success",
+      "status": "pending"
+    },
+    {
+      "name": "should handle concurrent users with mixed actions",
+      "target": "< 8 seconds for 30 users",
+      "status": "pending"
+    },
+    {
+      "name": "should maintain performance under sustained load (30 seconds)",
+      "target": "< 500ms avg, < 1% errors",
+      "status": "pending"
+    }
+  ],
+  "status": "red-phase-complete",
+  "nextPhase": "green",
+  "notes": "All concurrent user load tests written. Ready for GREEN phase optimization."
+}

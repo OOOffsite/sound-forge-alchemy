@@ -1,0 +1,50 @@
+{
+  "checkpoint_type": "tdd",
+  "test_suite": "indexes",
+  "phase": "red",
+  "timestamp": "2025-12-16T00:00:00Z",
+  "agent": "Supabase Migration Tests Agent",
+  "project": "Sound Forge Alchemy - Alchemy2 Phase 4",
+  "test_file": "/Users/jeremiah/Developer/sound-forge-alchemy/alchemy2/tests/infrastructure/supabase/indexes.test.ts",
+  "migration_file": "/Users/jeremiah/Developer/sound-forge-alchemy/alchemy2/supabase/migrations/20251216000001_initial_schema.sql",
+  "status": "tests_written",
+  "tests_written": 8,
+  "tests_passing": 0,
+  "tests_failing": 0,
+  "tests_pending": 8,
+  "coverage_target": 90,
+  "indexes_tested": [
+    "idx_tracks_spotify_id",
+    "idx_tracks_created_at",
+    "idx_download_jobs_track_id",
+    "idx_download_jobs_status",
+    "idx_download_jobs_created_at",
+    "idx_processing_jobs_track_id",
+    "idx_processing_jobs_status",
+    "idx_processing_jobs_created_at",
+    "idx_analysis_jobs_track_id",
+    "idx_analysis_jobs_status",
+    "idx_analysis_jobs_created_at",
+    "idx_stems_track_id",
+    "idx_stems_processing_job_id",
+    "idx_stems_stem_type",
+    "idx_analysis_results_track_id",
+    "idx_analysis_results_analysis_job_id"
+  ],
+  "validations": {
+    "total_indexes": 16,
+    "performance_tested": true,
+    "descending_indexes": 4
+  },
+  "test_categories": [
+    "index_existence",
+    "index_performance",
+    "query_optimization",
+    "explain_analyze"
+  ],
+  "next_steps": [
+    "Run tests to verify RED phase",
+    "Fix any missing indexes (GREEN phase)",
+    "Verify query performance"
+  ]
+}

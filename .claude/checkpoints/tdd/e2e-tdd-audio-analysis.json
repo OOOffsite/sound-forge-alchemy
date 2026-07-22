@@ -1,0 +1,119 @@
+{
+  "workflow": "audio-analysis",
+  "priority": 3,
+  "phase": "red",
+  "timestamp": "2025-12-16T00:00:00Z",
+  "testsWritten": 8,
+  "testFiles": [
+    "tests/e2e/audio-analysis.spec.ts"
+  ],
+  "testCases": [
+    {
+      "name": "should analyze audio and display features",
+      "description": "Tests complete audio analysis workflow",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Analysis not yet implemented"
+    },
+    {
+      "name": "should detect beats and display beat grid",
+      "description": "Tests beat detection feature",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Beat detection not yet implemented"
+    },
+    {
+      "name": "should detect chords and display chord progression",
+      "description": "Tests chord detection",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Chord detection not yet implemented"
+    },
+    {
+      "name": "should perform spectral analysis and display spectrum",
+      "description": "Tests spectral analysis",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Spectral analysis not yet implemented"
+    },
+    {
+      "name": "should export analysis data in multiple formats",
+      "description": "Tests export functionality",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Export not yet implemented"
+    },
+    {
+      "name": "should show real-time analysis during playback",
+      "description": "Tests real-time analysis",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Real-time analysis not yet implemented"
+    },
+    {
+      "name": "should compare analysis with Spotify audio features",
+      "description": "Tests Spotify comparison",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Spotify comparison not yet implemented"
+    },
+    {
+      "name": "should analyze multiple tracks in batch",
+      "description": "Tests batch analysis",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Batch processing not yet implemented"
+    },
+    {
+      "name": "should handle corrupted audio files gracefully",
+      "description": "Tests error handling",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Error handling not yet complete"
+    }
+  ],
+  "coverage": {
+    "target": 85,
+    "current": 0,
+    "workflows": [
+      "File upload",
+      "Analysis job",
+      "Feature extraction",
+      "Beat detection",
+      "Chord detection",
+      "Spectral analysis",
+      "Visualization",
+      "Export"
+    ]
+  },
+  "dependencies": {
+    "components": [
+      "ArrangementDetector",
+      "AudioProcessor"
+    ],
+    "services": [
+      "analysis-service",
+      "websocket-service"
+    ],
+    "features": [
+      "tempo",
+      "key",
+      "time-signature",
+      "energy",
+      "danceability",
+      "valence",
+      "beats",
+      "chords",
+      "spectrum"
+    ]
+  },
+  "nextPhase": "green",
+  "nextSteps": [
+    "Implement audio feature extraction",
+    "Implement beat detection algorithm",
+    "Implement chord detection",
+    "Implement spectral analysis",
+    "Implement visualization components",
+    "Implement export functionality"
+  ]
+}

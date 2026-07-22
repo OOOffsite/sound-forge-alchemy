@@ -1,0 +1,35 @@
+{
+  "suite": "memory-usage",
+  "phase": "red",
+  "timestamp": "2025-12-16T00:00:00.000Z",
+  "testsWritten": 10,
+  "targets": {
+    "initialLoad": "< 100MB",
+    "navigationLeaks": "< 20% increase after 10 cycles",
+    "audioCleanup": "< 50% audio elements remaining",
+    "eventListenerCleanup": "< 2x accumulation",
+    "websocketCleanup": "<= 1 connection",
+    "largeDataMemory": "< 50MB increase, < 150MB total",
+    "repeatedRenderLeak": "no leak detected",
+    "domNodeAccumulation": "< 1.5x accumulation",
+    "timerCleanup": "< 3x timeouts, < 2x intervals"
+  },
+  "testFiles": [
+    "tests/performance/memory-usage.spec.ts"
+  ],
+  "status": "red",
+  "coverage": {
+    "expected": 85,
+    "actual": 0
+  },
+  "nextPhase": "green",
+  "nextActions": [
+    "Run tests to establish baseline",
+    "Add cleanup in useEffect return functions",
+    "Implement proper WebSocket cleanup",
+    "Add audio element disposal",
+    "Clear timers and intervals on unmount",
+    "Remove event listeners on cleanup",
+    "Implement memory profiling"
+  ]
+}

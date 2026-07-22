@@ -1,0 +1,50 @@
+{
+  "checkpoint_type": "tdd",
+  "test_suite": "realtime-configuration",
+  "phase": "red",
+  "timestamp": "2025-12-16T00:00:00Z",
+  "agent": "Supabase Migration Tests Agent",
+  "project": "Sound Forge Alchemy - Alchemy2 Phase 4",
+  "test_file": "/Users/jeremiah/Developer/sound-forge-alchemy/alchemy2/tests/infrastructure/supabase/realtime.test.ts",
+  "migration_file": "/Users/jeremiah/Developer/sound-forge-alchemy/alchemy2/supabase/migrations/20251216000001_initial_schema.sql",
+  "status": "tests_written",
+  "tests_written": 6,
+  "tests_passing": 0,
+  "tests_failing": 0,
+  "tests_pending": 6,
+  "coverage_target": 90,
+  "realtime_tables": [
+    "download_jobs",
+    "processing_jobs",
+    "analysis_jobs",
+    "stems"
+  ],
+  "non_realtime_tables": [
+    "tracks",
+    "analysis_results"
+  ],
+  "validations": {
+    "realtime_enabled": 4,
+    "insert_events": true,
+    "update_events": true,
+    "delete_events": true,
+    "channel_filtering": true
+  },
+  "test_categories": [
+    "publication_membership",
+    "insert_events",
+    "update_events",
+    "delete_events",
+    "event_filtering"
+  ],
+  "event_types_tested": [
+    "INSERT",
+    "UPDATE",
+    "DELETE"
+  ],
+  "next_steps": [
+    "Run tests to verify RED phase",
+    "Fix Realtime publication (GREEN phase)",
+    "Verify event broadcasting works"
+  ]
+}

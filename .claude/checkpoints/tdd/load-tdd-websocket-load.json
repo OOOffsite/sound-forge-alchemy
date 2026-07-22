@@ -1,0 +1,74 @@
+{
+  "suite": "websocket-load",
+  "phase": "red",
+  "timestamp": "2025-12-16T00:00:00.000Z",
+  "testsWritten": 8,
+  "testFiles": [
+    "tests/load/websocket-load.spec.ts"
+  ],
+  "targets": {
+    "concurrentConnections": 50,
+    "broadcastDelivery": "50 connections",
+    "messageRate": "1000 messages/second",
+    "sustainedLoad": "30s at 10 msg/s",
+    "reconnection": "After connection loss",
+    "multiChannel": "10 channels x 5 subscribers",
+    "messageOrdering": "100 sequential messages",
+    "largePayloads": "10 messages x 100KB"
+  },
+  "performanceTargets": {
+    "connectionSetup": "< 2s for 50 connections",
+    "broadcastTime": "< 2s to all connections",
+    "messageDelivery": "> 95% for 1000 msg/s",
+    "uptime": "> 99% for 30s",
+    "reconnectTime": "< 1s",
+    "multiChannelBroadcast": "< 3s, > 95% delivery",
+    "orderingPreservation": "100% ordered",
+    "largePayloadDelivery": "> 90%, < 5s"
+  },
+  "tests": [
+    {
+      "name": "should handle 50 concurrent WebSocket connections",
+      "target": "< 2s setup",
+      "status": "pending"
+    },
+    {
+      "name": "should broadcast to all connections within 2 seconds",
+      "target": "< 2s, > 98% delivery",
+      "status": "pending"
+    },
+    {
+      "name": "should handle high-frequency message stream (1000 messages/second)",
+      "target": "< 5.5s for 5s stream, > 95% delivery",
+      "status": "pending"
+    },
+    {
+      "name": "should maintain connection stability under sustained load",
+      "target": "> 99% uptime, > 98% delivery for 30s",
+      "status": "pending"
+    },
+    {
+      "name": "should handle reconnection after connection loss",
+      "target": "< 1s reconnect, messages received after",
+      "status": "pending"
+    },
+    {
+      "name": "should handle concurrent subscriptions to different channels",
+      "target": "< 3s for 10 channels, > 95% delivery",
+      "status": "pending"
+    },
+    {
+      "name": "should preserve message ordering under load",
+      "target": "100% ordered, all 100 messages received",
+      "status": "pending"
+    },
+    {
+      "name": "should handle large payload messages",
+      "target": "> 90% delivery, < 5s send time",
+      "status": "pending"
+    }
+  ],
+  "status": "red-phase-complete",
+  "nextPhase": "green",
+  "notes": "All WebSocket load tests written. Tests validate concurrent connections, high-frequency broadcasts, stability, and reliability."
+}

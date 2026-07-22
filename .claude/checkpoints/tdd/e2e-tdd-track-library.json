@@ -1,0 +1,131 @@
+{
+  "workflow": "track-library",
+  "priority": 5,
+  "phase": "red",
+  "timestamp": "2025-12-16T00:00:00Z",
+  "testsWritten": 11,
+  "testFiles": [
+    "tests/e2e/track-library.spec.ts"
+  ],
+  "testCases": [
+    {
+      "name": "should search tracks by title, artist, and album",
+      "description": "Tests search functionality",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Search not yet implemented"
+    },
+    {
+      "name": "should filter tracks by metadata",
+      "description": "Tests filtering",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Filters not yet implemented"
+    },
+    {
+      "name": "should sort tracks by various criteria",
+      "description": "Tests sorting",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Sorting not yet implemented"
+    },
+    {
+      "name": "should paginate track results",
+      "description": "Tests pagination",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Pagination not yet implemented"
+    },
+    {
+      "name": "should toggle between grid and list views",
+      "description": "Tests view modes",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "View modes not yet implemented"
+    },
+    {
+      "name": "should select multiple tracks and perform bulk actions",
+      "description": "Tests bulk selection",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Bulk actions not yet implemented"
+    },
+    {
+      "name": "should display track details in modal",
+      "description": "Tests details modal",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Details modal not yet implemented"
+    },
+    {
+      "name": "should edit track metadata",
+      "description": "Tests metadata editing",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Editing not yet implemented"
+    },
+    {
+      "name": "should drag tracks to playlist",
+      "description": "Tests drag-and-drop",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Drag-drop not yet implemented"
+    },
+    {
+      "name": "should show recently played tracks",
+      "description": "Tests recent tracks",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Recent tracks not yet implemented"
+    },
+    {
+      "name": "should import tracks from file system",
+      "description": "Tests file import",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Import not yet implemented"
+    }
+  ],
+  "coverage": {
+    "target": 85,
+    "current": 0,
+    "workflows": [
+      "Search",
+      "Filter",
+      "Sort",
+      "Pagination",
+      "View modes",
+      "Bulk selection",
+      "Details",
+      "Editing",
+      "Import"
+    ]
+  },
+  "dependencies": {
+    "components": [
+      "TrackLibrary",
+      "TrackList",
+      "SearchPage"
+    ],
+    "features": [
+      "search",
+      "filters",
+      "sorting",
+      "pagination",
+      "bulk-actions",
+      "metadata-editing",
+      "import"
+    ]
+  },
+  "nextPhase": "green",
+  "nextSteps": [
+    "Implement search functionality",
+    "Implement filter system",
+    "Implement sorting logic",
+    "Implement pagination",
+    "Implement view mode toggle",
+    "Implement bulk selection",
+    "Implement metadata editing",
+    "Implement file import"
+  ]
+}

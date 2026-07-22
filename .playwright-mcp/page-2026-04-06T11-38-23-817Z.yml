@@ -1,0 +1,943 @@
+- generic [active] [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - link "Alchemy" [ref=e8] [cursor=pointer]:
+            - /url: /
+          - button "v5.0.0" [ref=e9] [cursor=pointer]
+          - navigation "Main navigation" [ref=e10]:
+            - button [ref=e11]
+            - button "Library" [ref=e14]:
+              - generic: Library
+            - button "Browse" [ref=e16]:
+              - generic: Browse
+            - button "DAW" [ref=e19]:
+              - img [ref=e20]
+              - generic: DAW
+            - button "DJ" [ref=e22]:
+              - img [ref=e23]
+              - generic [ref=e26]: DJ
+            - button "Pads" [ref=e27]:
+              - img [ref=e28]
+              - generic: Pads
+            - link "Alchemy" [ref=e31] [cursor=pointer]:
+              - /url: /alchemy
+              - img [ref=e32]
+              - generic: Alchemy
+            - link "Crate" [ref=e34] [cursor=pointer]:
+              - /url: /crate
+              - img [ref=e35]
+              - generic: Crate
+            - link "Samples" [ref=e37] [cursor=pointer]:
+              - /url: /samples
+              - img [ref=e38]
+              - generic: Samples
+            - link "MIDI" [ref=e40] [cursor=pointer]:
+              - /url: /midi
+              - img [ref=e41]
+              - generic: MIDI
+            - link "Practice" [ref=e43] [cursor=pointer]:
+              - /url: /practice
+              - generic: Practice
+            - link "Admin" [ref=e45] [cursor=pointer]:
+              - /url: /admin
+              - generic: Admin
+        - generic [ref=e47]:
+          - button "MIDI" [ref=e50] [cursor=pointer]:
+            - img [ref=e51]
+            - generic [ref=e53]: MIDI
+          - button "Pipeline tracker, 0 active" [ref=e55]:
+            - img [ref=e56]
+          - button "Notifications, 1 unread" [ref=e59]:
+            - img [ref=e60]
+            - generic [ref=e62]: "1"
+          - button "D Dev" [ref=e64] [cursor=pointer]:
+            - generic [ref=e65]: D
+            - generic [ref=e66]: Dev
+    - generic "Notifications"
+    - main [ref=e68]:
+      - generic [ref=e69]:
+        - generic [ref=e70]:
+          - generic [ref=e71]:
+            - heading "Track Library" [level=3] [ref=e72]
+            - button "Close" [ref=e73]:
+              - img [ref=e74]
+          - generic [ref=e76]:
+            - generic [ref=e77]:
+              - generic [ref=e78]: 56 Nights
+              - generic [ref=e79]: Future
+            - generic [ref=e80]:
+              - generic [ref=e81]: No Compadre
+              - generic [ref=e82]: Future
+            - generic [ref=e83]:
+              - generic [ref=e84]: Now
+              - generic [ref=e85]: Future
+            - generic [ref=e86]:
+              - generic [ref=e87]: Diamonds from Africa
+              - generic [ref=e88]: Future
+            - generic [ref=e89]:
+              - generic [ref=e90]: Purple Comin In
+              - generic [ref=e91]: Future
+            - generic [ref=e92]:
+              - generic [ref=e93]: March Madness
+              - generic [ref=e94]: Future
+            - generic [ref=e95]:
+              - generic [ref=e96]: Never Gon Lose
+              - generic [ref=e97]: Future
+            - generic [ref=e98]:
+              - generic [ref=e99]: Old School Rules
+              - generic [ref=e100]: DANGERDOOM
+            - generic [ref=e101]:
+              - generic [ref=e102]: Papaya - Colonna sonora del film "La polizia ha le mani legate"
+              - generic [ref=e103]: Stelvio Cipriani
+            - generic [ref=e104]:
+              - generic [ref=e105]: Descansado
+              - generic [ref=e106]: Armando Trovajoli
+            - generic [ref=e107]:
+              - generic [ref=e108]: Lady Luna - Remastered
+              - generic [ref=e109]: Nora Orlandi
+            - generic [ref=e110]:
+              - generic [ref=e111]: Love's Been Right Here (Dj Spen & Gary Hudgins Instrumental)
+              - generic [ref=e112]: Stephanie Cooke
+            - generic [ref=e113]:
+              - generic [ref=e114]: I'd Rather Be with You
+              - generic [ref=e115]: Bootsy Collins
+            - generic [ref=e116]:
+              - generic [ref=e117]: Early In The Morning - 12" Version
+              - generic [ref=e118]: The Gap Band
+            - generic [ref=e119]:
+              - generic [ref=e120]: La nuit des masques - 2003 Remaster
+              - generic [ref=e121]: Pierre Barouh
+            - generic [ref=e122]:
+              - generic [ref=e123]: "?"
+              - generic [ref=e124]: MF DOOM
+            - generic [ref=e125]:
+              - generic [ref=e126]: Girl in a Sportscar
+              - generic [ref=e127]: Alan Hawkshaw
+            - generic [ref=e128]:
+              - generic [ref=e129]: Sounds of the Deep (from "Inner Space")
+              - generic [ref=e130]: Sven Libaek
+            - generic [ref=e131]:
+              - generic [ref=e132]: Mexican Dream
+              - generic [ref=e133]: Piero Piccioni
+            - generic [ref=e134]:
+              - generic [ref=e135]: D&T
+              - generic [ref=e136]: letherette
+            - generic [ref=e137]:
+              - generic [ref=e138]: Boogie Nights
+              - generic [ref=e139]: Heatwave
+            - generic [ref=e140]:
+              - generic [ref=e141]: Baby Lou
+              - generic [ref=e142]: Jane Birkin
+            - generic [ref=e143]:
+              - generic [ref=e144]: Helix
+              - generic [ref=e145]: Justice
+            - generic [ref=e146]:
+              - generic [ref=e147]: Silk Stop
+              - generic [ref=e148]: João Donato
+        - button "Toggle DJ library" [ref=e149]:
+          - img [ref=e150]
+        - generic [ref=e154]:
+          - generic [ref=e155]:
+            - generic [ref=e156]:
+              - button "Library Browser" [ref=e157]:
+                - img [ref=e158]
+                - text: Library Browser
+              - generic [ref=e160]:
+                - generic [ref=e161]: Layout
+                - button "Classic" [ref=e162]
+                - button "Traktor" [ref=e163]
+            - generic [ref=e165]:
+              - generic [ref=e166]: MASTER
+              - slider [ref=e170] [cursor=pointer]: "85"
+              - generic [ref=e171]: 85%
+            - generic [ref=e172]:
+              - generic [ref=e174]:
+                - generic [ref=e175]:
+                  - generic [ref=e176]:
+                    - generic [ref=e177]: DECK A
+                    - combobox "Deck type" [ref=e179] [cursor=pointer]:
+                      - option "FULL" [selected]
+                      - option "LOOP"
+                      - option "SND"
+                  - generic [ref=e180]:
+                    - button "MST" [ref=e181]
+                    - button "SYNC" [ref=e182]
+                    - button "♪" [ref=e183]
+                    - generic [ref=e184]: ■
+                - generic [ref=e185]:
+                  - button "Play deck 1" [ref=e186]:
+                    - img [ref=e187]
+                  - generic [ref=e189]:
+                    - paragraph [ref=e190]: Jane B.
+                    - paragraph [ref=e191]: Jane Birkin
+                  - generic [ref=e192]:
+                    - generic [ref=e193]: 00:00
+                    - button "SYNC" [ref=e194]
+                    - button "LEARN" [ref=e195]
+                    - button "TAP" [ref=e196]
+                    - generic [ref=e197]: "156.3"
+                    - generic [ref=e198]: BPM
+                - generic [ref=e199]:
+                  - generic [ref=e200]:
+                    - generic [ref=e201]: Grid
+                    - combobox "Grid overlay mode" [ref=e203] [cursor=pointer]:
+                      - option "BAR" [selected]
+                      - option "BEAT"
+                      - option "SUB"
+                      - option "SMART"
+                    - combobox "Grid interval / fraction" [ref=e205] [cursor=pointer]:
+                      - option "1/1"
+                      - option "1/2"
+                      - option "1/4" [selected]
+                      - option "1/8"
+                      - option "1/16"
+                      - option "1/32"
+                  - generic [ref=e206]:
+                    - generic [ref=e207]: Stem
+                    - combobox [ref=e209] [cursor=pointer]:
+                      - option "Drums" [selected]
+                      - option "Bass"
+                      - option "Vocals"
+                      - option "Other"
+                      - option "Auto"
+                  - button "QUANT" [ref=e210]
+                - generic [ref=e214]:
+                  - generic [ref=e215]:
+                    - generic [ref=e216]: Hot Cues
+                    - generic [ref=e217]: Click empty pad to set · Click set pad to jump
+                  - generic [ref=e218]:
+                    - generic [ref=e219]:
+                      - button "A 02:05.95" [ref=e220]:
+                        - generic [ref=e221]: A
+                        - generic [ref=e222]: 02:05.95
+                      - button "×" [ref=e223]
+                    - generic [ref=e224]:
+                      - button "B 00:00.00" [ref=e225]:
+                        - generic [ref=e226]: B
+                        - generic [ref=e227]: 00:00.00
+                      - button "×" [ref=e228]
+                    - button "C" [ref=e230]
+                    - button "D" [ref=e232]
+                    - button "E" [ref=e234]
+                    - button "F" [ref=e236]
+                    - button "G" [ref=e238]
+                    - button "H" [ref=e240]
+                  - generic [ref=e241]:
+                    - generic [ref=e242]:
+                      - generic [ref=e243]:
+                        - img [ref=e244]
+                        - text: Chef
+                        - generic [ref=e246]: (26)
+                      - generic [ref=e247]:
+                        - combobox [ref=e249] [cursor=pointer]:
+                          - option "Cue Set"
+                          - option "Loop Set"
+                          - option "Hot Cues" [selected]
+                        - combobox [ref=e251] [cursor=pointer]:
+                          - option "Confidence" [selected]
+                          - option "Position"
+                          - option "Intelligent"
+                        - button "AI" [ref=e252]
+                        - button "REGEN" [ref=e253]
+                    - generic [ref=e254]:
+                      - generic [ref=e255]:
+                        - button "00:00.00" [ref=e256]
+                        - button "⟲" [ref=e257]
+                      - generic [ref=e258]:
+                        - button "00:18.00" [ref=e259]
+                        - button "⟲" [ref=e260]
+                      - generic [ref=e261]:
+                        - button "02:54.00" [ref=e262]
+                        - button "⟲" [ref=e263]
+                      - generic [ref=e264]:
+                        - button "02:56.00" [ref=e265]
+                        - button "⟲" [ref=e266]
+                      - generic [ref=e267]:
+                        - button "02:58.00" [ref=e268]
+                        - button "⟲" [ref=e269]
+                      - generic [ref=e270]:
+                        - button "02:06.00" [ref=e271]
+                        - button "⟲" [ref=e272]
+                      - generic [ref=e273]:
+                        - button "02:38.00" [ref=e274]
+                        - button "⟲" [ref=e275]
+                      - generic [ref=e276]:
+                        - button "03:00.00" [ref=e277]
+                        - button "⟲" [ref=e278]
+                    - generic [ref=e279]:
+                      - button "←" [disabled] [ref=e280]
+                      - generic [ref=e281]: pg 1/4 · 26 cues
+                      - button "→" [ref=e282]
+                    - generic [ref=e284]:
+                      - button "My Sets" [ref=e285]:
+                        - text: My Sets
+                        - img [ref=e286]
+                      - button "+ Save as Set" [ref=e288]
+                - generic [ref=e289]:
+                  - generic [ref=e290]:
+                    - generic [ref=e291]: Cue Sequences
+                    - button "+ New" [ref=e292]
+                  - generic [ref=e293]: No sequences yet. Create one to step-sequence your hot cues.
+                - generic [ref=e294]:
+                  - generic [ref=e296]: Loop
+                  - generic [ref=e297]:
+                    - button "IN" [ref=e298]
+                    - button "OUT" [disabled] [ref=e299]
+                    - button "Toggle loop deck 1" [disabled] [ref=e300]: "OFF"
+                  - generic [ref=e301]:
+                    - generic [ref=e302]:
+                      - generic [ref=e303]: "Size:"
+                      - button "⅛" [ref=e304]
+                      - button "¼" [ref=e305]
+                      - button "½" [ref=e306]
+                      - button "1" [ref=e307]
+                      - button "2" [ref=e308]
+                      - button "4" [ref=e309]
+                      - button "8" [ref=e310]
+                      - button "16" [ref=e311]
+                      - button "32" [ref=e312]
+                    - generic [ref=e313]:
+                      - generic [ref=e314]: "Time:"
+                      - button "½×" [ref=e315]
+                      - button "1×" [ref=e316]
+                      - button "2×" [ref=e317]
+                - generic [ref=e318]:
+                  - generic [ref=e319]: Load Track
+                  - combobox "Select track for deck 1" [ref=e321]:
+                    - option "-- Select a track --"
+                    - option "'Black And Tan Fantasy' - Thelonious Monk"
+                    - option "'Walking The Blues' - Champion Jack Dupree"
+                    - option "(Are You Ready) Do The Bus Stop - Fatback Band"
+                    - option "25 or 6 to 4 - 2002 Remaster - Chicago"
+                    - option "30 Hours - Kanye West"
+                    - option "56 Nights - Future"
+                    - option "? - MF DOOM"
+                    - option "A Devil's Touch in the Midwest - Macabre Plaza"
+                    - option "ABC News - OMB Jay Dee"
+                    - option "Adrie's Dream - Sandro Brugnolini"
+                    - option "All Love - Mg Sleepy"
+                    - option "And I Love Him - Esther Phillips"
+                    - option "Au pays des merveilles de Juliet - Yves Simon"
+                    - option "Aujourd'hui c'est toi - Nicole Croisille"
+                    - option "Autostop Per Rio - Piero Umiliani"
+                    - option "Baby Lou - Jane Birkin"
+                    - option "Bagheera - Nino Nardini"
+                    - option "Ballade de Johnny-Jane - Jane Birkin"
+                    - option "Batida Diferente - Roberto Menescal E Seu Conjunto"
+                    - option "Big Opps - Jezz Gasoline"
+                    - option "Big Opps America - Elz Tay"
+                    - option "Blame It on the Boogie - The Jacksons"
+                    - option "Boogie Nights - Heatwave"
+                    - option "Book Of Slim - Gene Harris & The Three Sounds"
+                    - option "Bound - 2023 Remaster - The Ponderosa Twins Plus One"
+                    - option "Camera Shy - Justin Imperiale Mix - Osunlade"
+                    - option "Can't Let Go - Earth"
+                    - option "Cant be kind - Lil EBG"
+                    - option "Cars on the Interstate - Instrumental - Wu-Tang Clan"
+                    - option "Ces P'Tits Je T'aime - Daniel Forestal Et Sa Guitare"
+                    - option "Choo K - Elz Tay"
+                    - option "Chora Tua Tristeza - Oscar Castro-Neves"
+                    - option "Contact - Brigitte Bardot"
+                    - option "Cost of Love - Kartell"
+                    - option "Curiosità - Giuliano Sorgini"
+                    - option "D&T - letherette"
+                    - option "Da Hoti (Around7 Soulful Remix) - Indigènes"
+                    - option "Descansado - Armando Trovajoli"
+                    - option "Despues de Las Seis - Agustin Pereyra Lucena"
+                    - option "Diamonds from Africa - Future"
+                    - option "Dionne - Osunlade"
+                    - option "Discorsi in prospettiva - Fred Bongusto"
+                    - option "Down To The River To Pray - From “O Brother, Where Art Thou” Soundtrack - Alison Krauss"
+                    - option "Early In The Morning - 12\" Version - The Gap Band"
+                    - option "Efficace Swing - Cortex"
+                    - option "Elyjah Slaps the Space - Okvsho"
+                    - option "Erika, Seq. 4 - Roberto Pregadio"
+                    - option "Et moi, et moi, et moi - Jacques Dutronc"
+                    - option "Eyes - Alan Tew"
+                    - option "Faceless Joe - Hood Rese"
+                    - option "Favela - Remastered - Ike Quebec"
+                    - option "Follow God - Kanye West"
+                    - option "Found A Cure (A Tom Moulton Mix) - Mixed - Ashford & Simpson"
+                    - option "Funky Bull Part 1 - Dyke & The Blazers"
+                    - option "Gameboy - JaeEl"
+                    - option "Girl in a Sportscar - Alan Hawkshaw"
+                    - option "Give Up The Funk (Tear The Roof Off The Sucker) - Parliament"
+                    - option "Go Cinderella - Mg Sleepy"
+                    - option "Go Crazy - CHII WVTTZ"
+                    - option "Good Thang - Faze-O"
+                    - option "Goodmorning Sun - Piero Umiliani"
+                    - option "Gooey Sauce - CoachDaGhost"
+                    - option "Grazie nonna - Bossa per Maria Juana - Enrico Simonetti"
+                    - option "Gungala Serenata - Luigi Malatesta"
+                    - option "Half - JaeEl"
+                    - option "Harvest Moon - Jane Birkin"
+                    - option "Helix - Justice"
+                    - option "HighSpeed Music(Fast) - LuhWizz"
+                    - option "Home Base Groove - Kevin MacLeod"
+                    - option "I Am A Man Of Constant Sorrow - From “O Brother, Where Art Thou” Soundtrack / Radio Station Version - The Soggy Bottom Boys"
+                    - option "I Hear Music in the Street - François Kevorkian Mix - Unlimited Touch"
+                    - option "I Say a Little Prayer - Aretha Franklin"
+                    - option "I'd Rather Be with You - Bootsy Collins"
+                    - option "I'll Always Love My Mama - The Intruders"
+                    - option "I'll Be Around - The Spinners"
+                    - option "IYKTYK - CHII WVTTZ"
+                    - option "Jadugar Saiyan Chhod Mori Baiyan - From \"Nagin\" - Lata Mangeshkar"
+                    - option "Jane B. - Jane Birkin" [selected]
+                    - option "Keep Your Head to the Sky - Earth"
+                    - option "La Rua Madureira - Nino Ferrer"
+                    - option "La nuit des masques - 2003 Remaster - Pierre Barouh"
+                    - option "Lady Luna - Remastered - Nora Orlandi"
+                    - option "Le cœur au bout des doigts - Jacqueline Taieb"
+                    - option "Let It Whip (Re-Recorded) - Dazz Band"
+                    - option "Lions Tigers & Bears - Mg Sleepy"
+                    - option "Local Forecast - Elevator - Kevin MacLeod"
+                    - option "Love's Been Right Here (Dj Spen & Gary Hudgins Instrumental) - Stephanie Cooke"
+                    - option "MIS - Balenci"
+                    - option "Madame Mirage (Drumless Edit) - Teuteu"
+                    - option "Mahè - Piero Umiliani"
+                    - option "Mango Meat - Mandrill"
+                    - option "March Madness - Future"
+                    - option "Mes rêves de satin - Patricia"
+                    - 'option "Messa da Requiem: II. Dies irae - Giuseppe Verdi"'
+                    - option "Messaggio - Lesiman"
+                    - option "Mexican Dream - Piero Piccioni"
+                    - option "Moi je joue - Brigitte Bardot"
+                    - option "Moon - Little People"
+                    - 'option "Morceaux de salon, Op. 10: 7 Morceaux de salon, Op. 10: No. 5 Humoresque in G Major - Sergei Rachmaninoff"'
+                    - option "Mubu - Alberto Baldan Bembo"
+                    - option "Music for Eels (from \"Inner Space\") - Sven Libaek"
+                    - option "Neighborhood Hero - 3University"
+                    - option "Never Gon Lose - Future"
+                    - option "Never Too Much - Luther Vandross"
+                    - option "New Opp Pack - Jay Juice"
+                    - option "Nick Blixky - Elz Tay"
+                    - option "No Compadre - Future"
+                    - option "No Twirl Zone - Ace NumbaFive"
+                    - option "Nostalgia - Rhythm Version - Piero Umiliani"
+                    - option "Now - Future"
+                    - option "Now That We Found Love - The O'Jays"
+                    - option "Nun to say - Lil EBG"
+                    - option "Old School Rules - DANGERDOOM"
+                    - option "Olhou Pra Mim - João Donato"
+                    - option "Outstanding - The Gap Band"
+                    - option "Papaya - Colonna sonora del film \"La polizia ha le mani legate\" - Stelvio Cipriani"
+                    - option "Part II - I Am An Instrument"
+                    - option "Pra Que Chorar - Agustin Pereyra Lucena"
+                    - option "Purple Comin In - Future"
+                    - option "RDV (Late Nite Edit) - Teuteu"
+                    - option "RKO - 3University"
+                    - option "Red Clay - Jack Wilkins"
+                    - option "Rising Cost Of Love - Loose Change"
+                    - option "SMACKERS - 4N Iraq"
+                    - option "Samba Saravah - Pierre Barouh"
+                    - 'option "Schubert: String Quartet No. 14 in D Minor, D. 810 \"Death and the Maiden\": II. Andante con moto - Franz Schubert"'
+                    - option "Silk Stop - João Donato"
+                    - option "Skype - Slump Dotty"
+                    - option "So Many - 3University"
+                    - option "So Very Hard to Go - Tower Of Power"
+                    - option "Sounds of the Deep (from \"Inner Space\") - Sven Libaek"
+                    - option "Stain Season - ENVY CAINE"
+                    - option "StopTrollin - 4N Iraq"
+                    - 'option "Suite gothique, Op. 25: IV. Toccata - Léon Boëllmann"'
+                    - option "Sunday - JaeEl"
+                    - option "Sunday Theme - Alessandro Alessandroni"
+                    - option "Supa Icey - Elz Tay"
+                    - option "Surveillance - Alan Tew"
+                    - option "Suzie Thundertussy - Junie Morrison"
+                    - 'option "Symphony No. 9 in E Minor, Op. 95, B. 178 \"from the New World\": IV. Allegro con fuoco - Antonín Dvořák"'
+                    - option "That's Peg's Affair - Sven Libaek"
+                    - option "The Bomb (These Sounds Fall Into My Mind) - The Bucketheads"
+                    - option "The Grunt - Pt. 1 & 2 - The J.B.'s"
+                    - option "The Look Of Love - Sergio Mendes & Brasil '66"
+                    - option "The Love I Lost - Harold Melvin & The Blue Notes"
+                    - 'option "The Valkyrie: Ride Of The Valkyries - London Philharmonic Orchestra"'
+                    - option "Thoda Resham Lagta Hai - From \"Jyoti\" - Lata Mangeshkar"
+                    - option "Too Hot To Stop (Part 1) (Rerecorded) - The Bar-Kays"
+                    - option "Tu veux ou tu veux pas? - Brigitte Bardot"
+                    - option "Warning - PNV Jay"
+                    - option "Whatchu Want (feat. Jay-Z & The Notorious B.I.G.) - The Commission"
+                    - option "Why Future Funk ROCKED in '17 - CHANCE デラソウル"
+                    - option "Wildin - NateSosa"
+                    - option "Woo K, Pt. 2 - ENVY CAINE"
+                    - option "Ye-Me-Le - Sergio Mendes & Brasil '66"
+                    - option "You Make Me Feel (Mighty Real) - Sylvester"
+                    - option "Zazueira (with Stanley Turrentine) - Astrud Gilberto"
+                    - option "getting back - 10meil"
+                    - option "gordon ramsey - xani"
+                    - option "icarly - xani"
+                    - option "la danse - berlioz"
+                    - option "show me // something - Gianni´s Humble"
+                - button "Stem Loops" [ref=e323]:
+                  - generic [ref=e324]:
+                    - img [ref=e325]
+                    - generic [ref=e327]: Stem Loops
+                  - img [ref=e328]
+              - generic [ref=e330]:
+                - generic [ref=e331]:
+                  - generic [ref=e332]:
+                    - generic [ref=e333]: A
+                    - generic [ref=e335]:
+                      - slider [ref=e337] [cursor=pointer]: "0"
+                      - generic [ref=e338]: HI
+                    - generic [ref=e340]:
+                      - slider [ref=e342] [cursor=pointer]: "0"
+                      - generic [ref=e343]: MID
+                    - generic [ref=e345]:
+                      - slider [ref=e347] [cursor=pointer]: "0"
+                      - generic [ref=e348]: LO
+                    - generic [ref=e349]:
+                      - generic [ref=e350]: +0.0%
+                      - generic [ref=e352]:
+                        - slider [ref=e354] [cursor=pointer]: "0"
+                        - generic [ref=e355]: PITCH
+                      - button "RST" [disabled] [ref=e356]
+                    - generic [ref=e357]:
+                      - generic [ref=e358]:
+                        - button "S" [ref=e359]
+                        - generic [ref=e360]: dru
+                        - button "M" [ref=e361]
+                      - generic [ref=e362]:
+                        - button "S" [ref=e363]
+                        - generic [ref=e364]: gui
+                        - button "M" [ref=e365]
+                      - generic [ref=e366]:
+                        - button "S" [ref=e367]
+                        - generic [ref=e368]: oth
+                        - button "M" [ref=e369]
+                      - generic [ref=e370]:
+                        - button "S" [ref=e371]
+                        - generic [ref=e372]: pia
+                        - button "M" [ref=e373]
+                      - generic [ref=e374]:
+                        - button "S" [ref=e375]
+                        - generic [ref=e376]: bas
+                        - button "M" [ref=e377]
+                      - generic [ref=e378]:
+                        - button "S" [ref=e379]
+                        - generic [ref=e380]: voc
+                        - button "M" [ref=e381]
+                    - generic [ref=e382]:
+                      - generic [ref=e383]: VOL
+                      - slider "Deck A volume" [ref=e388] [cursor=pointer]: "100"
+                      - generic [ref=e389]: "100"
+                  - generic [ref=e390]:
+                    - generic [ref=e391]: B
+                    - generic [ref=e393]:
+                      - slider [ref=e395] [cursor=pointer]: "0"
+                      - generic [ref=e396]: HI
+                    - generic [ref=e398]:
+                      - slider [ref=e400] [cursor=pointer]: "0"
+                      - generic [ref=e401]: MID
+                    - generic [ref=e403]:
+                      - slider [ref=e405] [cursor=pointer]: "0"
+                      - generic [ref=e406]: LO
+                    - generic [ref=e407]:
+                      - generic [ref=e408]: "-8.0%"
+                      - generic [ref=e410]:
+                        - slider [ref=e412] [cursor=pointer]: "-80"
+                        - generic [ref=e413]: PITCH
+                      - button "RST" [ref=e414]
+                    - generic [ref=e415]:
+                      - generic [ref=e416]:
+                        - button "S" [ref=e417]
+                        - generic [ref=e418]: bas
+                        - button "M" [ref=e419]
+                      - generic [ref=e420]:
+                        - button "S" [ref=e421]
+                        - generic [ref=e422]: dru
+                        - button "M" [ref=e423]
+                      - generic [ref=e424]:
+                        - button "S" [ref=e425]
+                        - generic [ref=e426]: gui
+                        - button "M" [ref=e427]
+                      - generic [ref=e428]:
+                        - button "S" [ref=e429]
+                        - generic [ref=e430]: oth
+                        - button "M" [ref=e431]
+                      - generic [ref=e432]:
+                        - button "S" [ref=e433]
+                        - generic [ref=e434]: voc
+                        - button "M" [ref=e435]
+                      - generic [ref=e436]:
+                        - button "S" [ref=e437]
+                        - generic [ref=e438]: pia
+                        - button "M" [ref=e439]
+                    - generic [ref=e440]:
+                      - generic [ref=e441]: VOL
+                      - slider "Deck B volume" [ref=e446] [cursor=pointer]: "100"
+                      - generic [ref=e447]: "100"
+                - generic [ref=e448]:
+                  - generic [ref=e449]:
+                    - generic [ref=e450]: XFADER
+                    - button "SPLIT" [ref=e451]
+                  - generic [ref=e453]:
+                    - generic [ref=e454]: A
+                    - slider "Crossfader" [ref=e458] [cursor=pointer]: "0"
+                    - generic [ref=e459]: B
+                  - generic [ref=e460]:
+                    - generic [ref=e461]: A
+                    - generic [ref=e462]: "0"
+                    - generic [ref=e463]: B
+              - generic [ref=e465]:
+                - generic [ref=e466]:
+                  - generic [ref=e467]:
+                    - generic [ref=e468]: DECK B
+                    - combobox "Deck type" [ref=e470] [cursor=pointer]:
+                      - option "FULL" [selected]
+                      - option "LOOP"
+                      - option "SND"
+                  - generic [ref=e471]:
+                    - button "MST" [ref=e472]
+                    - button "SYNC" [ref=e473]
+                    - button "♪" [ref=e474]
+                    - generic [ref=e475]: ■
+                - generic [ref=e476]:
+                  - button "Play deck 2" [ref=e477]:
+                    - img [ref=e478]
+                  - generic [ref=e480]:
+                    - paragraph [ref=e481]: Big Opps America
+                    - paragraph [ref=e482]: Elz Tay
+                  - generic [ref=e483]:
+                    - generic [ref=e484]: 00:00
+                    - button "SYNC" [ref=e485]
+                    - button "LEARN" [ref=e486]
+                    - button "TAP" [ref=e487]
+                    - generic [ref=e488]: "144.2"
+                    - generic [ref=e489]: BPM
+                - generic [ref=e490]:
+                  - generic [ref=e491]:
+                    - generic [ref=e492]: Grid
+                    - combobox "Grid overlay mode" [ref=e494] [cursor=pointer]:
+                      - option "BAR" [selected]
+                      - option "BEAT"
+                      - option "SUB"
+                      - option "SMART"
+                    - combobox "Grid interval / fraction" [ref=e496] [cursor=pointer]:
+                      - option "1/1"
+                      - option "1/2"
+                      - option "1/4" [selected]
+                      - option "1/8"
+                      - option "1/16"
+                      - option "1/32"
+                  - generic [ref=e497]:
+                    - generic [ref=e498]: Stem
+                    - combobox [ref=e500] [cursor=pointer]:
+                      - option "Drums" [selected]
+                      - option "Bass"
+                      - option "Vocals"
+                      - option "Other"
+                      - option "Auto"
+                  - button "QUANT" [ref=e501]
+                - generic [ref=e505]:
+                  - generic [ref=e506]:
+                    - generic [ref=e507]: Hot Cues
+                    - generic [ref=e508]: Click empty pad to set · Click set pad to jump
+                  - generic [ref=e509]:
+                    - button "A" [ref=e511]
+                    - button "B" [ref=e513]
+                    - button "C" [ref=e515]
+                    - button "D" [ref=e517]
+                    - button "E" [ref=e519]
+                    - button "F" [ref=e521]
+                    - button "G" [ref=e523]
+                    - button "H" [ref=e525]
+                  - generic [ref=e526]:
+                    - generic [ref=e527]:
+                      - generic [ref=e528]:
+                        - img [ref=e529]
+                        - text: Chef
+                      - generic [ref=e531]:
+                        - combobox [ref=e533] [cursor=pointer]:
+                          - option "Cue Set"
+                          - option "Loop Set"
+                          - option "Hot Cues" [selected]
+                        - combobox [ref=e535] [cursor=pointer]:
+                          - option "Confidence" [selected]
+                          - option "Position"
+                          - option "Intelligent"
+                        - button "GENERATE" [ref=e536]
+                    - paragraph [ref=e537]: No Chef cues · click GENERATE
+                - generic [ref=e538]:
+                  - generic [ref=e539]:
+                    - generic [ref=e540]: Cue Sequences
+                    - button "+ New" [ref=e541]
+                  - generic [ref=e542]: No sequences yet. Create one to step-sequence your hot cues.
+                - generic [ref=e543]:
+                  - generic [ref=e545]: Loop
+                  - generic [ref=e546]:
+                    - button "IN" [ref=e547]
+                    - button "OUT" [disabled] [ref=e548]
+                    - button "Toggle loop deck 2" [disabled] [ref=e549]: "OFF"
+                  - generic [ref=e550]:
+                    - generic [ref=e551]:
+                      - generic [ref=e552]: "Size:"
+                      - button "⅛" [ref=e553]
+                      - button "¼" [ref=e554]
+                      - button "½" [ref=e555]
+                      - button "1" [ref=e556]
+                      - button "2" [ref=e557]
+                      - button "4" [ref=e558]
+                      - button "8" [ref=e559]
+                      - button "16" [ref=e560]
+                      - button "32" [ref=e561]
+                    - generic [ref=e562]:
+                      - generic [ref=e563]: "Time:"
+                      - button "½×" [ref=e564]
+                      - button "1×" [ref=e565]
+                      - button "2×" [ref=e566]
+                - generic [ref=e567]:
+                  - generic [ref=e568]: Load Track
+                  - combobox "Select track for deck 2" [ref=e570]:
+                    - option "-- Select a track --"
+                    - option "'Black And Tan Fantasy' - Thelonious Monk"
+                    - option "'Walking The Blues' - Champion Jack Dupree"
+                    - option "(Are You Ready) Do The Bus Stop - Fatback Band"
+                    - option "25 or 6 to 4 - 2002 Remaster - Chicago"
+                    - option "30 Hours - Kanye West"
+                    - option "56 Nights - Future"
+                    - option "? - MF DOOM"
+                    - option "A Devil's Touch in the Midwest - Macabre Plaza"
+                    - option "ABC News - OMB Jay Dee"
+                    - option "Adrie's Dream - Sandro Brugnolini"
+                    - option "All Love - Mg Sleepy"
+                    - option "And I Love Him - Esther Phillips"
+                    - option "Au pays des merveilles de Juliet - Yves Simon"
+                    - option "Aujourd'hui c'est toi - Nicole Croisille"
+                    - option "Autostop Per Rio - Piero Umiliani"
+                    - option "Baby Lou - Jane Birkin"
+                    - option "Bagheera - Nino Nardini"
+                    - option "Ballade de Johnny-Jane - Jane Birkin"
+                    - option "Batida Diferente - Roberto Menescal E Seu Conjunto"
+                    - option "Big Opps - Jezz Gasoline"
+                    - option "Big Opps America - Elz Tay" [selected]
+                    - option "Blame It on the Boogie - The Jacksons"
+                    - option "Boogie Nights - Heatwave"
+                    - option "Book Of Slim - Gene Harris & The Three Sounds"
+                    - option "Bound - 2023 Remaster - The Ponderosa Twins Plus One"
+                    - option "Camera Shy - Justin Imperiale Mix - Osunlade"
+                    - option "Can't Let Go - Earth"
+                    - option "Cant be kind - Lil EBG"
+                    - option "Cars on the Interstate - Instrumental - Wu-Tang Clan"
+                    - option "Ces P'Tits Je T'aime - Daniel Forestal Et Sa Guitare"
+                    - option "Choo K - Elz Tay"
+                    - option "Chora Tua Tristeza - Oscar Castro-Neves"
+                    - option "Contact - Brigitte Bardot"
+                    - option "Cost of Love - Kartell"
+                    - option "Curiosità - Giuliano Sorgini"
+                    - option "D&T - letherette"
+                    - option "Da Hoti (Around7 Soulful Remix) - Indigènes"
+                    - option "Descansado - Armando Trovajoli"
+                    - option "Despues de Las Seis - Agustin Pereyra Lucena"
+                    - option "Diamonds from Africa - Future"
+                    - option "Dionne - Osunlade"
+                    - option "Discorsi in prospettiva - Fred Bongusto"
+                    - option "Down To The River To Pray - From “O Brother, Where Art Thou” Soundtrack - Alison Krauss"
+                    - option "Early In The Morning - 12\" Version - The Gap Band"
+                    - option "Efficace Swing - Cortex"
+                    - option "Elyjah Slaps the Space - Okvsho"
+                    - option "Erika, Seq. 4 - Roberto Pregadio"
+                    - option "Et moi, et moi, et moi - Jacques Dutronc"
+                    - option "Eyes - Alan Tew"
+                    - option "Faceless Joe - Hood Rese"
+                    - option "Favela - Remastered - Ike Quebec"
+                    - option "Follow God - Kanye West"
+                    - option "Found A Cure (A Tom Moulton Mix) - Mixed - Ashford & Simpson"
+                    - option "Funky Bull Part 1 - Dyke & The Blazers"
+                    - option "Gameboy - JaeEl"
+                    - option "Girl in a Sportscar - Alan Hawkshaw"
+                    - option "Give Up The Funk (Tear The Roof Off The Sucker) - Parliament"
+                    - option "Go Cinderella - Mg Sleepy"
+                    - option "Go Crazy - CHII WVTTZ"
+                    - option "Good Thang - Faze-O"
+                    - option "Goodmorning Sun - Piero Umiliani"
+                    - option "Gooey Sauce - CoachDaGhost"
+                    - option "Grazie nonna - Bossa per Maria Juana - Enrico Simonetti"
+                    - option "Gungala Serenata - Luigi Malatesta"
+                    - option "Half - JaeEl"
+                    - option "Harvest Moon - Jane Birkin"
+                    - option "Helix - Justice"
+                    - option "HighSpeed Music(Fast) - LuhWizz"
+                    - option "Home Base Groove - Kevin MacLeod"
+                    - option "I Am A Man Of Constant Sorrow - From “O Brother, Where Art Thou” Soundtrack / Radio Station Version - The Soggy Bottom Boys"
+                    - option "I Hear Music in the Street - François Kevorkian Mix - Unlimited Touch"
+                    - option "I Say a Little Prayer - Aretha Franklin"
+                    - option "I'd Rather Be with You - Bootsy Collins"
+                    - option "I'll Always Love My Mama - The Intruders"
+                    - option "I'll Be Around - The Spinners"
+                    - option "IYKTYK - CHII WVTTZ"
+                    - option "Jadugar Saiyan Chhod Mori Baiyan - From \"Nagin\" - Lata Mangeshkar"
+                    - option "Jane B. - Jane Birkin"
+                    - option "Keep Your Head to the Sky - Earth"
+                    - option "La Rua Madureira - Nino Ferrer"
+                    - option "La nuit des masques - 2003 Remaster - Pierre Barouh"
+                    - option "Lady Luna - Remastered - Nora Orlandi"
+                    - option "Le cœur au bout des doigts - Jacqueline Taieb"
+                    - option "Let It Whip (Re-Recorded) - Dazz Band"
+                    - option "Lions Tigers & Bears - Mg Sleepy"
+                    - option "Local Forecast - Elevator - Kevin MacLeod"
+                    - option "Love's Been Right Here (Dj Spen & Gary Hudgins Instrumental) - Stephanie Cooke"
+                    - option "MIS - Balenci"
+                    - option "Madame Mirage (Drumless Edit) - Teuteu"
+                    - option "Mahè - Piero Umiliani"
+                    - option "Mango Meat - Mandrill"
+                    - option "March Madness - Future"
+                    - option "Mes rêves de satin - Patricia"
+                    - 'option "Messa da Requiem: II. Dies irae - Giuseppe Verdi"'
+                    - option "Messaggio - Lesiman"
+                    - option "Mexican Dream - Piero Piccioni"
+                    - option "Moi je joue - Brigitte Bardot"
+                    - option "Moon - Little People"
+                    - 'option "Morceaux de salon, Op. 10: 7 Morceaux de salon, Op. 10: No. 5 Humoresque in G Major - Sergei Rachmaninoff"'
+                    - option "Mubu - Alberto Baldan Bembo"
+                    - option "Music for Eels (from \"Inner Space\") - Sven Libaek"
+                    - option "Neighborhood Hero - 3University"
+                    - option "Never Gon Lose - Future"
+                    - option "Never Too Much - Luther Vandross"
+                    - option "New Opp Pack - Jay Juice"
+                    - option "Nick Blixky - Elz Tay"
+                    - option "No Compadre - Future"
+                    - option "No Twirl Zone - Ace NumbaFive"
+                    - option "Nostalgia - Rhythm Version - Piero Umiliani"
+                    - option "Now - Future"
+                    - option "Now That We Found Love - The O'Jays"
+                    - option "Nun to say - Lil EBG"
+                    - option "Old School Rules - DANGERDOOM"
+                    - option "Olhou Pra Mim - João Donato"
+                    - option "Outstanding - The Gap Band"
+                    - option "Papaya - Colonna sonora del film \"La polizia ha le mani legate\" - Stelvio Cipriani"
+                    - option "Part II - I Am An Instrument"
+                    - option "Pra Que Chorar - Agustin Pereyra Lucena"
+                    - option "Purple Comin In - Future"
+                    - option "RDV (Late Nite Edit) - Teuteu"
+                    - option "RKO - 3University"
+                    - option "Red Clay - Jack Wilkins"
+                    - option "Rising Cost Of Love - Loose Change"
+                    - option "SMACKERS - 4N Iraq"
+                    - option "Samba Saravah - Pierre Barouh"
+                    - 'option "Schubert: String Quartet No. 14 in D Minor, D. 810 \"Death and the Maiden\": II. Andante con moto - Franz Schubert"'
+                    - option "Silk Stop - João Donato"
+                    - option "Skype - Slump Dotty"
+                    - option "So Many - 3University"
+                    - option "So Very Hard to Go - Tower Of Power"
+                    - option "Sounds of the Deep (from \"Inner Space\") - Sven Libaek"
+                    - option "Stain Season - ENVY CAINE"
+                    - option "StopTrollin - 4N Iraq"
+                    - 'option "Suite gothique, Op. 25: IV. Toccata - Léon Boëllmann"'
+                    - option "Sunday - JaeEl"
+                    - option "Sunday Theme - Alessandro Alessandroni"
+                    - option "Supa Icey - Elz Tay"
+                    - option "Surveillance - Alan Tew"
+                    - option "Suzie Thundertussy - Junie Morrison"
+                    - 'option "Symphony No. 9 in E Minor, Op. 95, B. 178 \"from the New World\": IV. Allegro con fuoco - Antonín Dvořák"'
+                    - option "That's Peg's Affair - Sven Libaek"
+                    - option "The Bomb (These Sounds Fall Into My Mind) - The Bucketheads"
+                    - option "The Grunt - Pt. 1 & 2 - The J.B.'s"
+                    - option "The Look Of Love - Sergio Mendes & Brasil '66"
+                    - option "The Love I Lost - Harold Melvin & The Blue Notes"
+                    - 'option "The Valkyrie: Ride Of The Valkyries - London Philharmonic Orchestra"'
+                    - option "Thoda Resham Lagta Hai - From \"Jyoti\" - Lata Mangeshkar"
+                    - option "Too Hot To Stop (Part 1) (Rerecorded) - The Bar-Kays"
+                    - option "Tu veux ou tu veux pas? - Brigitte Bardot"
+                    - option "Warning - PNV Jay"
+                    - option "Whatchu Want (feat. Jay-Z & The Notorious B.I.G.) - The Commission"
+                    - option "Why Future Funk ROCKED in '17 - CHANCE デラソウル"
+                    - option "Wildin - NateSosa"
+                    - option "Woo K, Pt. 2 - ENVY CAINE"
+                    - option "Ye-Me-Le - Sergio Mendes & Brasil '66"
+                    - option "You Make Me Feel (Mighty Real) - Sylvester"
+                    - option "Zazueira (with Stanley Turrentine) - Astrud Gilberto"
+                    - option "getting back - 10meil"
+                    - option "gordon ramsey - xani"
+                    - option "icarly - xani"
+                    - option "la danse - berlioz"
+                    - option "show me // something - Gianni´s Humble"
+                - button "Stem Loops" [ref=e572]:
+                  - generic [ref=e573]:
+                    - img [ref=e574]
+                    - generic [ref=e576]: Stem Loops
+                  - img [ref=e577]
+            - generic [ref=e580]:
+              - generic [ref=e581]:
+                - generic [ref=e582]: Curve
+                - button "Lin" [ref=e583]
+                - button "EQ-P" [ref=e584]
+                - button "Sharp" [ref=e585]
+              - generic [ref=e586]: Z / X to nudge crossfader
+              - button "MASTER SYNC" [ref=e587]
+            - generic [ref=e588]:
+              - generic [ref=e589]: CLICK
+              - button "◎" [ref=e590]
+              - slider "Metronome volume" [ref=e592] [cursor=pointer]: "60"
+              - generic [ref=e593]: 156.3 BPM
+            - button "Chef AI AI-Powered Set Builder" [ref=e595]:
+              - generic [ref=e596]:
+                - img [ref=e597]
+                - generic [ref=e601]: Chef AI
+                - generic [ref=e602]: AI-Powered Set Builder
+              - img [ref=e603]
+            - generic [ref=e605]:
+              - generic [ref=e606]:
+                - generic [ref=e607]: Presets
+                - generic [ref=e608]:
+                  - button "Reset to default" [ref=e609]
+                  - button "Export" [ref=e610]
+              - generic [ref=e611]:
+                - generic [ref=e612]:
+                  - textbox "Name this layout..." [ref=e613]
+                  - button "Save" [disabled] [ref=e614]
+                - generic [ref=e615]: No saved presets yet
+                - generic [ref=e616]:
+                  - paragraph [ref=e617]: Import
+                  - generic [ref=e618]:
+                    - generic [ref=e620] [cursor=pointer]:
+                      - generic [ref=e621]: Traktor
+                      - generic [ref=e622]: .tsi · .touchosc
+                    - generic [ref=e624] [cursor=pointer]:
+                      - generic [ref=e625]: Serato
+                      - generic [ref=e626]: .xml
+                    - generic [ref=e628] [cursor=pointer]:
+                      - generic [ref=e629]: Rekordbox
+                      - generic [ref=e630]: .xml
+          - generic [ref=e632]:
+            - generic [ref=e633]:
+              - generic [ref=e634]: DECK A
+              - generic [ref=e635]: Jane B.
+              - generic [ref=e636]: 156.3 BPM
+              - generic [ref=e637]: 00:00:00:00
+              - generic "Bar.Beat.Tick (4/4)" [ref=e638]: 1.1.01
+            - generic [ref=e639]:
+              - generic [ref=e640]:
+                - generic [ref=e641]: SMPTE
+                - generic [ref=e642]: ·
+                - generic [ref=e643]: INT CLK
+              - generic [ref=e644]:
+                - generic [ref=e645]: DJ
+                - generic [ref=e646]: DAW
+                - generic [ref=e647]: PADS
+            - generic [ref=e648]:
+              - generic "Bar.Beat.Tick (4/4)" [ref=e649]: 1.1.01
+              - generic [ref=e650]: 00:00:00:00
+              - generic [ref=e651]: 144.2 BPM
+              - generic [ref=e652]: Big Opps America
+              - generic [ref=e653]: DECK B
+    - button "Open MIDI Monitor" [ref=e654]:
+      - img [ref=e655]
+    - button "Open debug panel" [ref=e657]:
+      - img [ref=e658]
+    - generic [ref=e660]:
+      - generic [ref=e661]:
+        - generic [ref=e663]: MIDI
+        - generic [ref=e664]: —
+      - generic [ref=e667]: no events yet
+      - button "MON" [ref=e668]
+      - button "LEARN" [ref=e669]
+      - button "Move bar to top" [ref=e670]:
+        - img [ref=e671]
+    - button "AI Assistant" [ref=e674]:
+      - img [ref=e675]
+      - text: AI Assistant
+  - iframe

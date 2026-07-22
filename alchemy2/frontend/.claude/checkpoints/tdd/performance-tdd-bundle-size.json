@@ -1,0 +1,36 @@
+{
+  "suite": "bundle-size",
+  "phase": "red",
+  "timestamp": "2025-12-16T00:00:00.000Z",
+  "testsWritten": 10,
+  "targets": {
+    "mainJsGzipped": "< 500KB",
+    "mainCssGzipped": "< 50KB",
+    "maxJsFiles": "< 20 files",
+    "lazyLoading": "additional chunks on navigation",
+    "cachingHeaders": "> 80% with caching",
+    "minification": "avg line > 100 chars in production",
+    "imageOptimization": "< 20% large images (>500KB)",
+    "treeshaking": "0 unused libraries",
+    "codeSplitting": "> 0 routes with chunks",
+    "compression": "> 80% compressed in production"
+  },
+  "testFiles": [
+    "tests/performance/bundle-size.spec.ts"
+  ],
+  "status": "red",
+  "coverage": {
+    "expected": 85,
+    "actual": 0
+  },
+  "nextPhase": "green",
+  "nextActions": [
+    "Run tests to establish baseline",
+    "Configure Vite for optimal code splitting",
+    "Implement lazy loading for routes",
+    "Add tree shaking configuration",
+    "Optimize images with WebP/AVIF",
+    "Enable compression (Brotli/Gzip)",
+    "Add proper caching headers"
+  ]
+}

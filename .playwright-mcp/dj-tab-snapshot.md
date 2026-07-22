@@ -1,0 +1,745 @@
+- generic [active] [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - link "Sound Forge Alchemy" [ref=e8] [cursor=pointer]:
+            - /url: /
+          - generic [ref=e9]: v4.1.0
+          - navigation "Main navigation" [ref=e10]:
+            - button "Library" [ref=e11]: Library
+            - button "Browse" [ref=e13]: Browse
+            - button "DAW" [ref=e15]:
+              - img [ref=e16]
+              - text: DAW
+            - button "DJ" [ref=e18]:
+              - img [ref=e19]
+              - text: DJ
+            - button "Pads" [ref=e22]:
+              - img [ref=e23]
+              - text: Pads
+            - link "Admin" [ref=e25] [cursor=pointer]:
+              - /url: /admin
+              - text: Admin
+        - generic [ref=e27]:
+          - button "MIDI 14" [ref=e560] [cursor=pointer]:
+            - img [ref=e31]
+            - generic [ref=e33]: MIDI
+            - generic [ref=e561]: "14"
+          - button "Pipeline tracker, 0 active" [ref=e35]:
+            - img [ref=e36]
+          - button "Notifications, 2 unread" [ref=e39]:
+            - img [ref=e40]
+            - generic [ref=e42]: "2"
+          - button "D Dev" [ref=e44] [cursor=pointer]:
+            - generic [ref=e45]: D
+            - generic [ref=e46]: Dev
+    - generic "Notifications"
+    - main [ref=e48]:
+      - generic [ref=e49]:
+        - generic [ref=e50]:
+          - button "Library Browser" [ref=e52]:
+            - img [ref=e53]
+            - text: Library Browser
+          - generic [ref=e55]:
+            - generic [ref=e56]:
+              - generic [ref=e57]:
+                - generic [ref=e58]: DECK 1
+                - generic [ref=e59]: STOPPED
+              - generic [ref=e60]:
+                - paragraph [ref=e61]: Pra Que Chorar
+                - paragraph [ref=e62]: Agustin Pereyra Lucena
+              - generic [ref=e568]:
+                - generic:
+                  - generic:
+                    - generic: "1"
+              - generic [ref=e65]:
+                - generic [ref=e66]:
+                  - generic [ref=e67]: Hot Cues
+                  - generic [ref=e68]: Click empty pad to set · Click set pad to jump
+                - generic [ref=e69]:
+                  - button "A" [ref=e71]
+                  - button "B" [ref=e73]
+                  - button "C" [ref=e75]
+                  - button "D" [ref=e77]
+                  - button "E" [ref=e79]
+                  - button "F" [ref=e81]
+                  - button "G" [ref=e83]
+                  - button "H" [ref=e85]
+                - generic [ref=e86]:
+                  - generic [ref=e87]:
+                    - generic [ref=e88]:
+                      - img [ref=e89]
+                      - text: AI Cues
+                      - generic [ref=e91]: (top 8/26)
+                    - button "REGEN" [ref=e92]
+                  - generic [ref=e93]:
+                    - generic [ref=e94]:
+                      - button "00:00.00" [ref=e95]
+                      - button "⟲" [ref=e96]
+                    - generic [ref=e97]:
+                      - button "00:16.00" [ref=e98]
+                      - button "⟲" [ref=e99]
+                    - generic [ref=e100]:
+                      - button "00:20.00" [ref=e101]
+                      - button "⟲" [ref=e102]
+                    - generic [ref=e103]:
+                      - button "00:52.00" [ref=e104]
+                      - button "⟲" [ref=e105]
+                    - generic [ref=e106]:
+                      - button "00:54.00" [ref=e107]
+                      - button "⟲" [ref=e108]
+                    - generic [ref=e109]:
+                      - button "03:04.00" [ref=e110]
+                      - button "⟲" [ref=e111]
+                    - generic [ref=e112]:
+                      - button "03:46.00" [ref=e113]
+                      - button "⟲" [ref=e114]
+                    - generic [ref=e115]:
+                      - button "03:48.00" [ref=e116]
+                      - button "⟲" [ref=e117]
+              - generic [ref=e118]:
+                - button "Play deck 1" [ref=e119]:
+                  - img [ref=e120]
+                - generic [ref=e122]: 00:00
+                - generic "SMPTE timecode (30fps)" [ref=e123]: 00:00:00:00
+                - button "MIDI SYNC" [ref=e124]
+                - generic [ref=e125]:
+                  - generic [ref=e126]: BPM
+                  - generic [ref=e127]: "133.9"
+              - generic [ref=e128]:
+                - generic [ref=e129]:
+                  - generic [ref=e130]: Pitch
+                  - generic [ref=e131]:
+                    - generic [ref=e132]: +8.0%
+                    - button "RESET" [ref=e133]
+                - generic [ref=e134]:
+                  - slider "Pitch adjust deck 1" [ref=e135] [cursor=pointer]: "80"
+                  - generic [ref=e136]:
+                    - generic [ref=e137]: "-8%"
+                    - generic [ref=e138]: "0"
+                    - generic [ref=e139]: +8%
+                - generic [ref=e140]:
+                  - generic [ref=e141]:
+                    - generic [ref=e142]: Adj. BPM
+                    - generic [ref=e143]: "144.6"
+                  - button "SYNC" [ref=e144]
+              - generic [ref=e145]:
+                - generic [ref=e147]: Loop
+                - generic [ref=e148]:
+                  - button "IN" [ref=e149]
+                  - button "OUT" [disabled] [ref=e150]
+                  - button "Toggle loop deck 1" [disabled] [ref=e151]: "OFF"
+                - generic [ref=e152]:
+                  - generic [ref=e153]:
+                    - generic [ref=e154]: "Size:"
+                    - button "⅛" [ref=e155]
+                    - button "¼" [ref=e156]
+                    - button "½" [ref=e157]
+                    - button "1" [ref=e158]
+                    - button "2" [ref=e159]
+                    - button "4" [ref=e160]
+                    - button "8" [ref=e161]
+                    - button "16" [ref=e162]
+                    - button "32" [ref=e163]
+                  - generic [ref=e164]:
+                    - generic [ref=e165]: "Time:"
+                    - button "½×" [ref=e166]
+                    - button "1×" [ref=e167]
+                    - button "2×" [ref=e168]
+              - generic [ref=e169]:
+                - generic [ref=e170]:
+                  - generic [ref=e171]: EQ
+                  - button "high" [ref=e172]
+                  - button "mid" [ref=e173]
+                  - button "low" [ref=e174]
+                - generic [ref=e175]:
+                  - generic [ref=e176]: "Filter:"
+                  - button "HP" [ref=e177]
+                  - slider [disabled] [ref=e179] [cursor=pointer]: "0.5"
+                  - button "LP" [ref=e180]
+                  - button "OFF" [ref=e181]
+              - generic [ref=e182]:
+                - generic [ref=e183]: Stems
+                - generic [ref=e184]:
+                  - generic [ref=e185]:
+                    - button "S" [ref=e186]
+                    - generic [ref=e187]: voca
+                    - button "M" [ref=e188]
+                  - generic [ref=e189]:
+                    - button "S" [ref=e190]
+                    - generic [ref=e191]: drum
+                    - button "M" [ref=e192]
+                  - generic [ref=e193]:
+                    - button "S" [ref=e194]
+                    - generic [ref=e195]: othe
+                    - button "M" [ref=e196]
+                  - generic [ref=e197]:
+                    - button "S" [ref=e198]
+                    - generic [ref=e199]: bass
+                    - button "M" [ref=e200]
+              - generic [ref=e202]:
+                - generic [ref=e203]: Volume
+                - slider "Deck 1 volume" [ref=e205] [cursor=pointer]: "100"
+                - generic [ref=e206]: 100%
+              - generic [ref=e207]:
+                - generic [ref=e208]: Load Track
+                - combobox "Select track for deck 1" [ref=e210]:
+                  - option "-- Select a track --"
+                  - option "A Devil's Touch in the Midwest - Macabre Plaza"
+                  - option "ABC News - OMB Jay Dee"
+                  - option "All Love - Mg Sleepy"
+                  - option "And I Love Him - Esther Phillips"
+                  - option "Autostop Per Rio - Piero Umiliani"
+                  - option "Batida Diferente - Roberto Menescal E Seu Conjunto"
+                  - option "Big Opps - Jezz Gasoline"
+                  - option "Big Opps America - Elz Tay"
+                  - option "Cant be kind - Lil EBG"
+                  - option "Ces P'Tits Je T'aime - Daniel Forestal Et Sa Guitare"
+                  - option "Choo K - Elz Tay"
+                  - option "Contact - Brigitte Bardot"
+                  - option "Curiosità - Giuliano Sorgini"
+                  - option "Despues de Las Seis - Agustin Pereyra Lucena"
+                  - option "Discorsi in prospettiva - Fred Bongusto"
+                  - option "Efficace Swing - Cortex"
+                  - option "Elyjah Slaps the Space - Okvsho"
+                  - option "Et moi, et moi, et moi - Jacques Dutronc"
+                  - option "Faceless Joe - Hood Rese"
+                  - option "Gameboy - JaeEl"
+                  - option "Go Cinderella - Mg Sleepy"
+                  - option "Go Crazy - CHII WVTTZ"
+                  - option "Gooey Sauce - CoachDaGhost"
+                  - option "Half - JaeEl"
+                  - option "HighSpeed Music(Fast) - LuhWizz"
+                  - option "IYKTYK - CHII WVTTZ"
+                  - option "Jane B. - Jane Birkin"
+                  - option "La Rua Madureira - Nino Ferrer"
+                  - option "Le cœur au bout des doigts - Jacqueline Taieb"
+                  - option "Lions Tigers & Bears - Mg Sleepy"
+                  - option "MIS - Balenci"
+                  - option "Mahè - Piero Umiliani"
+                  - option "Moi je joue - Brigitte Bardot"
+                  - option "Mubu - Alberto Baldan Bembo"
+                  - option "Neighborhood Hero - 3University"
+                  - option "New Opp Pack - Jay Juice"
+                  - option "Nick Blixky - Elz Tay"
+                  - option "No Twirl Zone - Ace NumbaFive"
+                  - option "Nostalgia - Rhythm Version - Piero Umiliani"
+                  - option "Nun to say - Lil EBG"
+                  - option "Part II - I Am An Instrument"
+                  - option "Pra Que Chorar - Agustin Pereyra Lucena" [selected]
+                  - option "RDV (Late Nite Edit) - Teuteu"
+                  - option "RKO - 3University"
+                  - option "SMACKERS - 4N Iraq"
+                  - option "Samba Saravah - Pierre Barouh"
+                  - option "Skype - Slump Dotty"
+                  - option "So Many - 3University"
+                  - option "Stain Season - ENVY CAINE"
+                  - option "StopTrollin - 4N Iraq"
+                  - option "Sunday - JaeEl"
+                  - option "Supa Icey - Elz Tay"
+                  - option "That's Peg's Affair - Sven Libaek"
+                  - option "Tu veux ou tu veux pas? - Brigitte Bardot"
+                  - option "Warning - PNV Jay"
+                  - option "Why Future Funk ROCKED in '17 - CHANCE デラソウル"
+                  - option "Wildin - NateSosa"
+                  - option "Woo K, Pt. 2 - ENVY CAINE"
+                  - option "deep in it - berlioz"
+                  - option "getting back - 10meil"
+                  - option "gordon ramsey - xani"
+                  - option "icarly - xani"
+                  - option "la danse - berlioz"
+                  - option "show me // something - Gianni´s Humble"
+              - button "Stem Loops" [ref=e212]:
+                - generic [ref=e213]:
+                  - img [ref=e214]
+                  - generic [ref=e216]: Stem Loops
+                - img [ref=e217]
+            - generic [ref=e219]:
+              - generic [ref=e220]:
+                - generic [ref=e221]: DECK 2
+                - generic [ref=e222]: STOPPED
+              - generic [ref=e223]:
+                - paragraph [ref=e224]: Mahè
+                - paragraph [ref=e225]: Piero Umiliani
+              - generic [ref=e592]:
+                - generic [ref=e619]: chorus_17 start
+                - generic:
+                  - generic:
+                    - generic: "1"
+              - generic [ref=e228]:
+                - generic [ref=e229]:
+                  - generic [ref=e230]: Hot Cues
+                  - generic [ref=e231]: Click empty pad to set · Click set pad to jump
+                - generic [ref=e232]:
+                  - button "A" [ref=e234]
+                  - button "B" [ref=e236]
+                  - button "C" [ref=e238]
+                  - button "D" [ref=e240]
+                  - button "E" [ref=e242]
+                  - button "F" [ref=e244]
+                  - button "G" [ref=e246]
+                  - button "H" [ref=e248]
+                - generic [ref=e249]:
+                  - generic [ref=e250]:
+                    - generic [ref=e251]:
+                      - img [ref=e252]
+                      - text: AI Cues
+                      - generic [ref=e254]: (top 8/21)
+                    - button "REGEN" [ref=e255]
+                  - generic [ref=e256]:
+                    - generic [ref=e257]:
+                      - button "01:06.00" [ref=e258]
+                      - button "⟲" [ref=e259]
+                    - generic [ref=e260]:
+                      - button "01:16.00" [ref=e261]
+                      - button "⟲" [ref=e262]
+                    - generic [ref=e263]:
+                      - button "01:20.00" [ref=e264]
+                      - button "⟲" [ref=e265]
+                    - generic [ref=e266]:
+                      - button "02:06.00" [ref=e267]
+                      - button "⟲" [ref=e268]
+                    - generic [ref=e269]:
+                      - button "02:08.00" [ref=e270]
+                      - button "⟲" [ref=e271]
+                    - generic [ref=e272]:
+                      - button "02:12.00" [ref=e273]
+                      - button "⟲" [ref=e274]
+                    - generic [ref=e275]:
+                      - button "02:36.00" [ref=e276]
+                      - button "⟲" [ref=e277]
+                    - generic [ref=e278]:
+                      - button "02:38.00" [ref=e279]
+                      - button "⟲" [ref=e280]
+              - generic [ref=e281]:
+                - button "Play deck 2" [ref=e282]:
+                  - img [ref=e283]
+                - generic [ref=e285]: 00:00
+                - generic "SMPTE timecode (30fps)" [ref=e286]: 00:00:00:00
+                - button "MIDI SYNC" [ref=e287]
+                - generic [ref=e288]:
+                  - generic [ref=e289]: BPM
+                  - generic [ref=e290]: "165.4"
+              - generic [ref=e291]:
+                - generic [ref=e292]:
+                  - generic [ref=e293]: Pitch
+                  - generic [ref=e294]:
+                    - generic [ref=e295]: "-8.0%"
+                    - button "RESET" [ref=e296]
+                - generic [ref=e297]:
+                  - slider "Pitch adjust deck 2" [ref=e298] [cursor=pointer]: "-80"
+                  - generic [ref=e299]:
+                    - generic [ref=e300]: "-8%"
+                    - generic [ref=e301]: "0"
+                    - generic [ref=e302]: +8%
+                - generic [ref=e303]:
+                  - generic [ref=e304]:
+                    - generic [ref=e305]: Adj. BPM
+                    - generic [ref=e306]: "152.2"
+                  - button "SYNC" [ref=e307]
+              - generic [ref=e308]:
+                - generic [ref=e310]: Loop
+                - generic [ref=e311]:
+                  - button "IN" [ref=e312]
+                  - button "OUT" [disabled] [ref=e313]
+                  - button "Toggle loop deck 2" [disabled] [ref=e314]: "OFF"
+                - generic [ref=e315]:
+                  - generic [ref=e316]:
+                    - generic [ref=e317]: "Size:"
+                    - button "⅛" [ref=e318]
+                    - button "¼" [ref=e319]
+                    - button "½" [ref=e320]
+                    - button "1" [ref=e321]
+                    - button "2" [ref=e322]
+                    - button "4" [ref=e323]
+                    - button "8" [ref=e324]
+                    - button "16" [ref=e325]
+                    - button "32" [ref=e326]
+                  - generic [ref=e327]:
+                    - generic [ref=e328]: "Time:"
+                    - button "½×" [ref=e329]
+                    - button "1×" [ref=e330]
+                    - button "2×" [ref=e331]
+              - generic [ref=e332]:
+                - generic [ref=e333]:
+                  - generic [ref=e334]: EQ
+                  - button "high" [ref=e335]
+                  - button "mid" [ref=e336]
+                  - button "low" [ref=e337]
+                - generic [ref=e338]:
+                  - generic [ref=e339]: "Filter:"
+                  - button "HP" [ref=e340]
+                  - slider [disabled] [ref=e342] [cursor=pointer]: "0.5"
+                  - button "LP" [ref=e343]
+                  - button "OFF" [ref=e344]
+              - generic [ref=e345]:
+                - generic [ref=e346]: Stems
+                - generic [ref=e347]:
+                  - generic [ref=e348]:
+                    - button "S" [ref=e349]
+                    - generic [ref=e350]: bass
+                    - button "M" [ref=e351]
+                  - generic [ref=e352]:
+                    - button "S" [ref=e353]
+                    - generic [ref=e354]: drum
+                    - button "M" [ref=e355]
+                  - generic [ref=e356]:
+                    - button "S" [ref=e357]
+                    - generic [ref=e358]: guit
+                    - button "M" [ref=e359]
+                  - generic [ref=e360]:
+                    - button "S" [ref=e361]
+                    - generic [ref=e362]: othe
+                    - button "M" [ref=e363]
+                  - generic [ref=e364]:
+                    - button "S" [ref=e365]
+                    - generic [ref=e366]: pian
+                    - button "M" [ref=e367]
+                  - generic [ref=e368]:
+                    - button "S" [ref=e369]
+                    - generic [ref=e370]: voca
+                    - button "M" [ref=e371]
+              - generic [ref=e373]:
+                - generic [ref=e374]: Volume
+                - slider "Deck 2 volume" [ref=e376] [cursor=pointer]: "100"
+                - generic [ref=e377]: 100%
+              - generic [ref=e378]:
+                - generic [ref=e379]: Load Track
+                - combobox "Select track for deck 2" [ref=e381]:
+                  - option "-- Select a track --"
+                  - option "A Devil's Touch in the Midwest - Macabre Plaza"
+                  - option "ABC News - OMB Jay Dee"
+                  - option "All Love - Mg Sleepy"
+                  - option "And I Love Him - Esther Phillips"
+                  - option "Autostop Per Rio - Piero Umiliani"
+                  - option "Batida Diferente - Roberto Menescal E Seu Conjunto"
+                  - option "Big Opps - Jezz Gasoline"
+                  - option "Big Opps America - Elz Tay"
+                  - option "Cant be kind - Lil EBG"
+                  - option "Ces P'Tits Je T'aime - Daniel Forestal Et Sa Guitare"
+                  - option "Choo K - Elz Tay"
+                  - option "Contact - Brigitte Bardot"
+                  - option "Curiosità - Giuliano Sorgini"
+                  - option "Despues de Las Seis - Agustin Pereyra Lucena"
+                  - option "Discorsi in prospettiva - Fred Bongusto"
+                  - option "Efficace Swing - Cortex"
+                  - option "Elyjah Slaps the Space - Okvsho"
+                  - option "Et moi, et moi, et moi - Jacques Dutronc"
+                  - option "Faceless Joe - Hood Rese"
+                  - option "Gameboy - JaeEl"
+                  - option "Go Cinderella - Mg Sleepy"
+                  - option "Go Crazy - CHII WVTTZ"
+                  - option "Gooey Sauce - CoachDaGhost"
+                  - option "Half - JaeEl"
+                  - option "HighSpeed Music(Fast) - LuhWizz"
+                  - option "IYKTYK - CHII WVTTZ"
+                  - option "Jane B. - Jane Birkin"
+                  - option "La Rua Madureira - Nino Ferrer"
+                  - option "Le cœur au bout des doigts - Jacqueline Taieb"
+                  - option "Lions Tigers & Bears - Mg Sleepy"
+                  - option "MIS - Balenci"
+                  - option "Mahè - Piero Umiliani" [selected]
+                  - option "Moi je joue - Brigitte Bardot"
+                  - option "Mubu - Alberto Baldan Bembo"
+                  - option "Neighborhood Hero - 3University"
+                  - option "New Opp Pack - Jay Juice"
+                  - option "Nick Blixky - Elz Tay"
+                  - option "No Twirl Zone - Ace NumbaFive"
+                  - option "Nostalgia - Rhythm Version - Piero Umiliani"
+                  - option "Nun to say - Lil EBG"
+                  - option "Part II - I Am An Instrument"
+                  - option "Pra Que Chorar - Agustin Pereyra Lucena"
+                  - option "RDV (Late Nite Edit) - Teuteu"
+                  - option "RKO - 3University"
+                  - option "SMACKERS - 4N Iraq"
+                  - option "Samba Saravah - Pierre Barouh"
+                  - option "Skype - Slump Dotty"
+                  - option "So Many - 3University"
+                  - option "Stain Season - ENVY CAINE"
+                  - option "StopTrollin - 4N Iraq"
+                  - option "Sunday - JaeEl"
+                  - option "Supa Icey - Elz Tay"
+                  - option "That's Peg's Affair - Sven Libaek"
+                  - option "Tu veux ou tu veux pas? - Brigitte Bardot"
+                  - option "Warning - PNV Jay"
+                  - option "Why Future Funk ROCKED in '17 - CHANCE デラソウル"
+                  - option "Wildin - NateSosa"
+                  - option "Woo K, Pt. 2 - ENVY CAINE"
+                  - option "deep in it - berlioz"
+                  - option "getting back - 10meil"
+                  - option "gordon ramsey - xani"
+                  - option "icarly - xani"
+                  - option "la danse - berlioz"
+                  - option "show me // something - Gianni´s Humble"
+              - button "Stem Loops" [ref=e383]:
+                - generic [ref=e384]:
+                  - img [ref=e385]
+                  - generic [ref=e387]: Stem Loops
+                - img [ref=e388]
+          - generic [ref=e390]:
+            - generic [ref=e392]: Loop Tracks
+            - generic [ref=e394]:
+              - generic [ref=e395]:
+                - generic [ref=e396]: LOOP C
+                - generic [ref=e398]: STOPPED
+              - paragraph [ref=e399]: Empty — load a loop track
+              - generic [ref=e401]:
+                - button "▶ PLAY" [disabled] [ref=e402]
+                - generic [ref=e403]: 00:00:00:00
+              - generic [ref=e404]:
+                - button "IN" [disabled] [ref=e405]
+                - button "OUT" [disabled] [ref=e406]
+                - button "OFF" [disabled] [ref=e407]
+                - button "1" [disabled] [ref=e408]
+                - button "2" [disabled] [ref=e409]
+                - button "4" [disabled] [ref=e410]
+                - button "8" [disabled] [ref=e411]
+                - button "½×" [disabled] [ref=e412]
+                - button "2×" [disabled] [ref=e413]
+              - combobox [ref=e415]:
+                - option "Load loop track..." [selected]
+                - option "A Devil's Touch in the Midwest — Macabre Plaza"
+                - option "ABC News — OMB Jay Dee"
+                - option "All Love — Mg Sleepy"
+                - option "And I Love Him — Esther Phillips"
+                - option "Autostop Per Rio — Piero Umiliani"
+                - option "Batida Diferente — Roberto Menescal E Seu Conjunto"
+                - option "Big Opps — Jezz Gasoline"
+                - option "Big Opps America — Elz Tay"
+                - option "Cant be kind — Lil EBG"
+                - option "Ces P'Tits Je T'aime — Daniel Forestal Et Sa Guitare"
+                - option "Choo K — Elz Tay"
+                - option "Contact — Brigitte Bardot"
+                - option "Curiosità — Giuliano Sorgini"
+                - option "Despues de Las Seis — Agustin Pereyra Lucena"
+                - option "Discorsi in prospettiva — Fred Bongusto"
+                - option "Efficace Swing — Cortex"
+                - option "Elyjah Slaps the Space — Okvsho"
+                - option "Et moi, et moi, et moi — Jacques Dutronc"
+                - option "Faceless Joe — Hood Rese"
+                - option "Gameboy — JaeEl"
+                - option "Go Cinderella — Mg Sleepy"
+                - option "Go Crazy — CHII WVTTZ"
+                - option "Gooey Sauce — CoachDaGhost"
+                - option "Half — JaeEl"
+                - option "HighSpeed Music(Fast) — LuhWizz"
+                - option "IYKTYK — CHII WVTTZ"
+                - option "Jane B. — Jane Birkin"
+                - option "La Rua Madureira — Nino Ferrer"
+                - option "Le cœur au bout des doigts — Jacqueline Taieb"
+                - option "Lions Tigers & Bears — Mg Sleepy"
+                - option "MIS — Balenci"
+                - option "Mahè — Piero Umiliani"
+                - option "Moi je joue — Brigitte Bardot"
+                - option "Mubu — Alberto Baldan Bembo"
+                - option "Neighborhood Hero — 3University"
+                - option "New Opp Pack — Jay Juice"
+                - option "Nick Blixky — Elz Tay"
+                - option "No Twirl Zone — Ace NumbaFive"
+                - option "Nostalgia - Rhythm Version — Piero Umiliani"
+                - option "Nun to say — Lil EBG"
+                - option "Part II — I Am An Instrument"
+                - option "Pra Que Chorar — Agustin Pereyra Lucena"
+                - option "RDV (Late Nite Edit) — Teuteu"
+                - option "RKO — 3University"
+                - option "SMACKERS — 4N Iraq"
+                - option "Samba Saravah — Pierre Barouh"
+                - option "Skype — Slump Dotty"
+                - option "So Many — 3University"
+                - option "Stain Season — ENVY CAINE"
+                - option "StopTrollin — 4N Iraq"
+                - option "Sunday — JaeEl"
+                - option "Supa Icey — Elz Tay"
+                - option "That's Peg's Affair — Sven Libaek"
+                - option "Tu veux ou tu veux pas? — Brigitte Bardot"
+                - option "Warning — PNV Jay"
+                - option "Why Future Funk ROCKED in '17 — CHANCE デラソウル"
+                - option "Wildin — NateSosa"
+                - option "Woo K, Pt. 2 — ENVY CAINE"
+                - option "deep in it — berlioz"
+                - option "getting back — 10meil"
+                - option "gordon ramsey — xani"
+                - option "icarly — xani"
+                - option "la danse — berlioz"
+                - option "show me // something — Gianni´s Humble"
+            - generic [ref=e416]:
+              - generic [ref=e417]:
+                - generic [ref=e418]: LOOP D
+                - generic [ref=e420]: STOPPED
+              - paragraph [ref=e421]: Empty — load a loop track
+              - generic [ref=e423]:
+                - button "▶ PLAY" [disabled] [ref=e424]
+                - generic [ref=e425]: 00:00:00:00
+              - generic [ref=e426]:
+                - button "IN" [disabled] [ref=e427]
+                - button "OUT" [disabled] [ref=e428]
+                - button "OFF" [disabled] [ref=e429]
+                - button "1" [disabled] [ref=e430]
+                - button "2" [disabled] [ref=e431]
+                - button "4" [disabled] [ref=e432]
+                - button "8" [disabled] [ref=e433]
+                - button "½×" [disabled] [ref=e434]
+                - button "2×" [disabled] [ref=e435]
+              - combobox [ref=e437]:
+                - option "Load loop track..." [selected]
+                - option "A Devil's Touch in the Midwest — Macabre Plaza"
+                - option "ABC News — OMB Jay Dee"
+                - option "All Love — Mg Sleepy"
+                - option "And I Love Him — Esther Phillips"
+                - option "Autostop Per Rio — Piero Umiliani"
+                - option "Batida Diferente — Roberto Menescal E Seu Conjunto"
+                - option "Big Opps — Jezz Gasoline"
+                - option "Big Opps America — Elz Tay"
+                - option "Cant be kind — Lil EBG"
+                - option "Ces P'Tits Je T'aime — Daniel Forestal Et Sa Guitare"
+                - option "Choo K — Elz Tay"
+                - option "Contact — Brigitte Bardot"
+                - option "Curiosità — Giuliano Sorgini"
+                - option "Despues de Las Seis — Agustin Pereyra Lucena"
+                - option "Discorsi in prospettiva — Fred Bongusto"
+                - option "Efficace Swing — Cortex"
+                - option "Elyjah Slaps the Space — Okvsho"
+                - option "Et moi, et moi, et moi — Jacques Dutronc"
+                - option "Faceless Joe — Hood Rese"
+                - option "Gameboy — JaeEl"
+                - option "Go Cinderella — Mg Sleepy"
+                - option "Go Crazy — CHII WVTTZ"
+                - option "Gooey Sauce — CoachDaGhost"
+                - option "Half — JaeEl"
+                - option "HighSpeed Music(Fast) — LuhWizz"
+                - option "IYKTYK — CHII WVTTZ"
+                - option "Jane B. — Jane Birkin"
+                - option "La Rua Madureira — Nino Ferrer"
+                - option "Le cœur au bout des doigts — Jacqueline Taieb"
+                - option "Lions Tigers & Bears — Mg Sleepy"
+                - option "MIS — Balenci"
+                - option "Mahè — Piero Umiliani"
+                - option "Moi je joue — Brigitte Bardot"
+                - option "Mubu — Alberto Baldan Bembo"
+                - option "Neighborhood Hero — 3University"
+                - option "New Opp Pack — Jay Juice"
+                - option "Nick Blixky — Elz Tay"
+                - option "No Twirl Zone — Ace NumbaFive"
+                - option "Nostalgia - Rhythm Version — Piero Umiliani"
+                - option "Nun to say — Lil EBG"
+                - option "Part II — I Am An Instrument"
+                - option "Pra Que Chorar — Agustin Pereyra Lucena"
+                - option "RDV (Late Nite Edit) — Teuteu"
+                - option "RKO — 3University"
+                - option "SMACKERS — 4N Iraq"
+                - option "Samba Saravah — Pierre Barouh"
+                - option "Skype — Slump Dotty"
+                - option "So Many — 3University"
+                - option "Stain Season — ENVY CAINE"
+                - option "StopTrollin — 4N Iraq"
+                - option "Sunday — JaeEl"
+                - option "Supa Icey — Elz Tay"
+                - option "That's Peg's Affair — Sven Libaek"
+                - option "Tu veux ou tu veux pas? — Brigitte Bardot"
+                - option "Warning — PNV Jay"
+                - option "Why Future Funk ROCKED in '17 — CHANCE デラソウル"
+                - option "Wildin — NateSosa"
+                - option "Woo K, Pt. 2 — ENVY CAINE"
+                - option "deep in it — berlioz"
+                - option "getting back — 10meil"
+                - option "gordon ramsey — xani"
+                - option "icarly — xani"
+                - option "la danse — berlioz"
+                - option "show me // something — Gianni´s Humble"
+          - generic [ref=e438]:
+            - generic [ref=e439]:
+              - generic [ref=e440]: DECK 1
+              - generic [ref=e441]:
+                - generic [ref=e442]: Crossfader
+                - slider "Crossfader" [ref=e443] [cursor=pointer]: "0"
+                - generic [ref=e444]:
+                  - generic [ref=e445]: A
+                  - generic [ref=e446]: "|"
+                  - generic [ref=e447]: B
+                - generic [ref=e448]: Z / X to nudge
+              - generic [ref=e449]: DECK 2
+            - generic [ref=e450]:
+              - generic [ref=e451]: Curve
+              - button "Linear" [ref=e452]
+              - button "Equal Power" [ref=e453]
+              - button "Sharp" [ref=e454]
+            - button "MASTER SYNC" [ref=e456]
+          - generic [ref=e457]:
+            - generic [ref=e458]: Metronome
+            - button "◎ CLICK OFF" [ref=e459]
+            - generic [ref=e460]:
+              - generic [ref=e461]: Vol
+              - slider [ref=e463] [cursor=pointer]: "60"
+              - generic [ref=e464]: 60%
+            - generic [ref=e465]: 133.9 BPM
+          - button "Chef AI AI-Powered Set Builder" [ref=e467]:
+            - generic [ref=e468]:
+              - img [ref=e469]
+              - generic [ref=e473]: Chef AI
+              - generic [ref=e474]: AI-Powered Set Builder
+            - img [ref=e475]
+          - button "Import Preset" [ref=e478]:
+            - generic [ref=e479]:
+              - img [ref=e480]
+              - text: Import Preset
+            - img [ref=e482]
+          - generic [ref=e484]:
+            - heading "Virtual Controller" [level=3] [ref=e485]
+            - generic [ref=e486]:
+              - generic [ref=e487]:
+                - generic [ref=e488]: DECK 1
+                - img [ref=e491]:
+                  - generic [ref=e498]: CUE
+                - generic [ref=e499]:
+                  - button "1" [ref=e500]
+                  - button "2" [ref=e501]
+                  - button "3" [ref=e502]
+                  - button "4" [ref=e503]
+                  - button "5" [ref=e504]
+                  - button "6" [ref=e505]
+                  - button "7" [ref=e506]
+                  - button "8" [ref=e507]
+              - generic [ref=e508]:
+                - generic [ref=e509]: DECK 2
+                - img [ref=e512]:
+                  - generic [ref=e519]: CUE
+                - generic [ref=e520]:
+                  - button "1" [ref=e521]
+                  - button "2" [ref=e522]
+                  - button "3" [ref=e523]
+                  - button "4" [ref=e524]
+                  - button "5" [ref=e525]
+                  - button "6" [ref=e526]
+                  - button "7" [ref=e527]
+                  - button "8" [ref=e528]
+        - generic [ref=e530]:
+          - generic [ref=e531]:
+            - generic [ref=e532]: DECK 1
+            - generic [ref=e533]: Pra Que Chorar
+            - generic [ref=e534]: 133.9 BPM
+            - generic [ref=e535]: 00:00:00:00
+            - generic "Bar.Beat.Tick (4/4)" [ref=e536]: 1.1.01
+          - generic [ref=e537]:
+            - generic [ref=e538]:
+              - generic [ref=e539]: SMPTE
+              - generic [ref=e540]: ·
+              - generic [ref=e541]: INT CLK
+            - generic [ref=e542]:
+              - generic [ref=e543]: DJ
+              - generic [ref=e544]: DAW
+              - generic [ref=e545]: PADS
+          - generic [ref=e546]:
+            - generic "Bar.Beat.Tick (4/4)" [ref=e547]: 1.1.01
+            - generic [ref=e548]: 00:00:00:00
+            - generic [ref=e549]: 165.4 BPM
+            - generic [ref=e550]: Mahè
+            - generic [ref=e551]: DECK 2
+    - button "Open debug panel" [ref=e552]:
+      - img [ref=e553]
+    - button "AI Assistant" [ref=e556]:
+      - img [ref=e557]
+      - text: AI Assistant
+  - iframe

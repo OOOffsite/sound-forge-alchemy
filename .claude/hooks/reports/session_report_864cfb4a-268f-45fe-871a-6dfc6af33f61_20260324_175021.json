@@ -1,0 +1,90 @@
+{
+  "session_overview": {
+    "session_id": "864cfb4a-268f-45fe-871a-6dfc6af33f61",
+    "timestamp": "2026-03-24T17:50:21.406056",
+    "project": "idfwu",
+    "duration_estimate": "2 hours",
+    "overall_score": 0.1
+  },
+  "key_achievements": [],
+  "metrics_summary": {
+    "productivity_score": 0.0,
+    "quality_score": 0.0,
+    "efficiency_score": 0.5,
+    "collaboration_score": 0.0,
+    "innovation_score": 0.0,
+    "overall_score": 0.1,
+    "detailed_metrics": {
+      "productivity": {
+        "linear_operations": 0,
+        "agent_tasks_completed": 0,
+        "todos_processed": 0,
+        "schemas_validated": 0
+      },
+      "quality": {
+        "schema_validation_success_rate": 0.0,
+        "agent_success_rate": 0.0,
+        "error_rate": 0.0
+      },
+      "efficiency": {
+        "average_agent_execution_time": 0.0,
+        "operations_per_hour": 0.0
+      },
+      "collaboration": {
+        "issues_created": 0,
+        "comments_added": 0,
+        "issues_updated": 0
+      },
+      "innovation": {
+        "patterns_generated": 0,
+        "schema_innovations": 0,
+        "new_integrations": 0
+      }
+    }
+  },
+  "activity_breakdown": {
+    "linear_operations": 0,
+    "agent_tasks": 0,
+    "schema_validations": 0,
+    "todo_activities": 0,
+    "patterns_generated": 0
+  },
+  "recommendations": {
+    "immediate_actions": [
+      {
+        "priority": "high",
+        "action": "Review and fix quality issues",
+        "reason": "Quality score is low (0.00)",
+        "details": "Check schema validation failures and agent errors"
+      },
+      {
+        "priority": "medium",
+        "action": "Optimize agent performance",
+        "reason": "Efficiency score is low (0.50)",
+        "details": "Review agent execution times and task complexity"
+      }
+    ],
+    "optimization_suggestions": [],
+    "learning_opportunities": [],
+    "next_session_focus": [
+      {
+        "focus": "Schema development and innovation",
+        "reason": "Innovation score is below average",
+        "activities": [
+          "Explore new IDFW/FORCE patterns",
+          "Experiment with schema optimizations"
+        ]
+      }
+    ]
+  },
+  "next_steps": [
+    "Review and fix quality issues",
+    "Focus on: Schema development and innovation"
+  ],
+  "session_data_references": {
+    "linear_tracking": false,
+    "agent_performance": false,
+    "schema_validations": false,
+    "patterns_generated": false
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "suite": "api-throughput",
+  "phase": "red",
+  "timestamp": "2025-12-16T00:00:00.000Z",
+  "testsWritten": 8,
+  "testFiles": [
+    "tests/load/api-throughput.spec.ts"
+  ],
+  "targets": {
+    "spotifyFetch": "100 req/s",
+    "downloadJobStatus": "200 req/s",
+    "processingStatus": "150 req/s",
+    "tracksAPI": "100 req/s",
+    "burstTraffic": "500 requests in 2s",
+    "sustainedLoad": "60s at 50 req/s",
+    "mixedEndpoints": "Multiple endpoints concurrently",
+    "recovery": "< 500ms after spike"
+  },
+  "performanceTargets": {
+    "successRate": "> 95% under normal load",
+    "peakSuccessRate": "> 90% under peak load",
+    "avgResponseTime": "< 100ms",
+    "burstHandling": "< 2s for 500 requests",
+    "sustainedPerformance": "< 5% degradation over 60s",
+    "recoveryTime": "< 500ms after spike"
+  },
+  "tests": [
+    {
+      "name": "should handle 100 requests/second to /api/spotify/fetch",
+      "target": "< 5.5s total, > 95% success",
+      "status": "pending"
+    },
+    {
+      "name": "should handle 200 requests/second to /api/download/job/:id",
+      "target": "< 5.5s total, > 98% success, < 100ms avg",
+      "status": "pending"
+    },
+    {
+      "name": "should handle 150 requests/second to /api/processing/status",
+      "target": "< 5.5s total, > 95% success",
+      "status": "pending"
+    },
+    {
+      "name": "should handle 100 requests/second to /api/tracks",
+      "target": "< 5.5s total, > 95% success",
+      "status": "pending"
+    },
+    {
+      "name": "should handle burst traffic (500 requests in 2 seconds)",
+      "target": "< 2s, > 90% success",
+      "status": "pending"
+    },
+    {
+      "name": "should maintain throughput under sustained load (60 seconds)",
+      "target": "> 95% success, < 5% degradation",
+      "status": "pending"
+    },
+    {
+      "name": "should handle mixed API endpoints concurrently",
+      "target": "< 11s total, > 95% success",
+      "status": "pending"
+    },
+    {
+      "name": "should recover quickly after traffic spike",
+      "target": "< 500ms post-recovery",
+      "status": "pending"
+    }
+  ],
+  "status": "red-phase-complete",
+  "nextPhase": "green",
+  "notes": "All API throughput tests written. Includes throttling helpers and comprehensive rate testing."
+}

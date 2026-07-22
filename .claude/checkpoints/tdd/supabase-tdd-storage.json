@@ -1,0 +1,63 @@
+{
+  "checkpoint_type": "tdd",
+  "test_suite": "storage-buckets",
+  "phase": "red",
+  "timestamp": "2025-12-16T00:00:00Z",
+  "agent": "Supabase Migration Tests Agent",
+  "project": "Sound Forge Alchemy - Alchemy2 Phase 4",
+  "test_file": "/Users/jeremiah/Developer/sound-forge-alchemy/alchemy2/tests/infrastructure/supabase/storage.test.ts",
+  "config_file": "/Users/jeremiah/Developer/sound-forge-alchemy/alchemy2/supabase/config.toml",
+  "status": "tests_written",
+  "tests_written": 10,
+  "tests_passing": 0,
+  "tests_failing": 0,
+  "tests_pending": 10,
+  "coverage_target": 90,
+  "storage_buckets": [
+    "audio-files",
+    "stems"
+  ],
+  "validations": {
+    "buckets_created": 2,
+    "file_uploads": true,
+    "file_downloads": true,
+    "mime_type_validation": true,
+    "size_limits": true,
+    "public_url_generation": true
+  },
+  "bucket_config": {
+    "audio-files": {
+      "public": false,
+      "file_size_limit": "50MiB",
+      "allowed_mime_types": [
+        "audio/mpeg",
+        "audio/wav",
+        "audio/flac",
+        "audio/ogg"
+      ]
+    },
+    "stems": {
+      "public": false,
+      "file_size_limit": "50MiB",
+      "allowed_mime_types": [
+        "audio/mpeg",
+        "audio/wav",
+        "audio/flac"
+      ]
+    }
+  },
+  "test_categories": [
+    "bucket_existence",
+    "bucket_configuration",
+    "file_uploads",
+    "file_downloads",
+    "mime_type_restrictions",
+    "size_limits",
+    "url_generation"
+  ],
+  "next_steps": [
+    "Run tests to verify RED phase",
+    "Verify bucket configuration (GREEN phase)",
+    "Test file operations"
+  ]
+}

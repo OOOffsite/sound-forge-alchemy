@@ -1,0 +1,99 @@
+{
+  "workflow": "stem-separation",
+  "priority": 2,
+  "phase": "red",
+  "timestamp": "2025-12-16T00:00:00Z",
+  "testsWritten": 8,
+  "testFiles": [
+    "tests/e2e/stem-separation.spec.ts"
+  ],
+  "testCases": [
+    {
+      "name": "should separate stems from uploaded audio",
+      "description": "Tests complete stem separation workflow",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Stem separation not yet implemented"
+    },
+    {
+      "name": "should allow switching between stems during playback",
+      "description": "Tests stem switching feature",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Stem switching not yet implemented"
+    },
+    {
+      "name": "should allow solo and mute of individual stems",
+      "description": "Tests stem solo/mute controls",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Solo/mute not yet implemented"
+    },
+    {
+      "name": "should allow downloading individual stems",
+      "description": "Tests stem download functionality",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Stem download not yet implemented"
+    },
+    {
+      "name": "should allow comparing different Demucs models",
+      "description": "Tests model comparison feature",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Model comparison not yet implemented"
+    },
+    {
+      "name": "should show error for unsupported audio formats",
+      "description": "Tests file format validation",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Format validation not yet implemented"
+    },
+    {
+      "name": "should allow canceling stem separation",
+      "description": "Tests cancellation feature",
+      "status": "pending",
+      "expectedToFail": true,
+      "reason": "Cancellation not yet implemented"
+    }
+  ],
+  "coverage": {
+    "target": 85,
+    "current": 0,
+    "workflows": [
+      "File upload",
+      "Model selection",
+      "Stem selection",
+      "Processing job",
+      "Realtime progress",
+      "Stem playback",
+      "Stem download"
+    ]
+  },
+  "dependencies": {
+    "components": [
+      "AudioProcessor",
+      "StemViewer",
+      "JobProgress"
+    ],
+    "services": [
+      "processing-service",
+      "websocket-service"
+    ],
+    "models": [
+      "htdemucs",
+      "htdemucs_ft",
+      "htdemucs_6s"
+    ]
+  },
+  "nextPhase": "green",
+  "nextSteps": [
+    "Implement file upload handling",
+    "Implement Demucs model integration",
+    "Implement stem selection UI",
+    "Implement processing job system",
+    "Implement stem player",
+    "Implement stem download"
+  ]
+}

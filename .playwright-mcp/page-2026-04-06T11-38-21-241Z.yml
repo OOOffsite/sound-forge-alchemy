@@ -1,0 +1,911 @@
+- generic [active] [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - link "Alchemy" [ref=e8] [cursor=pointer]:
+            - /url: /
+          - button "v5.0.0" [ref=e9] [cursor=pointer]
+          - navigation "Main navigation" [ref=e10]:
+            - button [ref=e11]
+            - button "Library" [ref=e14]:
+              - generic [ref=e16]: Library
+            - button "Browse" [ref=e17]:
+              - generic: Browse
+            - button "DAW" [ref=e20]:
+              - img [ref=e21]
+              - generic: DAW
+            - button "DJ" [ref=e23]:
+              - img [ref=e24]
+              - generic: DJ
+            - button "Pads" [ref=e27]:
+              - img [ref=e28]
+              - generic: Pads
+            - link "Alchemy" [ref=e31] [cursor=pointer]:
+              - /url: /alchemy
+              - img [ref=e32]
+              - generic: Alchemy
+            - link "Crate" [ref=e34] [cursor=pointer]:
+              - /url: /crate
+              - img [ref=e35]
+              - generic: Crate
+            - link "Samples" [ref=e37] [cursor=pointer]:
+              - /url: /samples
+              - img [ref=e38]
+              - generic: Samples
+            - link "MIDI" [ref=e40] [cursor=pointer]:
+              - /url: /midi
+              - img [ref=e41]
+              - generic: MIDI
+            - link "Practice" [ref=e43] [cursor=pointer]:
+              - /url: /practice
+              - generic: Practice
+            - link "Admin" [ref=e45] [cursor=pointer]:
+              - /url: /admin
+              - generic: Admin
+        - generic [ref=e47]:
+          - button "MIDI 2" [ref=e50] [cursor=pointer]:
+            - img [ref=e51]
+            - generic [ref=e53]: MIDI
+            - generic [ref=e54]: "2"
+          - button "Pipeline tracker, 0 active" [ref=e56]:
+            - img [ref=e57]
+          - button "Notifications, 1 unread" [ref=e60]:
+            - img [ref=e61]
+            - generic [ref=e63]: "1"
+          - button "D Dev" [ref=e65] [cursor=pointer]:
+            - generic [ref=e66]: D
+            - generic [ref=e67]: Dev
+    - generic "Notifications":
+      - alert [ref=e68]:
+        - generic [ref=e69]:
+          - img [ref=e71]
+          - generic [ref=e73]:
+            - paragraph [ref=e74]: Spotify
+            - paragraph [ref=e75]: Failed to initialize player
+          - button "Dismiss notification" [ref=e76]:
+            - img [ref=e77]
+    - alert [ref=e79]:
+      - img [ref=e80]
+      - generic [ref=e82]: Welcome back!
+      - button "Dismiss" [ref=e83]: ×
+    - generic [ref=e84]:
+      - complementary [ref=e85]:
+        - navigation "Library navigation" [ref=e86]:
+          - generic [ref=e87]:
+            - heading "Library" [level=3] [ref=e88]
+            - list [ref=e89]:
+              - listitem [ref=e90]:
+                - button "All Tracks 162" [ref=e91]:
+                  - generic [ref=e93]: All Tracks
+                  - generic [ref=e94]: "162"
+              - listitem [ref=e95]:
+                - button "Recently Added" [ref=e96]:
+                  - generic [ref=e98]: Recently Added
+          - generic [ref=e99]:
+            - generic [ref=e100]:
+              - heading "Playlists" [level=3] [ref=e101]
+              - generic [ref=e102]:
+                - generic [ref=e103]: "12"
+                - button "Create new playlist" [ref=e104]
+            - list [ref=e106]:
+              - listitem [ref=e107]:
+                - button "0197edd0" [ref=e108]:
+                  - generic [ref=e110]: 0197edd0
+              - listitem [ref=e111]:
+                - button "New Playlist" [ref=e112]:
+                  - generic [ref=e114]: New Playlist
+              - listitem [ref=e115]:
+                - button "New Playlist" [ref=e116]:
+                  - generic [ref=e118]: New Playlist
+              - listitem [ref=e119]:
+                - button "New Playlist" [ref=e120]:
+                  - generic [ref=e122]: New Playlist
+              - listitem [ref=e123]:
+                - button "New Playlist" [ref=e124]:
+                  - generic [ref=e126]: New Playlist
+              - listitem [ref=e127]:
+                - button "New Playlist" [ref=e128]:
+                  - generic [ref=e130]: New Playlist
+              - listitem [ref=e131]:
+                - button "No More Parties In LA" [ref=e132]:
+                  - generic [ref=e134]: No More Parties In LA
+              - listitem [ref=e135]:
+                - button "OPP READY" [ref=e136]:
+                  - generic [ref=e138]: OPP READY
+              - listitem [ref=e139]:
+                - button "ayo u won’t double down on this new vibe" [ref=e140]:
+                  - generic [ref=e142]: ayo u won’t double down on this new vibe
+              - listitem [ref=e143]:
+                - button "multisex" [ref=e144]:
+                  - generic [ref=e146]: multisex
+              - listitem [ref=e147]:
+                - button "samples r good iii" [ref=e148]:
+                  - generic [ref=e150]: samples r good iii
+              - listitem [ref=e151]:
+                - button "scenic drive for crossaints" [ref=e152]:
+                  - generic [ref=e154]: scenic drive for crossaints
+          - generic [ref=e155]:
+            - heading "Sources" [level=3] [ref=e156]
+            - list [ref=e157]:
+              - listitem [ref=e158]:
+                - button "Splice" [ref=e159]:
+                  - img [ref=e160]
+                  - generic [ref=e162]: Splice
+          - generic [ref=e163]:
+            - heading "Browse" [level=3] [ref=e164]
+            - list [ref=e165]:
+              - listitem [ref=e166]:
+                - button "Artists 120" [ref=e167]:
+                  - generic [ref=e169]: Artists
+                  - generic [ref=e170]: "120"
+              - listitem [ref=e171]:
+                - button "Albums 145" [ref=e172]:
+                  - generic [ref=e174]: Albums
+                  - generic [ref=e175]: "145"
+          - generic [ref=e176]:
+            - heading "Studio" [level=3] [ref=e177]
+            - list [ref=e178]:
+              - listitem [ref=e179]:
+                - button "DAW" [ref=e180]:
+                  - img [ref=e181]
+                  - generic [ref=e183]: DAW
+              - listitem [ref=e184]:
+                - button "DJ" [ref=e185]:
+                  - img [ref=e186]
+                  - generic [ref=e189]: DJ
+              - listitem [ref=e190]:
+                - button "Pads" [ref=e191]:
+                  - img [ref=e192]
+                  - generic [ref=e194]: Pads
+              - listitem [ref=e195]:
+                - link "Alchemy" [ref=e196] [cursor=pointer]:
+                  - /url: /alchemy
+                  - img [ref=e197]
+                  - generic [ref=e199]: Alchemy
+              - listitem [ref=e200]:
+                - link "Crate Digger" [ref=e201] [cursor=pointer]:
+                  - /url: /crate
+                  - img [ref=e202]
+                  - generic [ref=e204]: Crate Digger
+      - main [ref=e205]:
+        - generic [ref=e206]:
+          - generic [ref=e207]:
+            - textbox "Paste a Spotify URL (track, album, or playlist)..." [ref=e208]
+            - generic [ref=e209]:
+              - checkbox "Auto-download" [checked] [ref=e210] [cursor=pointer]
+              - text: Auto-download
+            - button "Fetch track from Spotify URL" [ref=e211]: Fetch
+          - generic [ref=e214]:
+            - generic [ref=e215]:
+              - generic [ref=e216] [cursor=pointer]:
+                - img [ref=e217]
+                - generic [ref=e219]: Drop audio files or click to browse (MP3, WAV, FLAC, OGG, M4A)
+              - button "Drop audio files or click to browse (MP3, WAV, FLAC, OGG, M4A)" [ref=e220]
+            - button "Upload selected audio files" [disabled] [ref=e221]: Upload
+        - generic [ref=e222]:
+          - generic [ref=e223]:
+            - generic [ref=e224]:
+              - textbox "Search tracks" [ref=e226]:
+                - /placeholder: Search tracks...
+              - combobox "Sort tracks by" [ref=e228]:
+                - option "Newest" [selected]
+                - option "Oldest"
+                - option "Title"
+                - option "Artist"
+                - option "Duration"
+              - group "View mode" [ref=e229]:
+                - button "Grid view" [pressed] [ref=e230]:
+                  - img [ref=e231]
+                - button "Compact list view" [ref=e233]:
+                  - img [ref=e234]
+                - button "Expanded list view" [ref=e236]:
+                  - img [ref=e237]
+              - button "Toggle batch select mode" [ref=e239]:
+                - img [ref=e240]
+                - text: Batch Select
+            - generic [ref=e242]:
+              - combobox "Filter by status" [ref=e243]:
+                - option "All Status" [selected]
+                - option "Pending"
+                - option "Downloaded"
+                - option "Processed"
+                - option "Analyzed"
+              - combobox "Filter by artist" [ref=e244]:
+                - option "All Artists" [selected]
+                - option "10meil"
+                - option "3University"
+                - option "4N Iraq"
+                - option "Ace NumbaFive"
+                - option "Agustin Pereyra Lucena"
+                - option "Alan Hawkshaw"
+                - option "Alan Tew"
+                - option "Alberto Baldan Bembo"
+                - option "Alessandro Alessandroni"
+                - option "Alison Krauss"
+                - option "Antonín Dvořák"
+                - option "Aretha Franklin"
+                - option "Armando Trovajoli"
+                - option "Ashford & Simpson"
+                - option "Astrud Gilberto"
+                - option "Balenci"
+                - option "Bootsy Collins"
+                - option "Brigitte Bardot"
+                - option "CHANCE デラソウル"
+                - option "CHII WVTTZ"
+                - option "Champion Jack Dupree"
+                - option "Chicago"
+                - option "CoachDaGhost"
+                - option "Cortex"
+                - option "DANGERDOOM"
+                - option "Daniel Forestal Et Sa Guitare"
+                - option "Dazz Band"
+                - option "Dyke & The Blazers"
+                - option "ENVY CAINE"
+                - option "Earth"
+                - option "Elz Tay"
+                - option "Enrico Simonetti"
+                - option "Esther Phillips"
+                - option "Fatback Band"
+                - option "Faze-O"
+                - option "Franz Schubert"
+                - option "Fred Bongusto"
+                - option "Future"
+                - option "Gene Harris & The Three Sounds"
+                - option "Gianni´s Humble"
+                - option "Giuliano Sorgini"
+                - option "Giuseppe Verdi"
+                - option "Harold Melvin & The Blue Notes"
+                - option "Heatwave"
+                - option "Hood Rese"
+                - option "I Am An Instrument"
+                - option "Ike Quebec"
+                - option "Indigènes"
+                - option "Jack Wilkins"
+                - option "Jacqueline Taieb"
+                - option "Jacques Dutronc"
+                - option "JaeEl"
+                - option "Jane Birkin"
+                - option "Jay Juice"
+                - option "Jezz Gasoline"
+                - option "João Donato"
+                - option "Junie Morrison"
+                - option "Justice"
+                - option "Kanye West"
+                - option "Kartell"
+                - option "Kevin MacLeod"
+                - option "Lata Mangeshkar"
+                - option "Lesiman"
+                - option "Lil EBG"
+                - option "Little People"
+                - option "London Philharmonic Orchestra"
+                - option "Loose Change"
+                - option "LuhWizz"
+                - option "Luigi Malatesta"
+                - option "Luther Vandross"
+                - option "Léon Boëllmann"
+                - option "MF DOOM"
+                - option "Macabre Plaza"
+                - option "Mandrill"
+                - option "Mg Sleepy"
+                - option "NateSosa"
+                - option "Nicole Croisille"
+                - option "Nino Ferrer"
+                - option "Nino Nardini"
+                - option "Nora Orlandi"
+                - option "OMB Jay Dee"
+                - option "Okvsho"
+                - option "Oscar Castro-Neves"
+                - option "Osunlade"
+                - option "PNV Jay"
+                - option "Parliament"
+                - option "Patricia"
+                - option "Piero Piccioni"
+                - option "Piero Umiliani"
+                - option "Pierre Barouh"
+                - option "Roberto Menescal E Seu Conjunto"
+                - option "Roberto Pregadio"
+                - option "Sandro Brugnolini"
+                - option "Sergei Rachmaninoff"
+                - option "Sergio Mendes & Brasil '66"
+                - option "Slump Dotty"
+                - option "Stelvio Cipriani"
+                - option "Stephanie Cooke"
+                - option "Sven Libaek"
+                - option "Sylvester"
+                - option "Teuteu"
+                - option "The Bar-Kays"
+                - option "The Bucketheads"
+                - option "The Commission"
+                - option "The Gap Band"
+                - option "The Intruders"
+                - option "The J.B.'s"
+                - option "The Jacksons"
+                - option "The O'Jays"
+                - option "The Ponderosa Twins Plus One"
+                - option "The Soggy Bottom Boys"
+                - option "The Spinners"
+                - option "Thelonious Monk"
+                - option "Tower Of Power"
+                - option "Unlimited Touch"
+                - option "Wu-Tang Clan"
+                - option "Yves Simon"
+                - option "berlioz"
+                - option "letherette"
+                - option "xani"
+            - generic [ref=e246] [cursor=pointer]:
+              - checkbox "Select all tracks" [ref=e247]
+              - generic [ref=e248]: All
+          - generic [ref=e249]:
+            - list "Track library" [ref=e250]:
+              - generic [ref=e251]:
+                - link "56 Nights 56 Nights Future 56 Nights" [ref=e252] [cursor=pointer]:
+                  - /url: /tracks/ef946d54-00e1-40da-b81c-32f89774edb8
+                  - generic [ref=e253]:
+                    - img [ref=e255]
+                    - img "56 Nights" [ref=e257]
+                    - generic "Downloaded" [ref=e258]:
+                      - img [ref=e259]
+                  - heading "56 Nights" [level=3] [ref=e261]
+                  - paragraph [ref=e262]: Future
+                  - paragraph [ref=e263]: 56 Nights
+                - generic [ref=e264]:
+                  - button "Play 56 Nights" [ref=e265]:
+                    - img [ref=e266]
+                  - link "Open 56 Nights in DAW" [ref=e268] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=ef946d54-00e1-40da-b81c-32f89774edb8
+                    - img [ref=e269]
+                  - button "Edit 56 Nights" [ref=e271]:
+                    - img [ref=e272]
+                  - button "Delete 56 Nights" [ref=e274]:
+                    - img [ref=e275]
+              - generic [ref=e277]:
+                - link "No Compadre No Compadre Future 56 Nights" [ref=e278] [cursor=pointer]:
+                  - /url: /tracks/3cb50b55-1fb6-49e7-8e01-d7b319b5e11c
+                  - generic [ref=e279]:
+                    - img [ref=e281]
+                    - img "No Compadre" [ref=e283]
+                    - generic "Downloaded" [ref=e284]:
+                      - img [ref=e285]
+                  - heading "No Compadre" [level=3] [ref=e287]
+                  - paragraph [ref=e288]: Future
+                  - paragraph [ref=e289]: 56 Nights
+                - generic [ref=e290]:
+                  - button "Play No Compadre" [ref=e291]:
+                    - img [ref=e292]
+                  - link "Open No Compadre in DAW" [ref=e294] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=3cb50b55-1fb6-49e7-8e01-d7b319b5e11c
+                    - img [ref=e295]
+                  - button "Edit No Compadre" [ref=e297]:
+                    - img [ref=e298]
+                  - button "Delete No Compadre" [ref=e300]:
+                    - img [ref=e301]
+              - generic [ref=e303]:
+                - link "Now Now Future 56 Nights" [ref=e304] [cursor=pointer]:
+                  - /url: /tracks/247e5139-18ee-46ea-bf36-4d008265213c
+                  - generic [ref=e305]:
+                    - img [ref=e307]
+                    - img "Now" [ref=e309]
+                    - generic "Downloaded" [ref=e310]:
+                      - img [ref=e311]
+                  - heading "Now" [level=3] [ref=e313]
+                  - paragraph [ref=e314]: Future
+                  - paragraph [ref=e315]: 56 Nights
+                - generic [ref=e316]:
+                  - button "Play Now" [ref=e317]:
+                    - img [ref=e318]
+                  - link "Open Now in DAW" [ref=e320] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=247e5139-18ee-46ea-bf36-4d008265213c
+                    - img [ref=e321]
+                  - button "Edit Now" [ref=e323]:
+                    - img [ref=e324]
+                  - button "Delete Now" [ref=e326]:
+                    - img [ref=e327]
+              - generic [ref=e329]:
+                - link "Diamonds from Africa Diamonds from Africa Future 56 Nights" [ref=e330] [cursor=pointer]:
+                  - /url: /tracks/cfa6b80b-bea1-46d7-9c97-9590476bcaf4
+                  - generic [ref=e331]:
+                    - img [ref=e333]
+                    - img "Diamonds from Africa" [ref=e335]
+                    - generic "Downloaded" [ref=e336]:
+                      - img [ref=e337]
+                  - heading "Diamonds from Africa" [level=3] [ref=e339]
+                  - paragraph [ref=e340]: Future
+                  - paragraph [ref=e341]: 56 Nights
+                - generic [ref=e342]:
+                  - button "Play Diamonds from Africa" [ref=e343]:
+                    - img [ref=e344]
+                  - link "Open Diamonds from Africa in DAW" [ref=e346] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=cfa6b80b-bea1-46d7-9c97-9590476bcaf4
+                    - img [ref=e347]
+                  - button "Edit Diamonds from Africa" [ref=e349]:
+                    - img [ref=e350]
+                  - button "Delete Diamonds from Africa" [ref=e352]:
+                    - img [ref=e353]
+              - generic [ref=e355]:
+                - link "Purple Comin In Purple Comin In Future 56 Nights" [ref=e356] [cursor=pointer]:
+                  - /url: /tracks/414c9c06-9240-4068-bdb9-ae9418fc9323
+                  - generic [ref=e357]:
+                    - img [ref=e359]
+                    - img "Purple Comin In" [ref=e361]
+                    - generic "Downloaded" [ref=e362]:
+                      - img [ref=e363]
+                  - heading "Purple Comin In" [level=3] [ref=e365]
+                  - paragraph [ref=e366]: Future
+                  - paragraph [ref=e367]: 56 Nights
+                - generic [ref=e368]:
+                  - button "Play Purple Comin In" [ref=e369]:
+                    - img [ref=e370]
+                  - link "Open Purple Comin In in DAW" [ref=e372] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=414c9c06-9240-4068-bdb9-ae9418fc9323
+                    - img [ref=e373]
+                  - button "Edit Purple Comin In" [ref=e375]:
+                    - img [ref=e376]
+                  - button "Delete Purple Comin In" [ref=e378]:
+                    - img [ref=e379]
+              - generic [ref=e381]:
+                - link "March Madness March Madness Future 56 Nights" [ref=e382] [cursor=pointer]:
+                  - /url: /tracks/c797f963-5a03-4134-a86b-ff85a447cc95
+                  - generic [ref=e383]:
+                    - img [ref=e385]
+                    - img "March Madness" [ref=e387]
+                    - generic "Downloaded" [ref=e388]:
+                      - img [ref=e389]
+                  - heading "March Madness" [level=3] [ref=e391]
+                  - paragraph [ref=e392]: Future
+                  - paragraph [ref=e393]: 56 Nights
+                - generic [ref=e394]:
+                  - button "Play March Madness" [ref=e395]:
+                    - img [ref=e396]
+                  - link "Open March Madness in DAW" [ref=e398] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=c797f963-5a03-4134-a86b-ff85a447cc95
+                    - img [ref=e399]
+                  - button "Edit March Madness" [ref=e401]:
+                    - img [ref=e402]
+                  - button "Delete March Madness" [ref=e404]:
+                    - img [ref=e405]
+              - generic [ref=e407]:
+                - link "Never Gon Lose Never Gon Lose Future 56 Nights" [ref=e408] [cursor=pointer]:
+                  - /url: /tracks/43d46de4-01ef-4fc5-bc19-b1b47b42ec91
+                  - generic [ref=e409]:
+                    - img [ref=e411]
+                    - img "Never Gon Lose" [ref=e413]
+                    - generic "Downloaded" [ref=e414]:
+                      - img [ref=e415]
+                  - heading "Never Gon Lose" [level=3] [ref=e417]
+                  - paragraph [ref=e418]: Future
+                  - paragraph [ref=e419]: 56 Nights
+                - generic [ref=e420]:
+                  - button "Play Never Gon Lose" [ref=e421]:
+                    - img [ref=e422]
+                  - link "Open Never Gon Lose in DAW" [ref=e424] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=43d46de4-01ef-4fc5-bc19-b1b47b42ec91
+                    - img [ref=e425]
+                  - button "Edit Never Gon Lose" [ref=e427]:
+                    - img [ref=e428]
+                  - button "Delete Never Gon Lose" [ref=e430]:
+                    - img [ref=e431]
+              - generic [ref=e433]:
+                - link "Old School Rules Old School Rules DANGERDOOM THE MOUSE & THE MASK" [ref=e434] [cursor=pointer]:
+                  - /url: /tracks/9ed2c770-b587-4801-8c11-80ba49fd25e3
+                  - generic [ref=e435]:
+                    - img [ref=e437]
+                    - img "Old School Rules" [ref=e439]
+                    - generic "Downloaded" [ref=e440]:
+                      - img [ref=e441]
+                  - heading "Old School Rules" [level=3] [ref=e443]
+                  - paragraph [ref=e444]: DANGERDOOM
+                  - paragraph [ref=e445]: THE MOUSE & THE MASK
+                - generic [ref=e446]:
+                  - button "Play Old School Rules" [ref=e447]:
+                    - img [ref=e448]
+                  - link "Open Old School Rules in DAW" [ref=e450] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=9ed2c770-b587-4801-8c11-80ba49fd25e3
+                    - img [ref=e451]
+                  - button "Edit Old School Rules" [ref=e453]:
+                    - img [ref=e454]
+                  - button "Delete Old School Rules" [ref=e456]:
+                    - img [ref=e457]
+              - generic [ref=e459]:
+                - link "Papaya - Colonna sonora del film \"La polizia ha le mani legate\" Papaya - Colonna sonora del film \"La polizia ha le mani legate\" Stelvio Cipriani Best Tracks" [ref=e460] [cursor=pointer]:
+                  - /url: /tracks/8154bb37-32af-4242-bc62-824bcde5f5a8
+                  - generic [ref=e461]:
+                    - img [ref=e463]
+                    - img "Papaya - Colonna sonora del film \"La polizia ha le mani legate\"" [ref=e465]
+                    - generic "Downloaded" [ref=e466]:
+                      - img [ref=e467]
+                  - heading "Papaya - Colonna sonora del film \"La polizia ha le mani legate\"" [level=3] [ref=e469]
+                  - paragraph [ref=e470]: Stelvio Cipriani
+                  - paragraph [ref=e471]: Best Tracks
+                - generic [ref=e472]:
+                  - button "Play Papaya - Colonna sonora del film \"La polizia ha le mani legate\"" [ref=e473]:
+                    - img [ref=e474]
+                  - link "Open Papaya - Colonna sonora del film \"La polizia ha le mani legate\" in DAW" [ref=e476] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=8154bb37-32af-4242-bc62-824bcde5f5a8
+                    - img [ref=e477]
+                  - button "Edit Papaya - Colonna sonora del film \"La polizia ha le mani legate\"" [ref=e479]:
+                    - img [ref=e480]
+                  - button "Delete Papaya - Colonna sonora del film \"La polizia ha le mani legate\"" [ref=e482]:
+                    - img [ref=e483]
+              - generic [ref=e485]:
+                - link "Descansado Descansado Armando Trovajoli Ieri, Oggi, Domani (Original Motion Picture Soundtrack)" [ref=e486] [cursor=pointer]:
+                  - /url: /tracks/da9ee01b-1ede-47d9-9993-76257e3e91b4
+                  - generic [ref=e487]:
+                    - img [ref=e489]
+                    - img "Descansado" [ref=e491]
+                    - generic "Downloaded" [ref=e492]:
+                      - img [ref=e493]
+                  - heading "Descansado" [level=3] [ref=e495]
+                  - paragraph [ref=e496]: Armando Trovajoli
+                  - paragraph [ref=e497]: Ieri, Oggi, Domani (Original Motion Picture Soundtrack)
+                - generic [ref=e498]:
+                  - button "Play Descansado" [ref=e499]:
+                    - img [ref=e500]
+                  - link "Open Descansado in DAW" [ref=e502] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=da9ee01b-1ede-47d9-9993-76257e3e91b4
+                    - img [ref=e503]
+                  - button "Edit Descansado" [ref=e505]:
+                    - img [ref=e506]
+                  - button "Delete Descansado" [ref=e508]:
+                    - img [ref=e509]
+              - generic [ref=e511]:
+                - link "Lady Luna - Remastered Lady Luna - Remastered Nora Orlandi Lady Luna / Arianna" [ref=e512] [cursor=pointer]:
+                  - /url: /tracks/258f0e07-b404-499b-be9a-91caf271cb6a
+                  - generic [ref=e513]:
+                    - img [ref=e515]
+                    - img "Lady Luna - Remastered" [ref=e517]
+                    - generic "Downloaded" [ref=e518]:
+                      - img [ref=e519]
+                  - heading "Lady Luna - Remastered" [level=3] [ref=e521]
+                  - paragraph [ref=e522]: Nora Orlandi
+                  - paragraph [ref=e523]: Lady Luna / Arianna
+                - generic [ref=e524]:
+                  - button "Play Lady Luna - Remastered" [ref=e525]:
+                    - img [ref=e526]
+                  - link "Open Lady Luna - Remastered in DAW" [ref=e528] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=258f0e07-b404-499b-be9a-91caf271cb6a
+                    - img [ref=e529]
+                  - button "Edit Lady Luna - Remastered" [ref=e531]:
+                    - img [ref=e532]
+                  - button "Delete Lady Luna - Remastered" [ref=e534]:
+                    - img [ref=e535]
+              - generic [ref=e537]:
+                - link "Love's Been Right Here (Dj Spen & Gary Hudgins Instrumental) Love's Been Right Here (Dj Spen & Gary Hudgins Instrumental) Stephanie Cooke Love's Been Right Here" [ref=e538] [cursor=pointer]:
+                  - /url: /tracks/3ae9d68d-0d00-41a5-ba78-b9e3c54df70c
+                  - generic [ref=e539]:
+                    - img [ref=e541]
+                    - img "Love's Been Right Here (Dj Spen & Gary Hudgins Instrumental)" [ref=e543]
+                    - generic "Downloaded" [ref=e544]:
+                      - img [ref=e545]
+                  - heading "Love's Been Right Here (Dj Spen & Gary Hudgins Instrumental)" [level=3] [ref=e547]
+                  - paragraph [ref=e548]: Stephanie Cooke
+                  - paragraph [ref=e549]: Love's Been Right Here
+                - generic [ref=e550]:
+                  - button "Play Love's Been Right Here (Dj Spen & Gary Hudgins Instrumental)" [ref=e551]:
+                    - img [ref=e552]
+                  - link "Open Love's Been Right Here (Dj Spen & Gary Hudgins Instrumental) in DAW" [ref=e554] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=3ae9d68d-0d00-41a5-ba78-b9e3c54df70c
+                    - img [ref=e555]
+                  - button "Edit Love's Been Right Here (Dj Spen & Gary Hudgins Instrumental)" [ref=e557]:
+                    - img [ref=e558]
+                  - button "Delete Love's Been Right Here (Dj Spen & Gary Hudgins Instrumental)" [ref=e560]:
+                    - img [ref=e561]
+              - generic [ref=e563]:
+                - 'link "I''d Rather Be with You I''d Rather Be with You Bootsy Collins Back In The Day: The Best Of Bootsy" [ref=e564] [cursor=pointer]':
+                  - /url: /tracks/b984b946-de8c-4464-b2bb-7cc8837fa646
+                  - generic [ref=e565]:
+                    - img [ref=e567]
+                    - img "I'd Rather Be with You" [ref=e569]
+                    - generic "Downloaded" [ref=e570]:
+                      - img [ref=e571]
+                  - heading "I'd Rather Be with You" [level=3] [ref=e573]
+                  - paragraph [ref=e574]: Bootsy Collins
+                  - paragraph [ref=e575]: "Back In The Day: The Best Of Bootsy"
+                - generic [ref=e576]:
+                  - button "Play I'd Rather Be with You" [ref=e577]:
+                    - img [ref=e578]
+                  - link "Open I'd Rather Be with You in DAW" [ref=e580] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=b984b946-de8c-4464-b2bb-7cc8837fa646
+                    - img [ref=e581]
+                  - button "Edit I'd Rather Be with You" [ref=e583]:
+                    - img [ref=e584]
+                  - button "Delete I'd Rather Be with You" [ref=e586]:
+                    - img [ref=e587]
+              - generic [ref=e589]:
+                - link "Early In The Morning - 12\" Version Early In The Morning - 12\" Version The Gap Band The Best Of The Gap Band" [ref=e590] [cursor=pointer]:
+                  - /url: /tracks/45455f70-bafa-46a9-bc56-6783d02d0b08
+                  - generic [ref=e591]:
+                    - img [ref=e593]
+                    - img "Early In The Morning - 12\" Version" [ref=e595]
+                    - generic "Downloaded" [ref=e596]:
+                      - img [ref=e597]
+                  - heading "Early In The Morning - 12\" Version" [level=3] [ref=e599]
+                  - paragraph [ref=e600]: The Gap Band
+                  - paragraph [ref=e601]: The Best Of The Gap Band
+                - generic [ref=e602]:
+                  - button "Play Early In The Morning - 12\" Version" [ref=e603]:
+                    - img [ref=e604]
+                  - link "Open Early In The Morning - 12\" Version in DAW" [ref=e606] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=45455f70-bafa-46a9-bc56-6783d02d0b08
+                    - img [ref=e607]
+                  - button "Edit Early In The Morning - 12\" Version" [ref=e609]:
+                    - img [ref=e610]
+                  - button "Delete Early In The Morning - 12\" Version" [ref=e612]:
+                    - img [ref=e613]
+              - generic [ref=e615]:
+                - link "La nuit des masques - 2003 Remaster La nuit des masques - 2003 Remaster Pierre Barouh Viking Bank (2003 Remaster)" [ref=e616] [cursor=pointer]:
+                  - /url: /tracks/dbb99d2e-e770-4de7-ac5d-a0df650319b1
+                  - generic [ref=e617]:
+                    - img [ref=e619]
+                    - img "La nuit des masques - 2003 Remaster" [ref=e621]
+                    - generic "Downloaded" [ref=e622]:
+                      - img [ref=e623]
+                  - heading "La nuit des masques - 2003 Remaster" [level=3] [ref=e625]
+                  - paragraph [ref=e626]: Pierre Barouh
+                  - paragraph [ref=e627]: Viking Bank (2003 Remaster)
+                - generic [ref=e628]:
+                  - button "Play La nuit des masques - 2003 Remaster" [ref=e629]:
+                    - img [ref=e630]
+                  - link "Open La nuit des masques - 2003 Remaster in DAW" [ref=e632] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=dbb99d2e-e770-4de7-ac5d-a0df650319b1
+                    - img [ref=e633]
+                  - button "Edit La nuit des masques - 2003 Remaster" [ref=e635]:
+                    - img [ref=e636]
+                  - button "Delete La nuit des masques - 2003 Remaster" [ref=e638]:
+                    - img [ref=e639]
+              - generic [ref=e641]:
+                - 'link "? ? MF DOOM Operation: Doomsday (Complete)" [ref=e642] [cursor=pointer]':
+                  - /url: /tracks/4c9140bf-1537-4bf1-8c23-128aef33a5a6
+                  - generic [ref=e643]:
+                    - img [ref=e645]
+                    - img "?" [ref=e647]
+                    - generic "Downloaded" [ref=e648]:
+                      - img [ref=e649]
+                  - heading "?" [level=3] [ref=e651]
+                  - paragraph [ref=e652]: MF DOOM
+                  - paragraph [ref=e653]: "Operation: Doomsday (Complete)"
+                - generic [ref=e654]:
+                  - button "Play ?" [ref=e655]:
+                    - img [ref=e656]
+                  - link "Open ? in DAW" [ref=e658] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=4c9140bf-1537-4bf1-8c23-128aef33a5a6
+                    - img [ref=e659]
+                  - button "Edit ?" [ref=e661]:
+                    - img [ref=e662]
+                  - button "Delete ?" [ref=e664]:
+                    - img [ref=e665]
+              - generic [ref=e667]:
+                - 'link "Girl in a Sportscar Girl in a Sportscar Alan Hawkshaw Kpm 1000 Series: Friendly Faces" [ref=e668] [cursor=pointer]':
+                  - /url: /tracks/23b03c69-29a6-4244-9be4-f6b365525413
+                  - generic [ref=e669]:
+                    - img [ref=e671]
+                    - img "Girl in a Sportscar" [ref=e673]
+                    - generic "Downloaded" [ref=e674]:
+                      - img [ref=e675]
+                  - heading "Girl in a Sportscar" [level=3] [ref=e677]
+                  - paragraph [ref=e678]: Alan Hawkshaw
+                  - paragraph [ref=e679]: "Kpm 1000 Series: Friendly Faces"
+                - generic [ref=e680]:
+                  - button "Play Girl in a Sportscar" [ref=e681]:
+                    - img [ref=e682]
+                  - link "Open Girl in a Sportscar in DAW" [ref=e684] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=23b03c69-29a6-4244-9be4-f6b365525413
+                    - img [ref=e685]
+                  - button "Edit Girl in a Sportscar" [ref=e687]:
+                    - img [ref=e688]
+                  - button "Delete Girl in a Sportscar" [ref=e690]:
+                    - img [ref=e691]
+              - generic [ref=e693]:
+                - 'link "Sounds of the Deep (from \"Inner Space\") Sounds of the Deep (from \"Inner Space\") Sven Libaek Inner Space: The Lost Film Music of Sven Libaek" [ref=e694] [cursor=pointer]':
+                  - /url: /tracks/f0720c74-a1a0-4c50-ad5a-e22b5766299a
+                  - generic [ref=e695]:
+                    - img [ref=e697]
+                    - img "Sounds of the Deep (from \"Inner Space\")" [ref=e699]
+                    - generic "Downloaded" [ref=e700]:
+                      - img [ref=e701]
+                  - heading "Sounds of the Deep (from \"Inner Space\")" [level=3] [ref=e703]
+                  - paragraph [ref=e704]: Sven Libaek
+                  - paragraph [ref=e705]: "Inner Space: The Lost Film Music of Sven Libaek"
+                - generic [ref=e706]:
+                  - button "Play Sounds of the Deep (from \"Inner Space\")" [ref=e707]:
+                    - img [ref=e708]
+                  - link "Open Sounds of the Deep (from \"Inner Space\") in DAW" [ref=e710] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=f0720c74-a1a0-4c50-ad5a-e22b5766299a
+                    - img [ref=e711]
+                  - button "Edit Sounds of the Deep (from \"Inner Space\")" [ref=e713]:
+                    - img [ref=e714]
+                  - button "Delete Sounds of the Deep (from \"Inner Space\")" [ref=e716]:
+                    - img [ref=e717]
+              - generic [ref=e719]:
+                - link "Mexican Dream Mexican Dream Piero Piccioni Colpo Rovente - Red Hot Shot (Original Motion Picture Soundtrack)" [ref=e720] [cursor=pointer]:
+                  - /url: /tracks/e7aae268-122c-4efa-be0f-7f575cfb3aa1
+                  - generic [ref=e721]:
+                    - img [ref=e723]
+                    - img "Mexican Dream" [ref=e725]
+                    - generic "Downloaded" [ref=e726]:
+                      - img [ref=e727]
+                  - heading "Mexican Dream" [level=3] [ref=e729]
+                  - paragraph [ref=e730]: Piero Piccioni
+                  - paragraph [ref=e731]: Colpo Rovente - Red Hot Shot (Original Motion Picture Soundtrack)
+                - generic [ref=e732]:
+                  - button "Play Mexican Dream" [ref=e733]:
+                    - img [ref=e734]
+                  - link "Open Mexican Dream in DAW" [ref=e736] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=e7aae268-122c-4efa-be0f-7f575cfb3aa1
+                    - img [ref=e737]
+                  - button "Edit Mexican Dream" [ref=e739]:
+                    - img [ref=e740]
+                  - button "Delete Mexican Dream" [ref=e742]:
+                    - img [ref=e743]
+              - generic [ref=e745]:
+                - link "D&T D&T letherette Electro Lab 01" [ref=e746] [cursor=pointer]:
+                  - /url: /tracks/4b924e61-313c-4b7f-a98d-de523b1e54e2
+                  - generic [ref=e747]:
+                    - img [ref=e749]
+                    - img "D&T" [ref=e751]
+                    - generic "Downloaded" [ref=e752]:
+                      - img [ref=e753]
+                  - heading "D&T" [level=3] [ref=e755]
+                  - paragraph [ref=e756]: letherette
+                  - paragraph [ref=e757]: Electro Lab 01
+                - generic [ref=e758]:
+                  - button "Play D&T" [ref=e759]:
+                    - img [ref=e760]
+                  - link "Open D&T in DAW" [ref=e762] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=4b924e61-313c-4b7f-a98d-de523b1e54e2
+                    - img [ref=e763]
+                  - button "Edit D&T" [ref=e765]:
+                    - img [ref=e766]
+                  - button "Delete D&T" [ref=e768]:
+                    - img [ref=e769]
+              - generic [ref=e771]:
+                - link "Boogie Nights Boogie Nights Heatwave Too Hot To Handle" [ref=e772] [cursor=pointer]:
+                  - /url: /tracks/f4289208-8e52-48ab-81ef-6458541cadb1
+                  - generic [ref=e773]:
+                    - img [ref=e775]
+                    - img "Boogie Nights" [ref=e777]
+                    - generic "Downloaded" [ref=e778]:
+                      - img [ref=e779]
+                  - heading "Boogie Nights" [level=3] [ref=e781]
+                  - paragraph [ref=e782]: Heatwave
+                  - paragraph [ref=e783]: Too Hot To Handle
+                - generic [ref=e784]:
+                  - button "Play Boogie Nights" [ref=e785]:
+                    - img [ref=e786]
+                  - link "Open Boogie Nights in DAW" [ref=e788] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=f4289208-8e52-48ab-81ef-6458541cadb1
+                    - img [ref=e789]
+                  - button "Edit Boogie Nights" [ref=e791]:
+                    - img [ref=e792]
+                  - button "Delete Boogie Nights" [ref=e794]:
+                    - img [ref=e795]
+              - generic [ref=e797]:
+                - link "Baby Lou Baby Lou Jane Birkin Baby Alone In Babylone" [ref=e798] [cursor=pointer]:
+                  - /url: /tracks/e2d6d7be-53d6-494a-8d6d-aba41f8887a9
+                  - generic [ref=e799]:
+                    - img [ref=e801]
+                    - img "Baby Lou" [ref=e803]
+                    - generic "Downloaded" [ref=e804]:
+                      - img [ref=e805]
+                  - heading "Baby Lou" [level=3] [ref=e807]
+                  - paragraph [ref=e808]: Jane Birkin
+                  - paragraph [ref=e809]: Baby Alone In Babylone
+                - generic [ref=e810]:
+                  - button "Play Baby Lou" [ref=e811]:
+                    - img [ref=e812]
+                  - link "Open Baby Lou in DAW" [ref=e814] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=e2d6d7be-53d6-494a-8d6d-aba41f8887a9
+                    - img [ref=e815]
+                  - button "Edit Baby Lou" [ref=e817]:
+                    - img [ref=e818]
+                  - button "Delete Baby Lou" [ref=e820]:
+                    - img [ref=e821]
+              - generic [ref=e823]:
+                - link "Helix Helix Justice Audio, Video, Disco." [ref=e824] [cursor=pointer]:
+                  - /url: /tracks/da787d65-0e1b-4899-a807-8533733a7329
+                  - generic [ref=e825]:
+                    - img [ref=e827]
+                    - img "Helix" [ref=e829]
+                    - generic "Downloaded" [ref=e830]:
+                      - img [ref=e831]
+                  - heading "Helix" [level=3] [ref=e833]
+                  - paragraph [ref=e834]: Justice
+                  - paragraph [ref=e835]: Audio, Video, Disco.
+                - generic [ref=e836]:
+                  - button "Play Helix" [ref=e837]:
+                    - img [ref=e838]
+                  - link "Open Helix in DAW" [ref=e840] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=da787d65-0e1b-4899-a807-8533733a7329
+                    - img [ref=e841]
+                  - button "Edit Helix" [ref=e843]:
+                    - img [ref=e844]
+                  - button "Delete Helix" [ref=e846]:
+                    - img [ref=e847]
+              - generic [ref=e849]:
+                - link "Silk Stop Silk Stop João Donato A Bossa Muito Moderna" [ref=e850] [cursor=pointer]:
+                  - /url: /tracks/9724c4eb-de2a-478d-97f4-cca7cfb4b33d
+                  - generic [ref=e851]:
+                    - img [ref=e853]
+                    - img "Silk Stop" [ref=e855]
+                    - generic "Downloaded" [ref=e856]:
+                      - img [ref=e857]
+                  - heading "Silk Stop" [level=3] [ref=e859]
+                  - paragraph [ref=e860]: João Donato
+                  - paragraph [ref=e861]: A Bossa Muito Moderna
+                - generic [ref=e862]:
+                  - button "Play Silk Stop" [ref=e863]:
+                    - img [ref=e864]
+                  - link "Open Silk Stop in DAW" [ref=e866] [cursor=pointer]:
+                    - /url: /?tab=daw&track_id=9724c4eb-de2a-478d-97f4-cca7cfb4b33d
+                    - img [ref=e867]
+                  - button "Edit Silk Stop" [ref=e869]:
+                    - img [ref=e870]
+                  - button "Delete Silk Stop" [ref=e872]:
+                    - img [ref=e873]
+            - generic [ref=e876]:
+              - button "Go to page 1" [ref=e878]: "1"
+              - button "Go to page 2" [ref=e880]: "2"
+              - button "Go to page 3" [ref=e882]: "3"
+              - button "Go to page 4" [ref=e884]: "4"
+              - button "Go to page 5" [ref=e886]: "5"
+              - button "Go to page 6" [ref=e888]: "6"
+              - button "Go to page 7" [ref=e890]: "7"
+              - button "Go to next page" [ref=e891]: Next
+    - button "Open MIDI Monitor" [ref=e893]:
+      - img [ref=e894]
+    - button "Open debug panel" [ref=e896]:
+      - img [ref=e897]
+    - generic [ref=e899]:
+      - generic [ref=e900]:
+        - generic [ref=e902]: MIDI
+        - generic [ref=e903]: —
+      - generic [ref=e906]: no events yet
+      - button "MON" [ref=e907]
+      - button "LEARN" [ref=e908]
+      - button "Move bar to top" [ref=e909]:
+        - img [ref=e910]
+    - generic [ref=e912]:
+      - generic [ref=e914]:
+        - button "Local" [ref=e915]
+        - button "Spotify" [ref=e916]
+      - generic [ref=e917]:
+        - generic [ref=e919]:
+          - paragraph [ref=e920]: No Track
+          - paragraph [ref=e921]: "--"
+        - generic [ref=e923]:
+          - generic [ref=e924]: 00:00:00:00
+          - generic [ref=e925]:
+            - generic [ref=e926]: 30fps
+            - generic [ref=e927]: SMPTE
+        - generic [ref=e929]:
+          - button "Rewind to start (Home)" [ref=e930]:
+            - img [ref=e931]
+          - button "Rewind 5s" [ref=e933]:
+            - img [ref=e934]
+          - button "Stop" [ref=e936]:
+            - img [ref=e937]
+          - button "Play (Space)" [ref=e939]:
+            - img [ref=e940]
+          - button "Fast forward 5s" [ref=e942]:
+            - img [ref=e943]
+        - generic [ref=e946]:
+          - generic [ref=e947]: 0:00
+          - generic [ref=e950]: 0:00
+        - generic [ref=e952]:
+          - generic [ref=e953]: "120.0"
+          - generic [ref=e954]: BPM
+        - generic [ref=e956]:
+          - button "IN" [ref=e957]
+          - button "Enable loop" [ref=e958]:
+            - img [ref=e959]
+          - button "OUT" [ref=e961]
+        - generic [ref=e963]:
+          - img [ref=e964]
+          - 'slider "Volume: 80%" [ref=e968] [cursor=pointer]': "80"
+          - generic [ref=e969]: "80"
+    - button "AI Assistant" [ref=e971]:
+      - img [ref=e972]
+      - text: AI Assistant
+  - iframe

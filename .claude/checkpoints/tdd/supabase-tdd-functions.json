@@ -1,0 +1,54 @@
+{
+  "checkpoint_type": "tdd",
+  "test_suite": "functions-and-triggers",
+  "phase": "red",
+  "timestamp": "2025-12-16T00:00:00Z",
+  "agent": "Supabase Migration Tests Agent",
+  "project": "Sound Forge Alchemy - Alchemy2 Phase 4",
+  "test_file": "/Users/jeremiah/Developer/sound-forge-alchemy/alchemy2/tests/infrastructure/supabase/functions.test.ts",
+  "migration_file": "/Users/jeremiah/Developer/sound-forge-alchemy/alchemy2/supabase/migrations/20251216000001_initial_schema.sql",
+  "status": "tests_written",
+  "tests_written": 9,
+  "tests_passing": 0,
+  "tests_failing": 0,
+  "tests_pending": 9,
+  "coverage_target": 90,
+  "functions_tested": [
+    "update_updated_at_column",
+    "get_track_progress"
+  ],
+  "triggers_tested": [
+    "update_tracks_updated_at",
+    "update_download_jobs_updated_at",
+    "update_processing_jobs_updated_at",
+    "update_analysis_jobs_updated_at"
+  ],
+  "validations": {
+    "functions_created": 2,
+    "triggers_created": 4,
+    "updated_at_trigger_behavior": true,
+    "progress_calculation": true
+  },
+  "trigger_behavior": {
+    "event": "UPDATE",
+    "timing": "BEFORE",
+    "action": "update_updated_at_column()"
+  },
+  "progress_function_tests": [
+    "multiple_jobs_average",
+    "no_jobs_zero_progress",
+    "all_completed_100_progress"
+  ],
+  "test_categories": [
+    "function_existence",
+    "trigger_existence",
+    "trigger_behavior",
+    "updated_at_automation",
+    "progress_calculation"
+  ],
+  "next_steps": [
+    "Run tests to verify RED phase",
+    "Fix function/trigger issues (GREEN phase)",
+    "Verify automation works"
+  ]
+}

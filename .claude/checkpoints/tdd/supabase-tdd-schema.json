@@ -1,0 +1,50 @@
+{
+  "checkpoint_type": "tdd",
+  "test_suite": "schema-migration",
+  "phase": "red",
+  "timestamp": "2025-12-16T00:00:00Z",
+  "agent": "Supabase Migration Tests Agent",
+  "project": "Sound Forge Alchemy - Alchemy2 Phase 4",
+  "test_file": "/Users/jeremiah/Developer/sound-forge-alchemy/alchemy2/tests/infrastructure/supabase/schema.test.ts",
+  "migration_file": "/Users/jeremiah/Developer/sound-forge-alchemy/alchemy2/supabase/migrations/20251216000001_initial_schema.sql",
+  "status": "tests_written",
+  "tests_written": 10,
+  "tests_passing": 0,
+  "tests_failing": 0,
+  "tests_pending": 10,
+  "coverage_target": 90,
+  "tables_tested": [
+    "tracks",
+    "download_jobs",
+    "processing_jobs",
+    "analysis_jobs",
+    "stems",
+    "analysis_results"
+  ],
+  "validations": {
+    "tables_created": 6,
+    "columns_validated": 40,
+    "primary_keys": 6,
+    "foreign_keys": 8,
+    "unique_constraints": 1,
+    "check_constraints": 8,
+    "default_values": 12,
+    "cascade_deletes": 8
+  },
+  "test_categories": [
+    "table_existence",
+    "column_schema",
+    "data_types",
+    "primary_keys",
+    "foreign_keys",
+    "unique_constraints",
+    "default_values",
+    "check_constraints",
+    "cascade_behavior"
+  ],
+  "next_steps": [
+    "Run tests to verify RED phase",
+    "Fix any migration issues (GREEN phase)",
+    "Verify all tests pass"
+  ]
+}
